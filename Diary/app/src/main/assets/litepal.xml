@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+
+    <dbname value="diary" />
+
+    <version value="1" />
+
+    <list>
+        <mapping class="cn.snowt.diary.entity.Comment" />
+        <mapping class="cn.snowt.diary.entity.Diary" />
+        <mapping class="cn.snowt.diary.entity.Drawing" />
+        <mapping class="cn.snowt.diary.entity.Location" />
+        <mapping class="cn.snowt.diary.entity.Weather" />
+    </list>
+
+</litepal>

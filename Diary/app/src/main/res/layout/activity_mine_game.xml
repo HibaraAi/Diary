@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".mine.MineGameActivity"
+    android:background="#353C42">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <TextView
+            android:id="@+id/mine_best_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="最佳用时:1000000s"
+            android:textColor="#94A9BC"/>
+        <TextView
+            android:id="@+id/mine_now_used_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/mine_best_time"
+            android:text="当前用时:0s"
+            android:textColor="#94A9BC"/>
+        <TextView
+            android:id="@+id/mine_mine_num"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/mine_now_used_time"
+            android:text="总雷数(个):12"
+            android:textColor="#94A9BC"/>
+        <TextView
+            android:id="@+id/mine_sign_surplus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/mine_mine_num"
+            android:text="剩余标记数(个):12"
+            android:textColor="#94A9BC"/>
+
+        <Button
+            android:id="@+id/mine_btn_play_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="重开一局"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!--RecyclerView-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/block_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="500px"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

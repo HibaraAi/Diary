@@ -44,4 +44,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/de.hdodenhof/circleimageview
     implementation 'de.hdodenhof:circleimageview:2.1.0'
+
+    // https://mvnrepository.com/artifact/com.github.bumptech.glide/glide
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+
+    //SmartRefreshLayout
+    implementation  'com.scwang.smart:refresh-layout-kernel:2.0.3'  //核心必须依赖
+    implementation  'com.scwang.smart:refresh-header-radar:2.0.3'  //雷达刷新头
+    implementation  'com.scwang.smart:refresh-footer-ball:2.0.3'  //球脉冲加载
 }

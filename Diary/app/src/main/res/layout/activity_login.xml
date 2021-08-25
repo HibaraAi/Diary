@@ -160,7 +160,7 @@
             android:textColor="#00AEFF"
             android:textSize="50px"/>
         <Button
-            android:text="⬅"
+            android:text="✘"
             android:id="@+id/login_btn_del"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -170,7 +170,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num6"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="#FF0000"
             android:textSize="50px"/>
         <Button
             android:text="0"
@@ -194,7 +194,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_num9"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num8"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="#00FF00"
             android:textSize="50px"/>
 
 

@@ -4,25 +4,22 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.SimpleResult;
+import cn.snowt.mine.MineGameActivity;
 
 /**
  * @Author: HibaraAi
@@ -88,13 +85,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
+        BaseUtils.createOneShotByVibrator();
         switch (v.getId()){
             case R.id.login_btn_del:{
                 String s = password.getText().toString();
                 if(!"".equals(s)){
-                    Log.e("旧密码：",s);
                     s = s.substring(0,s.length()-1);
-                    Log.e("新密码：",s);
                     password.setText(s);
                 }
                 break;
@@ -102,6 +98,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.login_btn_login:{
                 String pinUserInput = password.getText().toString();
                 if("".equals(pinUserInput)){
+                    return;
+                }
+                //游戏跳转
+                String gameTag = "123";
+                if(gameTag.equals(pinUserInput)){
+                    BaseUtils.gotoActivity(this, MineGameActivity.class);
+                    this.finish();
                     return;
                 }
                 password.setText("");

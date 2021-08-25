@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/toolbar_goto_top"
+        android:icon="@drawable/bar_gototop"
+        android:title="回到顶部"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/toolbar_search"
+        android:icon="@drawable/bar_search"
+        android:title="查找"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/toolbar_write"
+        android:icon="@drawable/bar_write"
+        android:title="新增"
+        app:showAsAction="always"/>
+</menu>

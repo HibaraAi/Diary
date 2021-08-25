@@ -9,10 +9,15 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.litepal.LitePalApplication;
 
@@ -132,5 +137,31 @@ public class BaseUtils {
         }catch (Exception e){
             return false;
         }
+    }
+
+    /**
+     * 产生一小下的震动
+     */
+    public static void createOneShotByVibrator() {
+        Vibrator vibrator = (Vibrator) LitePalApplication.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(VibrationEffect.createOneShot(50,VibrationEffect.DEFAULT_AMPLITUDE));
+    }
+
+    /**
+     * 长时间的Snack提示
+     * @param view
+     * @param tip
+     */
+    public static void longTipInSnack(View view,String tip){
+        Snackbar.make(view,tip,Snackbar.LENGTH_LONG).show();
+    }
+
+    /**
+     * 短时间的Snack提示
+     * @param view
+     * @param tip
+     */
+    public static void shortTipInSnack(View view,String tip){
+        Snackbar.make(view,tip,Snackbar.LENGTH_SHORT).show();
     }
 }

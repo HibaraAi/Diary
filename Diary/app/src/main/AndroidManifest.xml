@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.snowt.diary">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
@@ -10,6 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.消消乐">
+        <activity android:name="cn.snowt.mine.MineGameActivity"
+            android:exported="true" />
         <activity
             android:name=".activity.HelpActivity"
             android:exported="true" />
@@ -18,7 +21,8 @@
             android:exported="true" />
         <activity
             android:name=".activity.MainActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/TopTransparent"/>
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true">

@@ -1,0 +1,22 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="软件设置">
+        <SwitchPreferenceCompat
+            app:key="showUsernameInBar"
+            app:title="顶部工具栏显示用户名"
+            app:summaryOff="显示“Diary”\n重启后生效"
+            app:summaryOn="显示你的用户名\n重启后生效"/>
+
+        <SwitchPreferenceCompat
+            app:key="saveImageInExRom"
+            app:defaultValue="true"
+            app:summaryOff="当前:使用图片原始地址，节约ROM使用。如果选中图片被删除/移动/修改名字则日记展示失效。\n此修改仅对今后新增日记生效。"
+            app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"
+            app:title="日记图片额外存储" />
+
+        <Preference
+            app:key="setPassword"
+            app:title="修改登录密码" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,6 +1,5 @@
 package cn.snowt.diary.util;
 
-import android.content.SharedPreferences;
 
 /**
  * @Author: HibaraAi

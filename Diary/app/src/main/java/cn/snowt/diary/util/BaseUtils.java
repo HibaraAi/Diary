@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -82,16 +83,6 @@ public class BaseUtils {
         context.startActivity(intent);
     }
 
-    /**
-     * 带RequestCode的Activity跳转
-     * @param context context
-     * @param clazz 跳转目标Activity的Class
-     * @param requestCode requestCode
-     */
-    public static void gotoActivity(Activity context,Class clazz,Integer requestCode){
-        Intent intent = new Intent(context, clazz);
-        context.startActivityForResult(intent,requestCode);
-    }
 
     /**
      * java.util.Date转String
@@ -125,6 +116,14 @@ public class BaseUtils {
      */
     public static SharedPreferences getSharedPreference(){
         return LitePalApplication.getContext().getSharedPreferences("appSetting",MODE_PRIVATE);
+    }
+
+    /**
+     * 获取默认的获取SharedPreferences
+     * @return
+     */
+    public static SharedPreferences getDefaultSharedPreferences(){
+        return PreferenceManager.getDefaultSharedPreferences(LitePalApplication.getContext());
     }
 
     /**

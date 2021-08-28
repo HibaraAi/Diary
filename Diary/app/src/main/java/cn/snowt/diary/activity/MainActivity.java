@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.scwang.smart.refresh.footer.BallPulseFooter;
 import com.scwang.smart.refresh.header.BezierRadarHeader;
@@ -53,6 +54,7 @@ import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
+import cn.snowt.mine.MineGameActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -100,6 +102,12 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     private void bindViewAndSetListener(){
         toolbar = findViewById(R.id.main_toolbar);
+        SharedPreferences sharedPreferences = BaseUtils.getDefaultSharedPreferences();
+        boolean showUsernameInBar = sharedPreferences.getBoolean("showUsernameInBar", false);
+        if(showUsernameInBar){
+            CollapsingToolbarLayout toolbarLayout = findViewById(R.id.main_title);
+            toolbarLayout.setTitle(MyConfiguration.getInstance().getUsername());
+        }
         setSupportActionBar(toolbar);
         drawerLayout = findViewById(R.id.drawer_activity_main);
         navView = findViewById(R.id.nav_view);
@@ -112,8 +120,12 @@ public class MainActivity extends AppCompatActivity {
         //侧滑菜单的按钮事件在这
         navView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()){
+                case R.id.nav_mine:{
+                    BaseUtils.gotoActivity(MainActivity.this, MineGameActivity.class);
+                    break;
+                }
                 case R.id.nav_settings:{
-                    BaseUtils.gotoActivity(MainActivity.this,SetPasswordActivity.class);
+                    BaseUtils.gotoActivity(MainActivity.this,SettingsActivity.class);
                     break;
                 }
                 case R.id.nav_help:{

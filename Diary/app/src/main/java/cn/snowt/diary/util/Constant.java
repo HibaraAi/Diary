@@ -1,5 +1,7 @@
 package cn.snowt.diary.util;
 
+import android.content.SharedPreferences;
+
 /**
  * @Author: HibaraAi
  * @Date: 2021-08-15 07:20
@@ -16,18 +18,6 @@ public class Constant {
     public static final String PASSWORD_PREFIX = "MD5*jiami-de$qianzhui#";
 
     /**
-     * 密码名称的最大长度
-     */
-    public static final Integer NAME_MAX_LENGTH = 8;
-    /**
-     * 账号及密码的最长长度
-     */
-    public static final Integer ACCOUNT_MAX_LENGTH = 40;
-    /**
-     * 备注的最长长度
-     */
-    public static final Integer REMARKS_MAX_LENGTH = 20;
-    /**
      * 时间格式
      */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -43,11 +33,6 @@ public class Constant {
     public static final Integer MAX_PUNISHMENT_LEVEL = 50;
 
     /**
-     * 生成密码时包含的特殊字符
-     */
-    public static final String SPECIAL_CHAR = "_&$@-+*/.";
-
-    /**
      * 关于的信息
      */
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
@@ -60,4 +45,19 @@ public class Constant {
      */
     public static final String STRING_HELP = "" +
             "一、功能介绍\n";
+
+    public static final String SHARE_PREFERENCES_HEAD_SRC = "headSrc";
+    public static final String SHARE_PREFERENCES_USERNAME = "username";
+    public static final String SHARE_PREFERENCES_MOTTO = "motto";
+    public static final String SHARE_PREFERENCES_MAIN_IMG_BG = "main_bg_image";
+
+    public static final int OPEN_ALBUM_TYPE_HEAD = 1;
+    public static final int OPEN_ALBUM_TYPE_MAIN_BG = 2;
+
+    /**
+     * 本应用在外部存储使用的路径名称
+     */
+    public static final String EXTERNAL_STORAGE_LOCATION = "/Hibara/Diary/";
+
+
 }

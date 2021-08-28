@@ -6,27 +6,26 @@
     android:background="@drawable/nav_bg">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/icon_image"
+        android:id="@+id/nav_header_head"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:src="@drawable/nav_icon"
         android:layout_centerInParent="true" />
 
     <TextView
-        android:id="@+id/mail"
+        android:id="@+id/nav_header_motto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="1156922267@qq.com"
         android:textColor="#FFF"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textStyle="italic"/>
 
     <TextView
-        android:id="@+id/username"
+        android:id="@+id/nav_header_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/mail"
-        android:text="HibaraAi"
+        android:layout_above="@+id/nav_header_motto"
         android:textColor="#FFF"
-        android:textSize="14sp" />
+        android:textSize="28sp" />
 </RelativeLayout>

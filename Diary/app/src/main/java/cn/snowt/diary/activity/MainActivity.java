@@ -1,22 +1,36 @@
 package cn.snowt.diary.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.scwang.smart.refresh.footer.BallPulseFooter;
 import com.scwang.smart.refresh.header.BezierRadarHeader;
@@ -31,9 +45,15 @@ import java.util.Random;
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
 import cn.snowt.diary.service.DiaryService;
+import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
+import cn.snowt.diary.service.impl.MyConfigurationServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.Constant;
+import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * @Author: HibaraAi
@@ -42,6 +62,10 @@ import cn.snowt.diary.vo.DiaryVo;
  */
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
+    public static final int CHOOSE_HEAD_IMAGE = 1;
+    public static final int CHOOSE_MAIN_BG = 2;
+
+
     private NavigationView navView;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -52,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
 
     private DiaryService diaryService = new DiaryServiceImpl();
     private List<DiaryVo> voList;
+
+    private CircleImageView headImg;
+    private TextView username;
+    private TextView motto;
+    private ImageView mainImageBg;
+
+    private MyConfigurationService configurationService = new MyConfigurationServiceImpl();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +144,147 @@ public class MainActivity extends AppCompatActivity {
             loadMoreDiary();
             refreshLayout.finishLoadMore();
         });
+        initNavHeader();
+    }
+
+    private void initNavHeader() {
+        headImg = navView.getHeaderView(0).findViewById(R.id.nav_header_head);
+        String headImgInSp = MyConfiguration.getInstance().getHeadImg();
+        if(null!=headImgInSp){
+            Glide.with(MainActivity.this).load(headImgInSp).into(headImg);
+        }
+        this.headImg.setOnClickListener(v->{
+            if(null!=headImgInSp){
+                Intent intent = new Intent(MainActivity.this,ZoomImageActivity.class);
+                intent.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,headImgInSp);
+                startActivity(intent);
+                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像");
+            }else{
+                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像\n(但你还没有更换自己的头像)");
+            }
+        });
+        this.headImg.setOnLongClickListener(v -> {
+            //判断有没有外部存储的写入权限
+            if(ContextCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED){
+                //如果没有立马申请
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+            }else{
+                //如果有，打开相册
+                BaseUtils.openAlbum(MainActivity.this,Constant.OPEN_ALBUM_TYPE_HEAD,CHOOSE_HEAD_IMAGE);
+            }
+            return true;
+        });
+        username = navView.getHeaderView(0).findViewById(R.id.nav_header_username);
+        username.setText(MyConfiguration.getInstance().getUsername());
+        username.setOnClickListener(v->{
+            android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(MainActivity.this);
+            dialog.setTitle("设置用户名");
+            dialog.setMessage("请输入新的用户名");
+            EditText editText = new EditText(MainActivity.this);
+            dialog.setView(editText);
+            dialog.setPositiveButton("确定", (dialog1, which) -> {
+                configurationService.updateUsername(editText.getText().toString());
+                username.setText(editText.getText().toString());
+                BaseUtils.shortTipInCoast(MainActivity.this,"更新成功，建议重启应用");
+            });
+            dialog.setNegativeButton("取消",null);
+            dialog.show();
+        });
+        motto = navView.getHeaderView(0).findViewById(R.id.nav_header_motto);
+        motto.setText(MyConfiguration.getInstance().getMotto());
+        motto.setOnClickListener(v->{
+            android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(MainActivity.this);
+            dialog.setTitle("设置个性签名");
+            dialog.setMessage("请输入新的个性签名");
+            EditText editText = new EditText(MainActivity.this);
+            dialog.setView(editText);
+            dialog.setPositiveButton("确定", (dialog1, which) -> {
+                configurationService.updateMotto(editText.getText().toString());
+                motto.setText(editText.getText().toString());
+            });
+            dialog.setNegativeButton("取消",null);
+            dialog.show();
+        });
+        mainImageBg = findViewById(R.id.main_image_bg);
+        String bgImg = MyConfiguration.getInstance().getBgImg();
+        if(null!=bgImg){
+            Glide.with(MainActivity.this).load(bgImg).into(mainImageBg);
+        }
+        mainImageBg.setOnClickListener(v->{
+            BaseUtils.shortTipInCoast(MainActivity.this,"长按修改背景图");
+        });
+        mainImageBg.setOnLongClickListener(v->{
+            //判断有没有外部存储的写入权限
+            if(ContextCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED){
+                //如果没有立马申请
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+            }else{
+                //如果有，打开相册
+                BaseUtils.openAlbum(MainActivity.this,Constant.OPEN_ALBUM_TYPE_MAIN_BG,CHOOSE_MAIN_BG);
+            }
+            return true;
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case 1:{
+                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                    BaseUtils.shortTipInCoast(MainActivity.this,"已获取权限，请重新操作一次");
+                }else{
+                    BaseUtils.shortTipInCoast(MainActivity.this,"你没有授权读取相册");
+                }
+                break;
+            }
+            default:break;
+        }
+    }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case CHOOSE_HEAD_IMAGE: {
+                if(resultCode == RESULT_OK){
+                    Uri uri = data.getData();
+                    if(null!=uri){
+                        SimpleResult result = configurationService.updateHeadImg(uri);
+                        if(result.getSuccess()){
+                            BaseUtils.shortTipInCoast(MainActivity.this,"更新头像成功,建议重新启动应用");
+                            String headSrc = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_HEAD_SRC,null);
+                            Glide.with(MainActivity.this).load(headSrc).into(headImg);
+                        }else{
+                            BaseUtils.shortTipInCoast(MainActivity.this,"更新头像失败");
+                        }
+                    }
+                }
+                break;
+            }
+            case CHOOSE_MAIN_BG:{
+                if(RESULT_OK == resultCode){
+                    Uri uri = data.getData();
+                    if(null!=uri){
+                        SimpleResult result = configurationService.updateMainBgImage(uri);
+                        if(result.getSuccess()){
+                            String bgSrc = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_MAIN_IMG_BG,null);
+                            Glide.with(MainActivity.this).load(bgSrc).into(mainImageBg);
+                        }else{
+                            BaseUtils.shortTipInCoast(MainActivity.this,"更新首页背景图失败");
+                        }
+                    }
+                }
+            }
+            default:break;
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")

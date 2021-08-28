@@ -29,7 +29,12 @@ public class Diary extends LitePalSupport implements Serializable {
     private Integer id;
 
     /**
-     * 正文内容
+     * 标签，不加密，可搜索
+     */
+    private String label;
+
+    /**
+     * 正文内容，加密，不可搜索
      */
     private String content;
 

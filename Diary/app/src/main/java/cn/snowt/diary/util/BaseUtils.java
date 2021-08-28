@@ -7,15 +7,20 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -24,6 +29,9 @@ import org.litepal.LitePalApplication;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
+
+import cn.snowt.diary.activity.MainActivity;
 
 /**
  * @Author: HibaraAi
@@ -163,5 +171,29 @@ public class BaseUtils {
      */
     public static void shortTipInSnack(View view,String tip){
         Snackbar.make(view,tip,Snackbar.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 打开相册选择相片
+     * @param context context
+     * @param type 此次打开相册的请求类型
+     * @param requestCode requestCode
+     */
+    public static void openAlbum(Context context,int type,int requestCode) {
+        switch (type) {
+            case Constant.OPEN_ALBUM_TYPE_HEAD:{
+                BaseUtils.shortTipInCoast(context,"请选择新头像");
+                break;
+            }
+            case Constant.OPEN_ALBUM_TYPE_MAIN_BG:{
+                BaseUtils.shortTipInCoast(context,"请选择新的首页背景图");
+                break;
+            }
+            default:return;
+        }
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        AppCompatActivity appCompatActivity = (AppCompatActivity) context;
+        appCompatActivity.startActivityForResult(intent,requestCode);
     }
 }

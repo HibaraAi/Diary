@@ -52,6 +52,7 @@ public class Constant {
 
     public static final int OPEN_ALBUM_TYPE_HEAD = 1;
     public static final int OPEN_ALBUM_TYPE_MAIN_BG = 2;
+    public static final int OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC = 3;
 
     /**
      * 本应用在外部存储使用的路径名称

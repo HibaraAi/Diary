@@ -45,6 +45,7 @@ import java.util.Random;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
+import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
@@ -74,16 +75,17 @@ public class MainActivity extends AppCompatActivity {
 
     RefreshLayout refreshLayout;
     RecyclerView recyclerView = null;
-    DiaryAdapter diaryAdapter;
+    private int nowIndex = 0;
 
     private DiaryService diaryService = new DiaryServiceImpl();
-    private List<DiaryVo> voList;
+    private List<DiaryVo> voList = new ArrayList<>();
 
     private CircleImageView headImg;
     private TextView username;
     private TextView motto;
     private ImageView mainImageBg;
 
+    private DiaryAdapter diaryAdapter;
     private MyConfigurationService configurationService = new MyConfigurationServiceImpl();
 
     @Override
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bindViewAndSetListener();
-        voList = getDiaryForFirstShow();
+        getDiaryForFirstShow();
         diaryAdapter = new DiaryAdapter(voList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -147,12 +149,10 @@ public class MainActivity extends AppCompatActivity {
                 .setPrimaryColor(Color.parseColor("#FA7298")));
         refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
         refreshLayout.setOnRefreshListener(refreshLayout -> {
-            Log.e(TAG,"在这里刷新");
             refreshDiary();
             refreshLayout.finishRefresh();
         });
         refreshLayout.setOnLoadMoreListener(refreshLayout -> {
-            Log.e(TAG,"在这里加载更多");
             loadMoreDiary();
             refreshLayout.finishLoadMore();
         });
@@ -301,36 +301,21 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("NotifyDataSetChanged")
     private void loadMoreDiary() {
-        for (int i =0; i<5;i++){
-            Random random = new Random();
-            int nextInt = random.nextInt(10);
-            String s = nextInt+"结尾说的有点仓促了。阿离对四魂之玉许愿后，就和犬夜叉瞬移到了现代古井，然而他们话都还没说一句，犬夜叉就被古井带回了战国，自此，古井就再也不能进行穿越了。过了3年，阿离对犬夜叉的思念再次打通了古井，穿越到战国和犬夜叉在一起了。在阿离读高中3年的同时，弥勒和珊瑚结婚了，并且生下来一对双胞胎妹妹(超可爱的！)；七宝则进行了狐妖考试，想成为维护世界和平的大妖怪；琥珀也成为了优秀的除妖师，和云母一起战斗，刀刀斋还给琥珀打造了一个蛮酷的武器；玲则是留在了枫婆婆家，杀生丸想让她过着人类的生活先，等她长大了再让玲决定要不要跟着杀生丸。此外还有一个广播剧，杀生丸和玲求婚了。完结撒花";
-            s = s+s;
-            List<String> list = new ArrayList<>();
-            for(int j=0;j<nextInt;j++){
-                list.add(j+"");
-            }
-            DiaryVo diaryVo = new DiaryVo(i+1,s,BaseUtils.dateToString(new Date()),"多云  25","广东省广州市",list);
-            voList.add(diaryVo);
+        List<DiaryVo> diaryVoList = diaryService.getDiaryVoList(nowIndex, 5);
+        if(diaryVoList.size()==0){
+            BaseUtils.shortTipInSnack(recyclerView,"没有更多日记了。");
+            refreshLayout.setNoMoreData(true);
+        }else{
+            voList.addAll(diaryVoList);
+            nowIndex += diaryVoList.size();
+            diaryAdapter.notifyDataSetChanged();
         }
-        diaryAdapter.notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
     private void refreshDiary() {
         voList.clear();
-        for (int i =0; i<5;i++){
-            Random random = new Random();
-            int nextInt = random.nextInt(9);
-            String s = nextInt+"结尾说的有点仓促了。阿离对四魂之玉许愿后，就和犬夜叉瞬移到了现代古井，然而他们话都还没说一句，犬夜叉就被古井带回了战国，自此，古井就再也不能进行穿越了。过了3年，阿离对犬夜叉的思念再次打通了古井，穿越到战国和犬夜叉在一起了。在阿离读高中3年的同时，弥勒和珊瑚结婚了，并且生下来一对双胞胎妹妹(超可爱的！)；七宝则进行了狐妖考试，想成为维护世界和平的大妖怪；琥珀也成为了优秀的除妖师，和云母一起战斗，刀刀斋还给琥珀打造了一个蛮酷的武器；玲则是留在了枫婆婆家，杀生丸想让她过着人类的生活先，等她长大了再让玲决定要不要跟着杀生丸。此外还有一个广播剧，杀生丸和玲求婚了。完结撒花";
-            s = s+s+s+s+s+s+s;
-            List<String> list = new ArrayList<>();
-            for(int j=0;j<nextInt;j++){
-                list.add(j+"");
-            }
-            DiaryVo diaryVo = new DiaryVo(i+1,s,BaseUtils.dateToString(new Date()),"多云  25","广东省广州市",list);
-            voList.add(diaryVo);
-        }
+        getDiaryForFirstShow();
         diaryAdapter.notifyDataSetChanged();
     }
 
@@ -354,6 +339,10 @@ public class MainActivity extends AppCompatActivity {
                 BaseUtils.shortTipInSnack(this.recyclerView,"已返回顶部");
                 break;
             }
+            case R.id.toolbar_write:{
+                BaseUtils.gotoActivity(MainActivity.this,KeepDiaryActivity.class);
+                break;
+            }
             default:{
                 Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
                 break;
@@ -362,20 +351,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private List<DiaryVo> getDiaryForFirstShow(){
-        List<DiaryVo> vos= new ArrayList<>();
-        for (int i =0; i<5;i++){
-            Random random = new Random();
-            int nextInt = random.nextInt(10);
-            String s = nextInt+"结尾说的有点仓促了。阿离对四魂之玉许愿后，就和犬夜叉瞬移到了现代古井，然而他们话都还没说一句，犬夜叉就被古井带回了战国，自此，古井就再也不能进行穿越了。过了3年，阿离对犬夜叉的思念再次打通了古井，穿越到战国和犬夜叉在一起了。在阿离读高中3年的同时，弥勒和珊瑚结婚了，并且生下来一对双胞胎妹妹(超可爱的！)；七宝则进行了狐妖考试，想成为维护世界和平的大妖怪；琥珀也成为了优秀的除妖师，和云母一起战斗，刀刀斋还给琥珀打造了一个蛮酷的武器；玲则是留在了枫婆婆家，杀生丸想让她过着人类的生活先，等她长大了再让玲决定要不要跟着杀生丸。此外还有一个广播剧，杀生丸和玲求婚了。完结撒花";
-            s = s+s;
-            List<String> list = new ArrayList<>();
-            for(int j=0;j<nextInt;j++){
-                list.add(j+"");
-            }
-            DiaryVo diaryVo = new DiaryVo(i+1,s,BaseUtils.dateToString(new Date()),"多云  25","广东省广州市",list);
-            vos.add(diaryVo);
-        }
-        return vos;
+    private void getDiaryForFirstShow(){
+        voList.addAll(diaryService.getDiaryVoList(0, 5));
+        nowIndex = voList.size();
     }
 }

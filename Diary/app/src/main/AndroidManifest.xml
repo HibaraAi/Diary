@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.消消乐">
         <activity
+            android:name=".activity.KeepDiaryActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.SettingsActivity"
             android:exported="true"
             android:label="@string/title_activity_settings" />

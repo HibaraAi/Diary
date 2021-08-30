@@ -22,6 +22,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class Location extends LitePalSupport implements Serializable {
+
+    /**
+     * 主键
+     */
+    private Integer id;
+
     /**
      * 经度
      */

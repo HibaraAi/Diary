@@ -6,6 +6,14 @@
             android:icon="@drawable/nav_game"
             android:title="扫雷"/>
         <item
+            android:id="@+id/nav_temp"
+            android:icon="@drawable/nav_temp"
+            android:title="草稿箱" />
+        <item
+            android:id="@+id/nav_time"
+            android:icon="@drawable/nav_time"
+            android:title="时间轴" />
+        <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/nav_settings"
             android:title="设置" />

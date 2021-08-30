@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,6 +33,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.snowt.diary.R;
+import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.activity.MainActivity;
 
 /**
@@ -65,7 +68,7 @@ public class BaseUtils {
      * @param title 标题
      * @param content 提示内容
      */
-    public static void alertDialog(Context context,String title,String content){
+    public static void alertDialogToShow(Context context,String title,String content){
         AlertDialog.Builder builder  = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(content);
@@ -186,6 +189,10 @@ public class BaseUtils {
             }
             case Constant.OPEN_ALBUM_TYPE_MAIN_BG:{
                 BaseUtils.shortTipInCoast(context,"请选择新的首页背景图");
+                break;
+            }
+            case Constant.OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC:{
+                BaseUtils.shortTipInCoast(context,"请选择一张你要插入的图片");
                 break;
             }
             default:return;

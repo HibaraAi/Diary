@@ -4,7 +4,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import cn.snowt.diary.entity.Diary;
+import cn.snowt.diary.util.RSAUtils;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -19,8 +22,6 @@ public class ExampleUnitTest {
 
     @Test
     public void test01(){
-        Diary diary = new Diary();
-        diary.setContent("dasdasdas");
-        System.out.println(diary);
+
     }
 }

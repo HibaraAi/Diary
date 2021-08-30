@@ -37,7 +37,7 @@
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax"
                     android:fitsSystemWindows="true"
-                    android:src="@drawable/nav_bg"/>
+                    android:src="@drawable/main_bg"/>
                 <!--普通Toolbar-->
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/main_toolbar"

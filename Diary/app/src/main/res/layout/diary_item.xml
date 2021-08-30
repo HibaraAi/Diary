@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="10dp">
+    android:layout_margin="7dp"
+    android:padding="10dp"
+    app:cardCornerRadius="10dp"
+    android:elevation="1dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/item_head"
         android:layout_width="50dp"
@@ -26,7 +36,7 @@
         android:layout_marginTop="1dp"
         android:layout_marginStart="5dp"
         android:text="灰原同学"
-        android:textColor="#FA7298"
+        android:textColor="?attr/colorPrimary"
         android:textSize="16dp"/>
 
     <TextView
@@ -73,13 +83,25 @@
         app:layout_constraintTop_toBottomOf="@+id/item_head"
         app:layout_constraintLeft_toLeftOf="parent"/>
     <TextView
-        android:id="@+id/item_content"
+        android:id="@+id/item_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintVertical_weight="1"
 
         android:layout_marginTop="3dp"
         app:layout_constraintTop_toBottomOf="@+id/item_location"
+        app:layout_constraintLeft_toRightOf="@+id/blank_area_left"
+        app:layout_constraintRight_toLeftOf="@+id/blank_area_right"
+        android:text="#毕业季##我知道#"
+        android:textColor="?attr/colorPrimary" />
+    <TextView
+        android:id="@+id/item_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintVertical_weight="1"
+
+        android:layout_marginTop="3dp"
+        app:layout_constraintTop_toBottomOf="@+id/item_label"
         app:layout_constraintLeft_toRightOf="@+id/blank_area_left"
         app:layout_constraintRight_toLeftOf="@+id/blank_area_right"
         />
@@ -116,4 +138,50 @@
         app:layout_constraintTop_toBottomOf="@+id/item_pic_area"
         android:layout_marginRight="5dp"
         android:text="删除"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!--评论区-->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/item_comment_area_parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@+id/item_btn_comment"
+        app:layout_constraintLeft_toRightOf="@id/blank_area_left"
+        app:layout_constraintRight_toLeftOf="@id/blank_area_right"
+        app:cardCornerRadius="0dp"
+        android:paddingBottom="10dp"
+        android:visibility="gone"
+        android:elevation="0dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <EditText
+                android:id="@+id/item_comment_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="在此输入评论"
+                android:background="@drawable/background_input"/>
+            <Button
+                android:id="@+id/item_comment_input_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="20dp"
+                android:text="发送评论"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/item_comment_area"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintHorizontal_weight="1"
+                android:padding="5dp"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+    <!--不知为何，评论区的cardView底边框会被遮住一些，所以需要下面的空行太高一下整个item-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_comment_area_parent"
+        android:text="      "/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

@@ -1,11 +1,15 @@
 package cn.snowt.diary.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,8 +22,13 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.service.CommentService;
+import cn.snowt.diary.service.DiaryService;
+import cn.snowt.diary.service.impl.CommentServiceImpl;
+import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 
 /**
@@ -31,6 +40,8 @@ public class DiaryAdapter extends RecyclerView.Adapter{
 
     private List<DiaryVo> diaryVoList;
     private Context context;
+    private static CommentService commentService = new CommentServiceImpl();
+    private static final DiaryService diaryService = new DiaryServiceImpl();
 
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -40,10 +51,15 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         TextView modifyDate;
         TextView weather;
         TextView location;
+        TextView label;
         TextView content;
         RecyclerView imageView;
+        RecyclerView commentView;
         Button comment;
         Button del;
+        Button submitCommentBtn;
+        EditText commentInput;
+        Boolean visible;
 
         Integer diaryId;
 
@@ -55,11 +71,17 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             modifyDate = itemView.findViewById(R.id.item_modifyDate);
             weather = itemView.findViewById(R.id.item_weather);
             location = itemView.findViewById(R.id.item_location);
+            label = itemView.findViewById(R.id.item_label);
             content = itemView.findViewById(R.id.item_content);
             comment = itemView.findViewById(R.id.item_btn_comment);
             del = itemView.findViewById(R.id.item_btn_del);
             imageView = itemView.findViewById(R.id.item_pic_area);
+            commentView = itemView.findViewById(R.id.item_comment_area);
             diaryView = itemView;
+            submitCommentBtn = itemView.findViewById(R.id.item_comment_input_btn);
+            commentInput = itemView.findViewById(R.id.item_comment_input);
+
+            visible = false;
         }
     }
 
@@ -76,14 +98,46 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             context = parent.getContext();
         }
         final ViewHolder viewHolder = new ViewHolder(view);
+        //展开或收起评论区
         viewHolder.comment.setOnClickListener(v->{
-            BaseUtils.shortTipInCoast(parent.getContext(),viewHolder.comment.getText().toString());
+            if(viewHolder.visible){
+                //改为不可见
+                viewHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.GONE);
+                viewHolder.visible = false;
+            }else{
+                viewHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.VISIBLE);
+                viewHolder.visible = true;
+            }
+        });
+        //读取输入的评论
+        viewHolder.submitCommentBtn.setOnClickListener(v->{
+            String commentInputStr = viewHolder.commentInput.getText().toString();
+            if(!"".equals(commentInputStr)){
+                SimpleResult result = commentService.addOneByArgs(commentInputStr, viewHolder.diaryId);
+                if(result.getSuccess()){
+                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"评论成功，请手动刷新");
+                    viewHolder.commentInput.setText("");
+                }else{
+                    BaseUtils.longTipInSnack(viewHolder.diaryView,result.getMsg());
+                }
+            }
         });
         viewHolder.del.setOnClickListener(v->{
-            BaseUtils.shortTipInCoast(parent.getContext(),"长按删除");
+            BaseUtils.shortTipInSnack(viewHolder.diaryView,"长按删除日记");
         });
         viewHolder.del.setOnLongClickListener(v->{
-            BaseUtils.shortTipInCoast(parent.getContext(),"删除逻辑");
+            new AlertDialog.Builder(context)
+                    .setTitle("确定要删除这条日记吗?")
+                    .setPositiveButton("确认删除", (dialog, which) -> {
+                        SimpleResult result = diaryService.deleteById(viewHolder.diaryId);
+                        if(result.getSuccess()){
+                            BaseUtils.shortTipInSnack(viewHolder.diaryView,"删除成功，刷新后将正常展示");
+                        }else{
+                            BaseUtils.shortTipInSnack(viewHolder.diaryView,result.getMsg());
+                        }
+                    })
+                    .setNegativeButton("刚刚点错了",null)
+                    .show();
             return true;
         });
         return viewHolder;
@@ -103,13 +157,24 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         newHolder.modifyDate.setText(diaryVo.getModifiedDate());
         newHolder.weather.setText(diaryVo.getWeatherStr());
         newHolder.location.setText(diaryVo.getLocationStr());
+        if("".equals(diaryVo.getLabelStr())){
+            newHolder.label.setVisibility(View.GONE);
+        }else{
+            newHolder.label.setText(diaryVo.getLabelStr());
+        }
         newHolder.content.setText(diaryVo.getContent());
         //处理图片展示
-        RecyclerView recyclerView = newHolder.imageView;
-        DiaryImageAdapter adapter = new DiaryImageAdapter(diaryVo.getPicSrcList());
+        RecyclerView imgRecyclerView = newHolder.imageView;
+        DiaryImageAdapter imgAdapter = new DiaryImageAdapter(diaryVo.getPicSrcList());
         GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(layoutManager);
+        imgRecyclerView.setAdapter(imgAdapter);
+        imgRecyclerView.setLayoutManager(layoutManager);
+        //处理评论区
+        RecyclerView commentRecyclerView = newHolder.commentView;
+        DiaryCommentAdapter commentAdapter = new DiaryCommentAdapter(diaryVo.getCommentList());
+        GridLayoutManager layoutManager2 = new GridLayoutManager(context, 1);
+        commentRecyclerView.setAdapter(commentAdapter);
+        commentRecyclerView.setLayoutManager(layoutManager2);
         holder = newHolder;
     }
 

@@ -24,11 +24,14 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
+import cn.snowt.diary.util.RSAUtils;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -69,6 +72,27 @@ public class ExampleInstrumentedTest {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void test01(){
+        List<String> randomKey = RSAUtils.getRandomKey();
+        if(null!=randomKey){
+            String publicKey = randomKey.get(0);
+            String privateKey = randomKey.get(1);
+            //String testStr = "纵一苇之所如，凌万顷之茫然";
+            String testStr2 = "致亲爱的学弟学妹们：你们问：如何为自己画好像，我想，其实一个人是怎样的，过去我认为别人的问答足够客观，我们应当相信；后来我明白，一个人是什么样的，终究还是自己说了算。学弟学妹们，有一句话说得好，“不尽狂澜走沧海，一拳天与压潮头”，确实，在百年未有之大变局的时代里，你们的自画像，该由你们自己画。你们会绘出更好的理想中的自己。我们的价值如何实现？我们可以绘出那个理想的自我吗？当然，这个时代赐予我们无数资源，我们亦可循着找到自己的光芒。写作、绘画、舞蹈，我们可尽情去学习。无数人的价值正被看到与发掘，袁隆平扎根田间为苍生福祉，钟南山逆行武汉护国人，张桂梅创办女子高中，为云南山区的女孩带去希望……。你们会以此为镜，绘出那个你理想中的自己。如果没有实现，那也多问自己：“我还需要做些什么？现在的我是我想要的样子吗？”答案其实就在你心底。你们会绘出更好的现实中的自己。你们会在即将到来的高一遇见友谊、师生情。我希望你以他们为镜，找出自己的不足。你或许更喜欢看网上周立波的那段“你的青春被狗吃了么”的激昂言论，你或许更喜欢看网上关于某省高考状元从来不上课外补习班的报道，你或许看着班级后黑板上的倒计时，还在默默安慰自己“没事，高考还早”……但是你有没有想过那些高考状元或许比你少了那两三个小时的课外补习，但他们比你多的，是高效的学习策略、良好的思考习惯，和自己默默的用功努力？你有没有担心过或许就是那句安慰性的“没事，高考还早”，让你略过你不想做的那道函数放缩，而你放弃的这道题，可能就是6月你哭都哭不回来的14分……亲爱的学弟学妹们，人总是在他人身上才能够准确的认识自己，我希望在即将到来的高一，你能找到自己的镜子，比照他们，画出更好的自己。你们会在祖国的大背景中画出最好的自己。今年，将完成全面小康的目标，而祖国的明天，将由你们来绘制。在今年，我们遭遇到了疫情，但是我们亦不畏惧，大家齐心协力，攻坚克难，漫长的冬天也会过去，而祖国的明天，就在你我手中。xí jìn píng总书记言：“青年是整个社会力量中最积极、最有生气的力量，国家的希望在青年，民族的未来在青年。今天，新时代中国青年处在中华民族发展的最好时期，既面临着难得的建功立业的人生际遇，也面临着‘天将降大任于斯人’的时代使命。”愿我们接继奋斗，共绘美丽中国，也在为祖国的奋斗中，画出最好的自己。弟学妹们，自己的人生由自己掌握，是老话，也是至理，以后，当你们遇见挫折，当你迷茫时，一定要回头望，问自己，“你要成为什么样的人？”要多找出适合自己的“镜子”，不断参照，不断反思。唯有如此，才能画好自己的像。《大秦帝国》里有句话：“敬那大争之世，敬这小酌之时。”希望我的话，能给大家一些帮助，在这个奔腾的时代里，愿你们，能绘出自己最好的自画像。谢谢大家地聆听。";
+            String encode = RSAUtils.encode(testStr2,publicKey);
+            String decode = RSAUtils.decode(encode, privateKey);
+
+            System.out.println("此次获取的公钥为:"+publicKey);
+            System.out.println("此次获取的私钥为:"+privateKey);
+            if(testStr2.equals(decode)){
+                System.out.println("这对密钥是可行的");
+            }else{
+                System.out.println("请重新获取密钥");
+            }
         }
     }
 

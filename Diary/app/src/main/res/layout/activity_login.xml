@@ -59,7 +59,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="2"
@@ -71,7 +71,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_num0"
             app:layout_constraintTop_toTopOf="parent"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="3"
@@ -83,7 +83,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_num1"
             app:layout_constraintTop_toTopOf="parent"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="4"
@@ -96,7 +96,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num0"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="5"
@@ -108,7 +108,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_num3"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num1"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="6"
@@ -120,7 +120,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_num4"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num2"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="7"
@@ -133,7 +133,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num3"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="8"
@@ -145,7 +145,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_num6"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num4"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="9"
@@ -157,7 +157,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_num7"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num5"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="✘"
@@ -182,7 +182,7 @@
             app:layout_constraintLeft_toRightOf="@+id/login_btn_del"
             app:layout_constraintTop_toBottomOf="@+id/login_btn_num7"
             android:background="#00000000"
-            android:textColor="#00AEFF"
+            android:textColor="?attr/colorPrimary"
             android:textSize="50px"/>
         <Button
             android:text="✔"

@@ -1,6 +1,7 @@
 package cn.snowt.diary.util;
 
 import android.util.Base64;
+import android.util.Log;
 
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -14,6 +15,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -43,10 +46,10 @@ public class RSAUtils {
      * 密钥长度，DSA算法的默认密钥长度是1024
      * 密钥长度必须是64的倍数，在512到65536位之间
      * */
-    private static final int KEY_SIZE=1024*5;
+    private static final int KEY_SIZE=1024*2;
 
     /**
-     * 加密
+     * 使用默认密钥加密
      * @param s
      * @return
      */
@@ -70,7 +73,7 @@ public class RSAUtils {
     }
 
     /**
-     * 解密
+     * 使用默认密钥解密
      * @param s
      * @return
      */
@@ -83,6 +86,66 @@ public class RSAUtils {
         return null;
     }
 
+    /**
+     * 使用自定义密钥加密
+     * @param s 需要加密的数据
+     * @param encodeKey 加密密钥
+     * @return 加密后的数据
+     */
+    public static String encode(String s,String encodeKey){
+        try {
+            return new String(Base64.encode(encryptByPublicKey(s.getBytes(), Base64.decode(encodeKey,Base64.DEFAULT)),Base64.DEFAULT));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 使用自定义密钥解密
+     * @param s 需要解密的数据
+     * @param decodeKey 解密密钥
+     * @return 解密后的数据
+     */
+    public static String decode(String s,String decodeKey){
+        try {
+            return new String(decryptByPrivateKey(Base64.decode(s,Base64.DEFAULT), Base64.decode(decodeKey,Base64.DEFAULT)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 随机获取一对密钥
+     * @return get(0)为公钥，get(1)为私钥，获取失败则返回null
+     */
+    public static List<String> getRandomKey(){
+        try {
+            KeyStore keys = createKeys();
+            byte[] publicKey = getPublicKey(keys);
+            byte[] privateKey = getPrivateKey(keys);
+            String privateKeyStr = new String((Base64.encode(privateKey, Base64.DEFAULT)));
+            String publicKeyStr = new String((Base64.encode(publicKey, Base64.DEFAULT)));
+            List<String> keyList = new ArrayList<>();
+            keyList.add(publicKeyStr);
+            keyList.add(privateKeyStr);
+            return keyList;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * 生成密钥对

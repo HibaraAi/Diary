@@ -3,6 +3,7 @@ package cn.snowt.diary.vo;
 import java.io.Serializable;
 import java.util.List;
 
+import cn.snowt.diary.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,7 @@ public class DiaryVo implements Serializable {
     private String modifiedDate;
     private String weatherStr;
     private String locationStr;
+    private String labelStr;
     private List<String> picSrcList;
+    private List<Comment> commentList;
 }

@@ -34,11 +34,6 @@ public class Comment extends LitePalSupport implements Serializable {
     private String content;
 
     /**
-     * 外键,被回复评论的id
-     */
-    private Integer commentId;
-
-    /**
      * 外键,被回复日记的id
      */
     private Integer diaryId;

@@ -30,6 +30,11 @@ public class Weather extends LitePalSupport implements Serializable {
     public static final String WEATHER_HAIL = "下冰雹";
 
     /**
+     * 主键
+     */
+    private Integer id;
+
+    /**
      * 天气情况
      */
     private String weather;

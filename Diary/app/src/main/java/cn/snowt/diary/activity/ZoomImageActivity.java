@@ -4,8 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.bumptech.glide.Glide;
+
+import java.io.File;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.util.BaseUtils;
@@ -19,6 +25,7 @@ import cn.snowt.diary.view.ZoomImageView;
 public class ZoomImageActivity extends AppCompatActivity {
 
     public static final String EXTRA_IMAGE_SRC = "imgSrc";
+    public static final String TAG = "ZoomImageActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

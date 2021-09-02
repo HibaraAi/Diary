@@ -151,13 +151,17 @@ public class DiaryServiceImpl implements DiaryService {
             return SimpleResult.error().msg("不存在该条日记，或许已经被删除了呢");
         }
         //先删除天气、位置信息
-        Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
-        if(null!=weather){
-            weather.delete();
+        if(null!=diary.getWeatherId()){
+            Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
+            if(null!=weather){
+                weather.delete();
+            }
         }
-        Location location = LitePal.find(Location.class, diary.getLocationId());
-        if(null!=location){
-            location.delete();
+        if(null!=diary.getLocationId()){
+            Location location = LitePal.find(Location.class, diary.getLocationId());
+            if(null!=location){
+                location.delete();
+            }
         }
         //删除评论
         commentService.deleteByDiaryId(diaryId);
@@ -171,5 +175,66 @@ public class DiaryServiceImpl implements DiaryService {
         }
         diary.delete();
         return SimpleResult.ok();
+    }
+
+    @Override
+    public SimpleResult getSimpleDiaryByDate(Date date1, Date date2) {
+        List<Diary> diaryList = LitePal.select("id,content,modifiedDate")
+                .where("modifiedDate > ? AND modifiedDate < ?", date1.getTime()+"", date2.getTime()+"")
+                .order("id desc")
+                .find(Diary.class);
+        List<DiaryVo> voList = new ArrayList<>();
+        diaryList.forEach(diary -> {
+            DiaryVo vo = new DiaryVo();
+            vo.setId(diary.getId());
+            String subDateStr = BaseUtils.dateToString(diary.getModifiedDate()).substring(0, 10);
+            vo.setModifiedDate(subDateStr);
+            String subDiary = (diary.getContent().length()>30)
+                    ? (diary.getContent().substring(0,30)+"...")
+                    : diary.getContent();
+            vo.setContent(subDiary);
+
+            List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").limit(1).find(Drawing.class);
+            List<String> picSrcList = new ArrayList<>();
+            drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
+            vo.setPicSrcList(picSrcList);
+            voList.add(vo);
+        });
+        return SimpleResult.ok().data(voList);
+    }
+
+    @Override
+    public SimpleResult getDiaryVoById(int diaryId) {
+        Diary diary = LitePal.find(Diary.class, diaryId);
+        if(null==diary){
+            return SimpleResult.error().msg("没有查询到日记详情");
+        }
+        DiaryVo vo = new DiaryVo();
+        vo.setId(diary.getId());
+        vo.setContent(diary.getContent());
+        vo.setModifiedDate(BaseUtils.dateToString(diary.getModifiedDate()));
+        vo.setLabelStr(diary.getLabel());
+        //地址
+        if(null!=diary.getLocationId()){
+            Location location = LitePal.find(Location.class, diary.getLocationId());
+            vo.setLocationStr(location.getLocationString());
+        }
+        //天气
+        if(null!=diary.getWeatherId()){
+            Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
+            vo.setWeatherStr(weather.getWeather());
+        }
+        //图片
+        List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class);
+        List<String> picSrcList = new ArrayList<>();
+        drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
+        vo.setPicSrcList(picSrcList);
+        //评论
+        List<Comment> commentList = LitePal.where("diaryId = ?",diary.getId()+"").order("id desc").find(Comment.class);
+//            commentList.forEach(comment ->
+//                    comment.setContent(RSAUtils.decode(comment.getContent())));
+//            vo.setCommentList(commentList);
+        vo.setCommentList(commentList);
+        return SimpleResult.ok().data(vo);
     }
 }

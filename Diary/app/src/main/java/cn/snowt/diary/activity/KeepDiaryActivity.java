@@ -20,9 +20,12 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.litepal.LitePal;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import java.util.List;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryImageAdapter;
+import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
@@ -47,6 +51,9 @@ import cn.snowt.diary.util.UriUtils;
 public class KeepDiaryActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String TAG = "KeepDiaryActivity";
+    public static final String OPEN_FROM_TYPE = "openFrom";
+    public static final int OPEN_FROM_TEMP_DIARY = 1;
+
     public static final int CHOOSE_PICTURE = 1;
 
     private EditText diaryInputView;
@@ -69,14 +76,39 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     @SuppressLint("StaticFieldLeak")
     private static DiaryImageAdapter imageAdapter;
 
+    /**
+     * 草稿的id
+     */
+    private int tempDiaryId = -1;
+
     private DiaryService diaryService = new DiaryServiceImpl();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //禁止截屏设置
+        boolean notAllowScreenshot = BaseUtils.getDefaultSharedPreferences().getBoolean("notAllowScreenshot", true);
+        if(notAllowScreenshot){
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }
         setContentView(R.layout.activity_keep_diary);
         bindViewAndSetListener();
+        Intent intent = getIntent();
+        if(null!=intent){
+            switch (intent.getIntExtra(OPEN_FROM_TYPE,-1)) {
+                case OPEN_FROM_TEMP_DIARY:{
+                    //从草稿箱来，回写草稿到输入框
+                    tempDiaryId = intent.getIntExtra("id", -1);
+                    List<TempDiary> tempDiaries = LitePal.where("id = ?",tempDiaryId+"").find(TempDiary.class);
+                    if(!tempDiaries.isEmpty()){
+                        diaryInputView.setText(tempDiaries.get(0).getContent());
+                    }
+                    break;
+                }
+                default:break;
+            }
+        }
     }
 
     private void bindViewAndSetListener() {
@@ -130,15 +162,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         switch (item.getItemId()) {
             case android.R.id.home:{
                 if(!"".equals(diaryInputView.getText().toString())){
-                    AlertDialog.Builder builder=new AlertDialog.Builder(KeepDiaryActivity.this);
-                    builder.setTitle("提示：");
-                    builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？");
-                    builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
-                        BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存草稿箱功能待实现");
-                        finish();
-                    });
-                    builder.setPositiveButton("直接退出",(dialog, which) -> finish());
-                    builder.show();
+                    askSave(diaryInputView.getText().toString());
                 }else{
                     finish();
                 }
@@ -195,6 +219,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 editText.setHint("空输入视为删除原有输入");
                 editText.setPadding(30,10,30,10);
                 dialog.setView(editText);
+                dialog.setCancelable(false);
                 dialog.setPositiveButton("添加", (dialog1, which) -> {
                     locationView.setText(editText.getText().toString());
                 });
@@ -216,6 +241,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                         weatherView.setText(items[which]);
                     }
                 });
+                dialog.setCancelable(false);
                 dialog.setPositiveButton("确定", null);
                 dialog.setNegativeButton("取消", (dialog12, which) -> weatherView.setText(""));
                 dialog.show();
@@ -234,6 +260,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 editText.setHint("空输入视为删除原有输入");
                 editText.setPadding(30,10,30,10);
                 dialog.setView(editText);
+                dialog.setCancelable(false);
                 dialog.setPositiveButton("添加", (dialog1, which) -> {
                     labelView.setText(editText.getText().toString());
                 });
@@ -254,9 +281,6 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 if(RESULT_OK==resultCode){
                     Uri uri = data.getData();
                     if(null!=uri){
-//                        if(null==imageTempSrcList){
-//                            imageTempSrcList = new ArrayList<>();
-//                        }
                         imageTempSrcList.add(UriUtils.getFileAbsolutePath(KeepDiaryActivity.this,uri));
                         imageAdapter.notifyDataSetChanged();
                     }
@@ -271,6 +295,46 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     protected void onDestroy() {
         super.onDestroy();
         clearTempPinInEdit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!"".equals(diaryInputView.getText().toString())){
+            askSave(diaryInputView.getText().toString());
+        }
+    }
+
+    /**
+     * 询问是否保存到草稿箱
+     */
+    private void askSave(String content){
+        AlertDialog.Builder builder=new AlertDialog.Builder(KeepDiaryActivity.this);
+        builder.setTitle("提示：");
+        builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？\n如果你是从草稿箱打开这个页面，不保存的话，草稿箱中的记录会被删除!");
+        builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
+            boolean saveSuccess = false;
+            TempDiary tempDiary = new TempDiary(null, content);
+            if(tempDiaryId!=-1){
+                int update = tempDiary.update(tempDiaryId);
+                if(0!=update){
+                    saveSuccess = true;
+                }
+            }else{
+                saveSuccess = tempDiary.save();
+            }
+            if(saveSuccess){
+                finish();
+            }else{
+                BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
+            }
+        });
+        builder.setPositiveButton("直接退出",(dialog, which) -> {
+            if(-1!=tempDiaryId){
+                LitePal.delete(TempDiary.class,tempDiaryId);
+            }
+            finish();
+        });
+        builder.show();
     }
 
     /**

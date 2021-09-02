@@ -5,18 +5,23 @@
       <map>
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_diary_detail.xml" value="0.18659420289855072" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_help.xml" value="0.25" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_keep_diary.xml" value="0.32088285229202035" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_login.xml" value="0.2390625" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_mine_game.xml" value="0.1766304347826087" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_set_password.xml" value="0.25364583333333335" />
+        <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_time_axis.xml" value="0.2890262751159196" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_zoom_image.xml" value="0.23143115942028986" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/block_item.xml" value="0.1766304347826087" />
+        <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/defalut_toolbar.xml" value="0.25364583333333335" />
+        <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/diary_axis_item.xml" value="0.3489795918367347" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/diary_comment_item.xml" value="0.2" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/diary_image_item.xml" value="0.19972826086956522" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/diary_item.xml" value="0.264" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/nav_header.xml" value="0.25" />
+        <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/settings_activity.xml" value="0.20108695652173914" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/menu/nav_menu.xml" value="0.25364583333333335" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/menu/toolbar.xml" value="0.25364583333333335" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/menu/toolbar_keep_diary.xml" value="0.25364583333333335" />

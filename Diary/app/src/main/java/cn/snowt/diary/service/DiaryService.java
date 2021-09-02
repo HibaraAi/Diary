@@ -1,5 +1,6 @@
 package cn.snowt.diary.service;
 
+import java.util.Date;
 import java.util.List;
 
 import cn.snowt.diary.util.SimpleResult;
@@ -26,6 +27,7 @@ public interface DiaryService {
      * @param locationStr 位置Str
      * @param weatherStr 天气Str
      * @param tempImgSrcList 读取到的图片缓存Src
+     * @return
      */
     SimpleResult addOneByArgs(String diaryContent, String labelStr, String locationStr, String weatherStr, List<String> tempImgSrcList);
 
@@ -35,4 +37,20 @@ public interface DiaryService {
      * @return
      */
     SimpleResult deleteById(Integer diaryId);
+
+    /**
+     * 根据给定时间，查找该时间段的日记
+     * @param date1 date1
+     * @param date2 date2
+     * @return 返回的data为diaryVoList,diaryVo
+     * 仅包含id，经过处理后的时间Str，截取正文内容Str，和一张图片src(如果有)
+     */
+    SimpleResult getSimpleDiaryByDate(Date date1, Date date2);
+
+    /**
+     * 根据id获取一个详情DiaryVo
+     * @param diaryId diaryId
+     * @return
+     */
+    SimpleResult getDiaryVoById(int diaryId);
 }

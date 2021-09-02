@@ -14,19 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,13 +40,10 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
-import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
@@ -67,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     public static final int CHOOSE_HEAD_IMAGE = 1;
     public static final int CHOOSE_MAIN_BG = 2;
+
+    private long firstTime = 0;
 
 
     private NavigationView navView;
@@ -91,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //禁止截屏设置
+        boolean notAllowScreenshot = BaseUtils.getDefaultSharedPreferences().getBoolean("notAllowScreenshot", true);
+        if(notAllowScreenshot){
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }
         setContentView(R.layout.activity_main);
         bindViewAndSetListener();
         getDiaryForFirstShow();
@@ -132,6 +137,45 @@ public class MainActivity extends AppCompatActivity {
                 }
                 case R.id.nav_help:{
                     BaseUtils.gotoActivity(MainActivity.this,HelpActivity.class);
+                    break;
+                }
+                case R.id.nav_time:{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("查找指定时间段的日记");
+                    builder.setMessage("请输入时间段，日期格式必须为:2021-09-01");
+                    EditText timeOne = new EditText(MainActivity.this);
+                    EditText timeTwo = new EditText(MainActivity.this);
+                    timeOne.setInputType(EditorInfo.TYPE_CLASS_DATETIME);
+                    timeOne.setBackgroundResource(R.drawable.background_input);
+                    timeOne.setHint("例如:2021-09-01");
+                    timeTwo.setBackgroundResource(R.drawable.background_input);
+                    timeTwo.setInputType(EditorInfo.TYPE_CLASS_DATETIME);
+                    timeTwo.setHint("例如:2021-01-01");
+                    LinearLayout linearLayout = new LinearLayout(this);
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    linearLayout.addView(timeOne);
+                    linearLayout.addView(timeTwo);
+                    builder.setView(linearLayout);
+                    builder.setCancelable(false);
+                    builder.setPositiveButton("确定", (dialog1, which) -> {
+                        String timeOneStr = timeOne.getText().toString();
+                        String timeTwoStr = timeTwo.getText().toString();
+                        if(!"".equals(timeOneStr) && !"".equals(timeTwoStr)){
+                            Intent intent = new Intent(MainActivity.this, DiaryListActivity.class);
+                            intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_TIME_AXIS);
+                            intent.putExtra(DiaryListActivity.DATE_ONE,timeOneStr);
+                            intent.putExtra(DiaryListActivity.DATE_TWO,timeTwoStr);
+                            startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton("取消",null);
+                    builder.show();
+                    break;
+                }
+                case R.id.nav_temp:{
+                    Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
+                    intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_TEMP_DIARY);
+                    startActivity(intent);
                     break;
                 }
                 default:{
@@ -196,10 +240,15 @@ public class MainActivity extends AppCompatActivity {
             dialog.setTitle("设置用户名");
             dialog.setMessage("请输入新的用户名");
             EditText editText = new EditText(MainActivity.this);
+            editText.setBackgroundResource(R.drawable.background_input);
             dialog.setView(editText);
+            dialog.setCancelable(false);
             dialog.setPositiveButton("确定", (dialog1, which) -> {
-                configurationService.updateUsername(editText.getText().toString());
-                username.setText(editText.getText().toString());
+                String s = editText.getText().toString();
+                if(!"".equals(s)){
+                    configurationService.updateUsername(s);
+                    username.setText(s);
+                }
                 BaseUtils.shortTipInCoast(MainActivity.this,"更新成功，建议重启应用");
             });
             dialog.setNegativeButton("取消",null);
@@ -212,10 +261,15 @@ public class MainActivity extends AppCompatActivity {
             dialog.setTitle("设置个性签名");
             dialog.setMessage("请输入新的个性签名");
             EditText editText = new EditText(MainActivity.this);
+            editText.setBackgroundResource(R.drawable.background_input);
             dialog.setView(editText);
+            dialog.setCancelable(false);
             dialog.setPositiveButton("确定", (dialog1, which) -> {
-                configurationService.updateMotto(editText.getText().toString());
-                motto.setText(editText.getText().toString());
+                String s = editText.getText().toString();
+                if(!"".equals(s)){
+                    configurationService.updateMotto(s);
+                    motto.setText(s);
+                }
             });
             dialog.setNegativeButton("取消",null);
             dialog.show();
@@ -226,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(MainActivity.this).load(bgImg).into(mainImageBg);
         }
         mainImageBg.setOnClickListener(v->{
-            BaseUtils.shortTipInCoast(MainActivity.this,"长按修改背景图");
+            BaseUtils.shortTipInSnack(mainImageBg,"长按修改背景图");
         });
         mainImageBg.setOnLongClickListener(v->{
             //判断有没有外部存储的写入权限
@@ -354,5 +408,16 @@ public class MainActivity extends AppCompatActivity {
     private void getDiaryForFirstShow(){
         voList.addAll(diaryService.getDiaryVoList(0, 5));
         nowIndex = voList.size();
+    }
+
+    @Override
+    public void onBackPressed() {
+        long secondTime = System.currentTimeMillis();
+        if (secondTime - firstTime > 2000) {
+            Toast.makeText(MainActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            firstTime = secondTime;
+        } else {
+            this.finish();
+        }
     }
 }

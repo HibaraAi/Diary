@@ -4,8 +4,8 @@
         <SwitchPreferenceCompat
             app:key="showUsernameInBar"
             app:title="顶部工具栏显示用户名"
-            app:summaryOff="显示“Diary”\n重启后生效"
-            app:summaryOn="显示你的用户名\n重启后生效"/>
+            app:summaryOff="显示“Diary”\n软件重启后生效"
+            app:summaryOn="显示你的用户名\n软件重启后生效"/>
 
         <SwitchPreferenceCompat
             app:key="saveImageInExRom"
@@ -14,9 +14,21 @@
             app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"
             app:title="日记图片额外存储" />
 
+        <SwitchPreferenceCompat
+            app:key="notAllowScreenshot"
+            app:title="日记界面不允许截屏"
+            app:defaultValue="true"
+            app:summaryOff="当前：允许截屏/录屏\n软件重启后生效"
+            app:summaryOn="当前：不允许截屏/录屏\n软件重启后生效"/>
+
         <Preference
             app:key="setPassword"
             app:title="修改登录密码" />
+
+        <Preference
+            app:key="clearCache"
+            app:title="清除缓存"
+            app:summary="45M"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

@@ -5,9 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.HelpActivity">
+
+    <include android:id="@+id/d46576543213" layout="@layout/defalut_toolbar" />
     <ListView
         android:id="@+id/help_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        app:layout_constraintVertical_weight="1"
+        app:layout_constraintTop_toBottomOf="@+id/d46576543213"
+        app:layout_constraintBottom_toBottomOf="parent">
     </ListView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,9 +1,12 @@
 package cn.snowt.diary.activity;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -73,6 +76,13 @@ public class SetPasswordActivity extends AppCompatActivity {
         });
 
         btnCancel.setOnClickListener(v-> finish());
+
+        setSupportActionBar(findViewById(R.id.default_toolbar_inc));
+        ActionBar supportActionBar = getSupportActionBar();
+        if(null!=supportActionBar){
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setTitle("重置密码");
+        }
     }
 
     /**
@@ -91,5 +101,17 @@ public class SetPasswordActivity extends AppCompatActivity {
         }
         textTip.setText(tip);
         return firstUse;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:{
+                finish();
+                break;
+            }
+            default:break;
+        }
+        return true;
     }
 }

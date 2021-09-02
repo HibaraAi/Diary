@@ -1,8 +1,11 @@
 package cn.snowt.diary.activity;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -25,6 +28,13 @@ public class HelpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
 
+        setSupportActionBar(findViewById(R.id.default_toolbar_inc));
+        ActionBar supportActionBar = getSupportActionBar();
+        if(null!=supportActionBar){
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setTitle("帮助&关于");
+        }
+
         List<String> list = new ArrayList<>();
         list.add(Constant.STRING_HELP);
         list.add(Constant.STRING_ABOUT);
@@ -41,5 +51,18 @@ public class HelpActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:{
+                finish();
+                break;
+            }
+            default:break;
+        }
+        return true;
     }
 }

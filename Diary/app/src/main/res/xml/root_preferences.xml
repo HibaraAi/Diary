@@ -27,8 +27,11 @@
 
         <Preference
             app:key="clearCache"
-            app:title="清除缓存"
-            app:summary="45M"/>
+            app:title="清除缓存"/>
+
+        <Preference
+            app:key="clearROM"
+            app:title="清除外部存储数据"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

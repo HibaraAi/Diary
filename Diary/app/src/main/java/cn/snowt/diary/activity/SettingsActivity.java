@@ -1,20 +1,19 @@
 package cn.snowt.diary.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Environment;
+import android.text.InputType;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
 
 import org.litepal.LitePalApplication;
 
@@ -22,7 +21,9 @@ import java.io.File;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
+import cn.snowt.diary.util.MD5Utils;
 
 /**
  * @Author: HibaraAi
@@ -72,6 +73,11 @@ public class SettingsActivity extends AppCompatActivity {
                     FileUtils.getStringForDirSize(
                             LitePalApplication.getContext()
                                     .getExternalCacheDir().getAbsolutePath()));
+            //读取外存中的数据大小并展示
+            Preference clearROMPreference = findPreference("clearROM");
+            clearROMPreference.setSummary(FileUtils.getStringForDirSize(
+                    Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath()
+            ));
         }
 
         @Override
@@ -93,6 +99,35 @@ public class SettingsActivity extends AppCompatActivity {
                                     LitePalApplication.getContext()
                                             .getExternalCacheDir().getAbsolutePath()));
 
+                    break;
+                }
+                case "clearROM":{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("警告");
+                    builder.setMessage("此操作仅供卸载前执行。清除外存数据会删除所有软件图片，包括日记图片等数据。请输入登录密码确认此操作");
+                    EditText editText = new EditText(context);
+                    editText.setBackgroundResource(R.drawable.background_input);
+                    editText.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD | InputType.TYPE_CLASS_NUMBER );
+                    editText.setHint("输入登录密码");
+                    builder.setView(editText);
+                    builder.setPositiveButton("确认清除数据", (dialog, which) -> {
+                        String s = editText.getText().toString();
+                        boolean truePassword = BaseUtils.getSharedPreference().getString("loginPassword","").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX+s));
+                        if(truePassword){
+                            String path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath();
+                            FileUtils.deleteFolder(path);
+                            //重新展示缓存大小
+                            Preference clearROMPreference = findPreference("clearROM");
+                            //读取缓存大小并展示
+                            clearROMPreference.setSummary(
+                                    FileUtils.getStringForDirSize(path));
+                            BaseUtils.longTipInCoast(context,"成功清除外部存储的数据，请放心卸载本程序");
+                        }else{
+                            BaseUtils.shortTipInCoast(context,"密码校验失败");
+                        }
+                    });
+                    builder.setNegativeButton("取消",null);
+                    builder.show();
                     break;
                 }
                 default:return false;

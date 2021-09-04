@@ -12,6 +12,9 @@ public class MyConfiguration {
     private static String username;
     private static String motto;
     private static String bgImg;
+    private static String privateKey;
+    private static String publicKey;
+    private static boolean requiredAndAbleToEncode;
 
     private static MyConfiguration myConfiguration;
     private MyConfiguration() {
@@ -30,6 +33,15 @@ public class MyConfiguration {
         headImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_HEAD_SRC,null);
         motto = sharedPreference.getString(Constant.SHARE_PREFERENCES_MOTTO,"到侧滑菜单中编辑个性签名");
         bgImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_MAIN_IMG_BG,null);
+        privateKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PRIVATE_KEY, "");
+        publicKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PUBLIC_KEY,"");
+        boolean useEncode = BaseUtils.getDefaultSharedPreferences().getBoolean("useEncode", false);
+        boolean haveSetEncodeKey = false;
+        String publicKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PUBLIC_KEY, "");
+        if(!"".equals(publicKey)){
+            haveSetEncodeKey = true;
+        }
+        requiredAndAbleToEncode = (useEncode && haveSetEncodeKey);
         return myConfiguration;
     }
 
@@ -56,5 +68,17 @@ public class MyConfiguration {
      */
     public String getBgImg() {
         return bgImg;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public boolean isRequiredAndAbleToEncode() {
+        return requiredAndAbleToEncode;
     }
 }

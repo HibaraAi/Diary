@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import org.litepal.LitePal;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +76,11 @@ public class DiaryListActivity extends AppCompatActivity {
             }
             case OPEN_FROM_TEMP_DIARY:{
                 showSimpleDiary();
+                break;
+            }
+            case OPEN_FROM_SEARCH_DIARY:{
+                showSimpleDiary(intent.getIntegerArrayListExtra("ids"),intent.getStringExtra("searchValue"));
+                break;
             }
             default:break;
         }
@@ -161,6 +167,19 @@ public class DiaryListActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
         }
+    }
+
+    /**
+     * 展示从搜索结果来的数据
+     * @param ids
+     */
+    private void showSimpleDiary(ArrayList<Integer> ids,String searchValue){
+        diaryList = diaryService.getSimpleDiaryByIds(ids);
+        tipView.setText("在标签中或未加密日记中，包含字符["+searchValue+"]的日记共有"+diaryList.size()+"条");
+        adapter = new DiaryAxisAdapter(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override

@@ -6,12 +6,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -172,6 +175,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 String diaryInputStr = diaryInputView.getText().toString();
                 if("".equals(diaryInputStr)){
                     BaseUtils.shortTipInSnack(diaryInputView,"空白日记有什么好记录的呢?");
+                }else if(diaryInputStr.length()>2000){
+                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存");
                 }else{
                     SimpleResult result = diaryService.addOneByArgs(diaryInputStr,
                             labelView.getText().toString(),
@@ -199,10 +204,17 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         switch (v.getId()) {
             case R.id.keep_diary_btn_image_tip:
             case R.id.keep_diary_btn_image:{
-                if(imageTempSrcList.size()>=8){
-                    BaseUtils.shortTipInSnack(v,"你最多选择8张图片。长按图片可将其移除。");
+                //判断权限
+                if(ContextCompat.checkSelfPermission(KeepDiaryActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED){
+                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
                 }else{
-                    BaseUtils.openAlbum(KeepDiaryActivity.this, Constant.OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC,CHOOSE_PICTURE);
+                    if(imageTempSrcList.size()>=8){
+                        BaseUtils.shortTipInSnack(v,"你最多选择8张图片。长按图片可将其移除。");
+                    }else{
+                        BaseUtils.openAlbum(KeepDiaryActivity.this, Constant.OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC,CHOOSE_PICTURE);
+                    }
                 }
                 break;
             }
@@ -251,7 +263,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_btn_label:{
                 android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
                 dialog.setTitle("请输入标签");
-                dialog.setMessage("可输入多个标签，但请用#隔开。\ne.g:#美食##周末#");
+                dialog.setMessage("可输入多个标签，但请用英文#隔开。\ne.g:#美食##周末#");
                 EditText editText = new EditText(KeepDiaryActivity.this);
                 editText.setBackgroundResource(R.drawable.background_input);
                 editText.setMinLines(4);
@@ -262,7 +274,20 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 dialog.setView(editText);
                 dialog.setCancelable(false);
                 dialog.setPositiveButton("添加", (dialog1, which) -> {
-                    labelView.setText(editText.getText().toString());
+                    String labelStr = editText.getText().toString();
+                    labelStr = labelStr.trim();
+                    int num = 0;
+                    for (char c : labelStr.toCharArray()) {
+                        if(c == '#'){
+                            num++;
+                        }
+                    }
+                    boolean flag = (num%2==0 && num!=0);
+                    if(labelStr.length()<=30 && flag){
+                        labelView.setText(labelStr);
+                    }else{
+                        BaseUtils.longTipInCoast(v.getContext(),"标签总字符数不超过30,格式必须正确");
+                    }
                 });
                 dialog.setNegativeButton("取消",null);
                 dialog.show();
@@ -312,20 +337,24 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         builder.setTitle("提示：");
         builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？\n如果你是从草稿箱打开这个页面，不保存的话，草稿箱中的记录会被删除!");
         builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
-            boolean saveSuccess = false;
-            TempDiary tempDiary = new TempDiary(null, content);
-            if(tempDiaryId!=-1){
-                int update = tempDiary.update(tempDiaryId);
-                if(0!=update){
-                    saveSuccess = true;
+            if(content.length()>2000){
+                BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存");
+            }else{
+                boolean saveSuccess = false;
+                TempDiary tempDiary = new TempDiary(null, content);
+                if(tempDiaryId!=-1){
+                    int update = tempDiary.update(tempDiaryId);
+                    if(0!=update){
+                        saveSuccess = true;
+                    }
+                }else{
+                    saveSuccess = tempDiary.save();
                 }
-            }else{
-                saveSuccess = tempDiary.save();
-            }
-            if(saveSuccess){
-                finish();
-            }else{
-                BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
+                if(saveSuccess){
+                    finish();
+                }else{
+                    BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
+                }
             }
         });
         builder.setPositiveButton("直接退出",(dialog, which) -> {

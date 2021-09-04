@@ -49,6 +49,8 @@ public class Constant {
     public static final String SHARE_PREFERENCES_USERNAME = "username";
     public static final String SHARE_PREFERENCES_MOTTO = "motto";
     public static final String SHARE_PREFERENCES_MAIN_IMG_BG = "main_bg_image";
+    public static final String SHARE_PREFERENCES_PRIVATE_KEY = "private_key";
+    public static final String SHARE_PREFERENCES_PUBLIC_KEY = "public_key";
 
     public static final int OPEN_ALBUM_TYPE_HEAD = 1;
     public static final int OPEN_ALBUM_TYPE_MAIN_BG = 2;

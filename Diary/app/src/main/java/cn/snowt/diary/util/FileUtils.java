@@ -1,6 +1,10 @@
 package cn.snowt.diary.util;
 
+import android.os.Environment;
+
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @Author: HibaraAi
@@ -10,6 +14,31 @@ import java.io.File;
 public class FileUtils {
 
     private static long countSize = 0;
+
+    public static boolean saveAsFileWriter(String content,String fileName) {
+        boolean flag = false;
+        FileWriter writer = null;
+        try {
+            File externalDirectory = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION + "output/");
+            if (!externalDirectory.exists()){
+                externalDirectory.mkdirs();
+            }
+            File file = new File(externalDirectory.getAbsolutePath() + "/" + fileName);
+            writer = new FileWriter(file);
+            writer.write(content);
+            flag = true;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                writer.flush();
+                writer.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return flag;
+    }
 
     /**
      * 获取文件夹的大小,10GB以上时以GB单位展示，1MB以下时以KB展示，其他为MB展示

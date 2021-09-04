@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -305,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
                 if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
                     BaseUtils.shortTipInCoast(MainActivity.this,"已获取权限，请重新操作一次");
                 }else{
-                    BaseUtils.shortTipInCoast(MainActivity.this,"你没有授权读取相册");
+                    BaseUtils.shortTipInCoast(MainActivity.this,"你没有授权外部存储的都且权限");
                 }
                 break;
             }
@@ -395,6 +396,35 @@ public class MainActivity extends AppCompatActivity {
             }
             case R.id.toolbar_write:{
                 BaseUtils.gotoActivity(MainActivity.this,KeepDiaryActivity.class);
+                break;
+            }
+            case R.id.toolbar_search:{
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(false);
+                builder.setTitle("搜索日记");
+                builder.setMessage("仅搜索日记标签和未加密的日记内容");
+                EditText editText = new EditText(MainActivity.this);
+                editText.setBackgroundResource(R.drawable.background_input);
+                editText.setHint("输入搜索内容，标签不需要加#");
+                editText.setMaxLines(3);
+                editText.setMinLines(3);
+                builder.setView(editText);
+                builder.setPositiveButton("搜索", (dialog, which) -> {
+                    String searchValue = editText.getText().toString();
+                    searchValue = searchValue.trim();
+                    SimpleResult result = diaryService.searchDiary(searchValue);
+                    if(result.getSuccess()){
+                        Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
+                        intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_SEARCH_DIARY);
+                        intent.putIntegerArrayListExtra("ids",(ArrayList<Integer>)result.getData());
+                        intent.putExtra("searchValue",searchValue);
+                        startActivity(intent);
+                    }else{
+                        BaseUtils.longTipInCoast(MainActivity.this,result.getMsg());
+                    }
+                });
+                builder.setNegativeButton("取消",null);
+                builder.show();
                 break;
             }
             default:{

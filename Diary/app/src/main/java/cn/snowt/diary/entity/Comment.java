@@ -42,4 +42,9 @@ public class Comment extends LitePalSupport implements Serializable {
      * 修改时间
      */
     private Date modifiedDate;
+
+    /**
+     * 加密标志
+     */
+    private Boolean encryption;
 }

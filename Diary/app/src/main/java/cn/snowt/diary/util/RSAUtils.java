@@ -36,60 +36,52 @@ public class RSAUtils {
     public static String UTF8 = "UTF-8";
 
     /**
-     * 私钥
-     */
-    private static final String DEFAULT_PRIVATE_KEY = "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC2Q0SieIhZUTRRZ8ZPaWX2Fa/8bwzowa1NJajXEZsAhsEpQaz2VAshRWYNtd1iRPC0v3yu7IkQXKNt4juyCYEtYaqiYMOpVIn4GeuDp1GnI5gkn625ExzIZ8oqrS/01KNF2GxvVX+4GwlWQVdjDN0dcaP0mZD1G2G7hjxL8ZsYtuNDnExGiOyXnD6TdbAD8W5qdsT/HrtqikgS6WxstbfBwYiuQU77e/2+c7JkNd2nwErGKcR1vm6l037LZL8bqMg7XzLRbHXmT476/N3h4A4jd+oZtZjYfLgn2o7khFQ/X1Nl24xXlzc+aHTYAHDQcjhT3WSZ9Ez0twJlAO7wvUx/AgMBAAECggEASHMW3kpxUKfB1zYcE0b/O8HFMd/mzsLmI4t7wPoDlkL6l26+1S/1OKWAeqS3Oq/SytZvNo1ZsoJQiIZsWkoC6kovbNpwDGhJa7DJ+IxTHdA9UxmSEcZyI4t2Rl6PeI/p0wLDn8HpwgIlRP82QG5FmsWoebttbrESuVsTrtB8aWbkMfqfudKkAuqlI14olLscU4KYiNeg6ewc1zunN3b8gsHxdUfaWZAKJ3GpoLhryHWZOfBbWsJh+SMUCzPj4s5nlAgP2VpAlt5nwlUAZgrNuFiC98AC6xxpOhNNrGhYG8m7JVR1WzUEU5iaicIvhgMdhT4tM4G+9zYekPI6mxGWcQKBgQD4DeZQIzagluUF1Wg+KXacXGZLR/u+WjFrAShTHjb64/p2A8m3obqhFbTzocQ/yodZOLPHmFqUTyk5D3IPjLHw3evQRVBGF15nBaq4ELPthOErMpegH85i2LLsnfbEUBPCI/LdjRplIHCI/PoRZ1P7429vywR9pL8M8rWwrw/+9wKBgQC8Gd0AIhRmJYpXfZXVHaZGQG2JGZcvFkrIseDf4xNSBWyz7Dm+ldK9GGtnFxeRaifgmxNBFPQsTKaqBkd2HQ7auLdq5+lr8pqTOyctbDL/raazlGUF7XK10vKcSzr7XuaOvb3FmjlfqErRzQtA/pamQGEKFi6g3vfudXrW02NUuQKBgEeDSljkLgWSOyi5Y7o4HffqM5uUfyFbw0+EH+oGlfcy7qxDX05PlAyIw4hRpNB3RRoV3M64P7TuNYY7y7hr6Yj1kdyTfxcV+aNd4N/8AMODQZ9AkLIbOVcJ/lt1FwV1yJx53LS+z1NETO1RcY6+6Vl/Mktajkriyimjd3oenk/1AoGAIWWmK4Phg1FfArG1jKU7BHYj/JeilCWtGX0bpCS5JXL5HejvR7tqM1DGoQMkmBj1A5gFDyUdRVBGtyFuRrZaENODHWQXuabVcxapmhL/6w1176SFW0wRdd8CXGWvDzqGTQm7S/5Z+XXz8tQpD10kelgr4pKVrNJpytjo+oOFu2ECgYAexjdOrwHRja51EvfEvar/uKE47I2XgqwMxUafWYtJ0Yee0qeZ2YIHPE+LVXcsImgRlocpNCBCogksVXwKNcbSq+NlCsY7upVQlbpqA8le6j6NtsevrAUGjQBxVfDknALV7Ne1FVi42s0VX5OjU0ZDFwMSOJ5EozK1nEvehebjmg==";
-    /**
-     * 公钥
-     */
-    private static final String DEFAULT_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtkNEoniIWVE0UWfGT2ll9hWv/G8M6MGtTSWo1xGbAIbBKUGs9lQLIUVmDbXdYkTwtL98ruyJEFyjbeI7sgmBLWGqomDDqVSJ+Bnrg6dRpyOYJJ+tuRMcyGfKKq0v9NSjRdhsb1V/uBsJVkFXYwzdHXGj9JmQ9Rthu4Y8S/GbGLbjQ5xMRojsl5w+k3WwA/FuanbE/x67aopIEulsbLW3wcGIrkFO+3v9vnOyZDXdp8BKxinEdb5updN+y2S/G6jIO18y0Wx15k+O+vzd4eAOI3fqGbWY2Hy4J9qO5IRUP19TZduMV5c3Pmh02ABw0HI4U91kmfRM9LcCZQDu8L1MfwIDAQAB";
-    /**
      * 密钥长度，DSA算法的默认密钥长度是1024
      * 密钥长度必须是64的倍数，在512到65536位之间
      * */
     private static final int KEY_SIZE=1024*2;
 
-    /**
-     * 原始的未修改的加密
-     * 使用默认密钥加密
-     * @param s
-     * @return
-     */
-    @Deprecated
-    public static String encodeOld(String s){
-        try {
-            return new String(Base64.encode(encryptByPublicKey(s.getBytes(), Base64.decode(DEFAULT_PUBLIC_KEY,Base64.DEFAULT)),Base64.DEFAULT));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    /**
+//     * 原始的未修改的加密
+//     * 使用默认密钥加密
+//     * @param s
+//     * @return
+//     */
+//    @Deprecated
+//    public static String encodeOld(String s){
+//        try {
+//            return new String(Base64.encode(encryptByPublicKey(s.getBytes(), Base64.decode(Constant.DEFAULT_PUBLIC_KEY,Base64.DEFAULT)),Base64.DEFAULT));
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        } catch (InvalidKeySpecException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchPaddingException e) {
+//            e.printStackTrace();
+//        } catch (BadPaddingException e) {
+//            e.printStackTrace();
+//        } catch (IllegalBlockSizeException e) {
+//            e.printStackTrace();
+//        } catch (InvalidKeyException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
-    /**
-     * 原始的未修改的解密
-     * 使用默认密钥解密
-     * @param s
-     * @return
-     */
-    @Deprecated
-    public static String decodeOld(String s){
-        try {
-            return new String(decryptByPrivateKey(Base64.decode(s,Base64.DEFAULT), Base64.decode(DEFAULT_PRIVATE_KEY,Base64.DEFAULT)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    /**
+//     * 原始的未修改的解密
+//     * 使用默认密钥解密
+//     * @param s
+//     * @return
+//     */
+//    @Deprecated
+//    public static String decodeOld(String s){
+//        try {
+//            return new String(decryptByPrivateKey(Base64.decode(s,Base64.DEFAULT), Base64.decode(Constant.DEFAULT_PRIVATE_KEY,Base64.DEFAULT)));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     /**
      * 使用自定义密钥加密
@@ -168,80 +160,80 @@ public class RSAUtils {
         return new String(decodeResultBytes);
     }
 
-    /**
-     * 使用默认密钥加密
-     * @param s 需要加密的数据
-     * @return 加密后的数据
-     */
-    public static String encode(String s){
-        byte[] trueEncodeKey = Base64.decode(DEFAULT_PUBLIC_KEY, Base64.DEFAULT);
-        byte[] originalBytes = s.getBytes();
-        //分片长度
-        int sliceLength = (KEY_SIZE / 8)-1;
-        //分片个数
-        int sliceNum = (int) Math.ceil((double)originalBytes.length/sliceLength);
-        byte[] encodeResultBytes = new byte[sliceNum*(sliceLength+1)];
-        for(int i=0;i<sliceNum;i++){
-            try {
-                int min = Math.min(originalBytes.length - (i * sliceLength), sliceLength);
-                byte[] bytes = new byte[min];
-                System.arraycopy(originalBytes,i*sliceLength,bytes,0, min);
-                byte[] bytes1 = encryptByPublicKey(bytes, trueEncodeKey);
-                System.arraycopy(bytes1,0,encodeResultBytes,i*(sliceLength+1),Math.min(bytes1.length,sliceLength+1));
-                System.out.println();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                return null;
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-                return null;
-            } catch (NoSuchPaddingException e) {
-                e.printStackTrace();
-                return null;
-            } catch (BadPaddingException e) {
-                e.printStackTrace();
-                return null;
-            } catch (IllegalBlockSizeException e) {
-                e.printStackTrace();
-                return null;
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-        return new String(Base64.encode(encodeResultBytes,Base64.DEFAULT));
-    }
+//    /**
+//     * 使用默认密钥加密
+//     * @param s 需要加密的数据
+//     * @return 加密后的数据
+//     */
+//    public static String encode(String s){
+//        byte[] trueEncodeKey = Base64.decode(Constant.DEFAULT_PUBLIC_KEY, Base64.DEFAULT);
+//        byte[] originalBytes = s.getBytes();
+//        //分片长度
+//        int sliceLength = (KEY_SIZE / 8)-1;
+//        //分片个数
+//        int sliceNum = (int) Math.ceil((double)originalBytes.length/sliceLength);
+//        byte[] encodeResultBytes = new byte[sliceNum*(sliceLength+1)];
+//        for(int i=0;i<sliceNum;i++){
+//            try {
+//                int min = Math.min(originalBytes.length - (i * sliceLength), sliceLength);
+//                byte[] bytes = new byte[min];
+//                System.arraycopy(originalBytes,i*sliceLength,bytes,0, min);
+//                byte[] bytes1 = encryptByPublicKey(bytes, trueEncodeKey);
+//                System.arraycopy(bytes1,0,encodeResultBytes,i*(sliceLength+1),Math.min(bytes1.length,sliceLength+1));
+//                System.out.println();
+//            } catch (NoSuchAlgorithmException e) {
+//                e.printStackTrace();
+//                return null;
+//            } catch (InvalidKeySpecException e) {
+//                e.printStackTrace();
+//                return null;
+//            } catch (NoSuchPaddingException e) {
+//                e.printStackTrace();
+//                return null;
+//            } catch (BadPaddingException e) {
+//                e.printStackTrace();
+//                return null;
+//            } catch (IllegalBlockSizeException e) {
+//                e.printStackTrace();
+//                return null;
+//            } catch (InvalidKeyException e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }
+//        return new String(Base64.encode(encodeResultBytes,Base64.DEFAULT));
+//    }
 
-    /**
-     * 使用默认密钥解密
-     * @param s 需要解密的数据
-     * @return 解密后的数据
-     */
-    public static String decode(String s){
-        byte[] trueDecodeKey = Base64.decode(DEFAULT_PRIVATE_KEY, Base64.DEFAULT);
-        byte[] originalBytes = Base64.decode(s, Base64.DEFAULT);
-        //分片长度
-        int sliceLength = (KEY_SIZE / 8)-1;
-        //分片个数
-        int sliceNum = originalBytes.length/(sliceLength+1);
-        byte[] decodeTempBytes = new byte[sliceNum*sliceLength];
-        int trueDecodeResultLength = 0;
-        for(int i=0;i<sliceNum;i++){
-            try{
-                byte[] bytes = new byte[sliceLength+1];
-                System.arraycopy(originalBytes,(i*(sliceLength+1)),bytes,0, sliceLength+1);
-                byte[] bytes1 = decryptByPrivateKey(bytes, trueDecodeKey);
-                System.arraycopy(bytes1,0,decodeTempBytes,i*sliceLength,Math.min(sliceLength,bytes1.length));
-                trueDecodeResultLength += Math.min(sliceLength,bytes1.length);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-        byte[] decodeResultBytes = new byte[trueDecodeResultLength];
-        System.arraycopy(decodeTempBytes,0,decodeResultBytes,0,trueDecodeResultLength);
-        return new String(decodeResultBytes);
-    }
+//    /**
+//     * 使用默认密钥解密
+//     * @param s 需要解密的数据
+//     * @return 解密后的数据
+//     */
+//    public static String decode(String s){
+//        byte[] trueDecodeKey = Base64.decode(Constant.DEFAULT_PRIVATE_KEY, Base64.DEFAULT);
+//        byte[] originalBytes = Base64.decode(s, Base64.DEFAULT);
+//        //分片长度
+//        int sliceLength = (KEY_SIZE / 8)-1;
+//        //分片个数
+//        int sliceNum = originalBytes.length/(sliceLength+1);
+//        byte[] decodeTempBytes = new byte[sliceNum*sliceLength];
+//        int trueDecodeResultLength = 0;
+//        for(int i=0;i<sliceNum;i++){
+//            try{
+//                byte[] bytes = new byte[sliceLength+1];
+//                System.arraycopy(originalBytes,(i*(sliceLength+1)),bytes,0, sliceLength+1);
+//                byte[] bytes1 = decryptByPrivateKey(bytes, trueDecodeKey);
+//                System.arraycopy(bytes1,0,decodeTempBytes,i*sliceLength,Math.min(sliceLength,bytes1.length));
+//                trueDecodeResultLength += Math.min(sliceLength,bytes1.length);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }
+//        byte[] decodeResultBytes = new byte[trueDecodeResultLength];
+//        System.arraycopy(decodeTempBytes,0,decodeResultBytes,0,trueDecodeResultLength);
+//        return new String(decodeResultBytes);
+//    }
 
     /**
      * 随机获取一对密钥

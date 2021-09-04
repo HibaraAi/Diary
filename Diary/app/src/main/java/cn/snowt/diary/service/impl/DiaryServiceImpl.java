@@ -15,6 +15,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,7 @@ import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
+import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.RSAUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
@@ -52,9 +55,13 @@ public class DiaryServiceImpl implements DiaryService {
         all.forEach(diary -> {
             DiaryVo vo = new DiaryVo();
             vo.setId(diary.getId());
-            //解密
-            //vo.setContent(RSAUtils.decode(diary.getContent()));
-            vo.setContent(diary.getContent());
+            if(diary.getEncryption()){
+                //此条记录被加密过
+                vo.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+            }else{
+                vo.setContent(diary.getContent());
+            }
+            //vo.setContent(diary.getContent());
             vo.setModifiedDate(BaseUtils.dateToString(diary.getModifiedDate()));
             vo.setLabelStr(diary.getLabel());
             //地址
@@ -74,9 +81,12 @@ public class DiaryServiceImpl implements DiaryService {
             vo.setPicSrcList(picSrcList);
             //评论
             List<Comment> commentList = LitePal.where("diaryId = ?",diary.getId()+"").order("id desc").find(Comment.class);
-//            commentList.forEach(comment ->
-//                    comment.setContent(RSAUtils.decode(comment.getContent())));
-//            vo.setCommentList(commentList);
+            commentList.forEach(comment ->{
+                if (comment.getEncryption()){
+                    //此条记录需要解密
+                    comment.setContent(RSAUtils.decode(comment.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+                }
+            });
             vo.setCommentList(commentList);
             voList.add(vo);
         });
@@ -97,26 +107,46 @@ public class DiaryServiceImpl implements DiaryService {
             location.save();
         }
         //再存Diary，它的主键要当图片的外键
-        Diary diary = new Diary(null,
-                labelStr,
-                diaryContent,
-                //RSAUtils.encode(diaryContent),
-                new Date(),
-                weather.getId(),
-                location.getId());
+        Diary diary;
+        if(MyConfiguration.getInstance().isRequiredAndAbleToEncode()){
+            //开启解密
+            diary = new Diary(null,
+                    labelStr,
+                    RSAUtils.encode(diaryContent,MyConfiguration.getInstance().getPublicKey()),
+                    new Date(),
+                    weather.getId(),
+                    location.getId(),true);
+        }else{
+            //不需要加密
+            diary = new Diary(null,
+                    labelStr,
+                    diaryContent,
+                    new Date(),
+                    weather.getId(),
+                    location.getId(),false);
+        }
         if (diary.save()) {
             //存储图片关系
+            @SuppressLint("SimpleDateFormat")
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+            String nowMonth = sdf.format(new Date());
+            File path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION+"image/"+nowMonth+"/");
+            if(!path.exists()){
+                Log.i(TAG,"------创建目录"+path.getAbsolutePath());
+                path.mkdirs();
+            }
+            String absolutePath = path.getAbsolutePath();
             tempImgSrcList.forEach(picSrc->{
                 //将缓存图片移动到指定存储目录
-                @SuppressLint("SimpleDateFormat")
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-                String nowMonth = sdf.format(new Date());
-                File path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION+"image/"+nowMonth+"/");
-                if(!path.exists()){
-                    Log.i(TAG,"------创建目录"+path.getAbsolutePath());
-                    path.mkdirs();
-                }
-                String absolutePath = path.getAbsolutePath();
+//                @SuppressLint("SimpleDateFormat")
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+//                String nowMonth = sdf.format(new Date());
+//                File path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION+"image/"+nowMonth+"/");
+//                if(!path.exists()){
+//                    Log.i(TAG,"------创建目录"+path.getAbsolutePath());
+//                    path.mkdirs();
+//                }
+//                String absolutePath = path.getAbsolutePath();
                 File finalSavePath = new File((absolutePath + "/" + UUID.randomUUID().toString() + ".hibara"));
                 try {
                     finalSavePath.createNewFile();
@@ -179,7 +209,7 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public SimpleResult getSimpleDiaryByDate(Date date1, Date date2) {
-        List<Diary> diaryList = LitePal.select("id,content,modifiedDate")
+        List<Diary> diaryList = LitePal.select("id,content,modifiedDate,encryption")
                 .where("modifiedDate > ? AND modifiedDate < ?", date1.getTime()+"", date2.getTime()+"")
                 .order("id desc")
                 .find(Diary.class);
@@ -189,11 +219,14 @@ public class DiaryServiceImpl implements DiaryService {
             vo.setId(diary.getId());
             String subDateStr = BaseUtils.dateToString(diary.getModifiedDate()).substring(0, 10);
             vo.setModifiedDate(subDateStr);
+            if(diary.getEncryption()){
+                //需要解密
+                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+            }
             String subDiary = (diary.getContent().length()>30)
                     ? (diary.getContent().substring(0,30)+"...")
                     : diary.getContent();
             vo.setContent(subDiary);
-
             List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").limit(1).find(Drawing.class);
             List<String> picSrcList = new ArrayList<>();
             drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
@@ -211,7 +244,10 @@ public class DiaryServiceImpl implements DiaryService {
         }
         DiaryVo vo = new DiaryVo();
         vo.setId(diary.getId());
-        vo.setContent(diary.getContent());
+        if(diary.getEncryption()){
+            //需要解密
+            vo.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+        }
         vo.setModifiedDate(BaseUtils.dateToString(diary.getModifiedDate()));
         vo.setLabelStr(diary.getLabel());
         //地址
@@ -231,10 +267,59 @@ public class DiaryServiceImpl implements DiaryService {
         vo.setPicSrcList(picSrcList);
         //评论
         List<Comment> commentList = LitePal.where("diaryId = ?",diary.getId()+"").order("id desc").find(Comment.class);
-//            commentList.forEach(comment ->
-//                    comment.setContent(RSAUtils.decode(comment.getContent())));
-//            vo.setCommentList(commentList);
+        commentList.forEach(comment ->{
+            if (comment.getEncryption()){
+                comment.setContent(RSAUtils.decode(comment.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+            }
+        });
         vo.setCommentList(commentList);
         return SimpleResult.ok().data(vo);
+    }
+
+    @Override
+    public SimpleResult searchDiary(String searchValue) {
+        List<Diary> diaryList = LitePal.select("id").where("(label like ? OR (encryption = 0 AND content like ?))",("%"+searchValue+"%"),("%"+searchValue+"%")).find(Diary.class);
+        if(diaryList.isEmpty()){
+            return SimpleResult.error().msg("没有符合搜索值为["+searchValue+"]的日记");
+        }else{
+            List<Integer> idList = new ArrayList<>();
+            diaryList.forEach(diary -> idList.add(diary.getId()));
+            return SimpleResult.ok().data(idList);
+        }
+    }
+
+    @Override
+    public List<DiaryVo> getSimpleDiaryByIds(ArrayList<Integer> ids) {
+        if(ids.isEmpty()){
+            return new ArrayList<DiaryVo>();
+        }
+        long[] idsArray = new long[ids.size()];
+        for (int i=0;i<ids.size();i++){
+            idsArray[i] = ids.get(i);
+        }
+        //此处应该SELECT指定列，IN语句限制id范围
+        List<Diary> diaryList = LitePal.findAll(Diary.class, idsArray);
+        List<DiaryVo> voList = new ArrayList<>();
+        diaryList.forEach(diary -> {
+            DiaryVo vo = new DiaryVo();
+            vo.setId(diary.getId());
+            String subDateStr = BaseUtils.dateToString(diary.getModifiedDate()).substring(0, 10);
+            vo.setModifiedDate(subDateStr);
+            if(diary.getEncryption()){
+                //需要解密
+                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+            }
+            String subDiary = (diary.getContent().length()>30)
+                    ? (diary.getContent().substring(0,30)+"...")
+                    : diary.getContent();
+            vo.setContent(subDiary);
+            List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").limit(1).find(Drawing.class);
+            List<String> picSrcList = new ArrayList<>();
+            drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
+            vo.setPicSrcList(picSrcList);
+            voList.add(vo);
+        });
+        Collections.reverse(voList);
+        return voList;
     }
 }

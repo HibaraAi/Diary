@@ -11,6 +11,7 @@ import java.util.List;
 import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.service.CommentService;
+import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.RSAUtils;
 import cn.snowt.diary.util.SimpleResult;
 
@@ -24,13 +25,20 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public SimpleResult addOneByArgs(String commentStr, Integer diaryId) {
-        //Comment comment = new Comment(null, RSAUtils.encode(commentStr),diaryId,new Date());
         //判断给日记还存不存在
         List<Diary> diaryList = LitePal.select("id").where("id = ?", diaryId + "").find(Diary.class);
         if(diaryList.size()!=1){
             return SimpleResult.error().msg("该日记貌似不存在了，不能提交评论");
         }
-        Comment comment = new Comment(null, commentStr,diaryId,new Date());
+        if(commentStr.length()>2000){
+            return SimpleResult.error().msg("你以为出书呢？大于2000字了，禁止保存");
+        }
+        Comment comment;
+        if(MyConfiguration.getInstance().isRequiredAndAbleToEncode()){
+            comment = new Comment(null, RSAUtils.encode(commentStr,MyConfiguration.getInstance().getPublicKey()),diaryId,new Date(),true);
+        }else{
+            comment = new Comment(null, commentStr,diaryId,new Date(),false);
+        }
         if (comment.save()) {
             return SimpleResult.ok();
         }else{

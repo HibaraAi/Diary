@@ -52,4 +52,9 @@ public class Diary extends LitePalSupport implements Serializable {
      * 外键,所在位置
      */
     private Integer locationId;
+
+    /**
+     * 加密标志
+     */
+    private Boolean encryption;
 }

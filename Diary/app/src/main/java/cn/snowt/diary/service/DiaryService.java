@@ -1,5 +1,6 @@
 package cn.snowt.diary.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -53,4 +54,18 @@ public interface DiaryService {
      * @return
      */
     SimpleResult getDiaryVoById(int diaryId);
+
+    /**
+     * 搜索日记
+     * @param searchValue 搜索值
+     * @return 仅返回diaryId集合，如果没有符合的记录返回SimpleResult.error()
+     */
+    SimpleResult searchDiary(String searchValue);
+
+    /**
+     * 根据给定id集合，查找日记
+     * @param ids id集合
+     * @return diaryVo仅包含id，经过处理后的时间Str，截取正文内容Str，和一张图片src(如果有)
+     */
+    List<DiaryVo> getSimpleDiaryByIds(ArrayList<Integer> ids);
 }

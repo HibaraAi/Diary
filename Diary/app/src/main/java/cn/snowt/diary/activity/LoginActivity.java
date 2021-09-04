@@ -1,8 +1,15 @@
 package cn.snowt.diary.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -83,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onClick(View v) {
         BaseUtils.createOneShotByVibrator();
@@ -137,8 +145,41 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //第一次使用本程序
             //创建数据库
             LitePal.getDatabase();
-            //跳转设置登录密码界面
-            BaseUtils.gotoActivity(this, SetPasswordActivity.class);
+            //申请存储权限
+            applyPermission();
+        }
+    }
+
+
+    private void applyPermission() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        builder.setTitle("存储权限申请");
+        builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，本软件不会偷盗你的数据，放心使用。" +
+                "\n读权限用在了读取相册中的图片、读取本软件生成的备份文件。" +
+                "\n写权限用在了日记配图、头像、背景图、加密密钥和备份文件的存储。" +
+                "\n你可以在后续使用过程中再来许可权限，但不敢保证会不会出现闪退现象，因此本软件强烈建议你在此时授予权限" +
+                "\n你可在帮助和关于中找到权限使用的详细说明");
+        builder.setPositiveButton("了解", (dialog, which) -> {
+            ActivityCompat.requestPermissions(LoginActivity.this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case 1:{
+                if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                    BaseUtils.shortTipInCoast(LoginActivity.this,"已获取外部存储的读写权限");
+                }else{
+                    BaseUtils.shortTipInCoast(LoginActivity.this,"你没有授权外部存储的读写权限");
+                }
+                //跳转设置登录密码界面
+                BaseUtils.gotoActivity(this, SetPasswordActivity.class);
+                break;
+            }
+            default:break;
         }
     }
 }

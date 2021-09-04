@@ -130,6 +130,14 @@ public class SettingsActivity extends AppCompatActivity {
                     builder.show();
                     break;
                 }
+                case "changeEncodeKey":{
+                    BaseUtils.gotoActivity((Activity) context,SetRSAActivity.class);
+                    break;
+                }
+                case "useEncode":{
+                    BaseUtils.alertDialogToShow(context,"提示","你已更改日记的存储安全策略，请立马重启软件。\n如果你还没有修改过加密密钥，则此项设置无效");
+                    break;
+                }
                 default:return false;
             }
             return true;

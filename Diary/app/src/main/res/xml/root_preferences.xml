@@ -33,5 +33,17 @@
             app:key="clearROM"
             app:title="清除外部存储数据"/>
 
+        <SwitchPreferenceCompat
+            app:key="useEncode"
+            app:defaultValue="false"
+            app:title="启用加密"
+            app:summaryOn="当前: 已启用\n更安全但运行速度更慢(仅对今后新增日记生效)"
+            app:summaryOff="当前: 未开启\n响应更快速(仅对今后新增日记生效)"/>
+        <Preference
+            app:key="changeEncodeKey"
+            app:dependency="useEncode"
+            app:title="修改加密密钥"
+            app:summary="日记加密/解密用到的密钥。仅可修改一次"/>
+
     </PreferenceCategory>
 </PreferenceScreen>

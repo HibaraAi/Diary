@@ -3,6 +3,7 @@ package cn.snowt.diary.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
@@ -28,9 +29,10 @@ public interface DiaryService {
      * @param locationStr 位置Str
      * @param weatherStr 天气Str
      * @param tempImgSrcList 读取到的图片缓存Src
+     * @param date 日记时间,如果为null，则自动填写时间
      * @return
      */
-    SimpleResult addOneByArgs(String diaryContent, String labelStr, String locationStr, String weatherStr, List<String> tempImgSrcList);
+    SimpleResult addOneByArgs(String diaryContent, String labelStr, String locationStr, String weatherStr, List<String> tempImgSrcList,Date date);
 
     /**
      * 通过id删除一条日记，级联删除其他相关内容
@@ -68,4 +70,29 @@ public interface DiaryService {
      * @return diaryVo仅包含id，经过处理后的时间Str，截取正文内容Str，和一张图片src(如果有)
      */
     List<DiaryVo> getSimpleDiaryByIds(ArrayList<Integer> ids);
+
+    /**
+     *备份日记
+     * @param privateKey privateKey
+     * @param publicKey publicKey
+     * @param pinKey pinKey
+     * @return
+     */
+    SimpleResult backupDiary(String privateKey,String publicKey,String pinKey);
+
+    /**
+     * 从已经读取的备份数据恢复日记
+     * @param pinKeyInput 输入的pin口令
+     * @param privateKeyInput 输入的私钥
+     * @param map 已经读取到的数据
+     * @return
+     */
+    SimpleResult recoveryDiary(String pinKeyInput, String privateKeyInput, Map<String,Object> map);
+
+    /**
+     * 根据标签，查找同标签的所有日记
+     * @param labelStr 标签
+     * @return diaryVo仅包含id，经过处理后的时间Str，截取正文内容Str，和一张图片src(如果有)
+     */
+    List<DiaryVo> getSimpleDiaryByLabel(String labelStr);
 }

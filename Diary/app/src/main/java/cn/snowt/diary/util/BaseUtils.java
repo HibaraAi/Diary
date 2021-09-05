@@ -100,7 +100,7 @@ public class BaseUtils {
     /**
      * String转java.util.Date
      * @param dateStr 指定格式的String日期
-     * @return Date
+     * @return Date 转换失败返回null
      */
     public static Date stringToDate(String dateStr){
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat(Constant.DATE_FORMAT);

@@ -39,6 +39,7 @@ import com.scwang.smart.refresh.footer.BallPulseFooter;
 import com.scwang.smart.refresh.header.BezierRadarHeader;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
+import com.scwang.smart.refresh.layout.wrapper.RefreshFooterWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         refreshLayout.setRefreshHeader(new BezierRadarHeader(this)
                 .setEnableHorizontalDrag(true)
                 .setPrimaryColor(Color.parseColor("#FA7298")));
-        refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
+        refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.FixedBehind));
         refreshLayout.setOnRefreshListener(refreshLayout -> {
             refreshDiary();
             refreshLayout.finishRefresh();

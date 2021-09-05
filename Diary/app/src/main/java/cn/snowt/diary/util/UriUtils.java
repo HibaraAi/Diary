@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +30,14 @@ import java.io.OutputStream;
  * @Description:
  */
 public class UriUtils {
+    public static byte[] getBytesByUri(Context context, Uri uri) throws IOException {
+        InputStream iStream = context.getContentResolver().openInputStream(uri);
+        if (iStream == null) {
+            return null;
+        }
+        return getBytes(iStream);
+    }
+
     public static String getFilePathFromURI(Context context, Uri contentUri) {
         File rootDataDir = context.getExternalFilesDir(null);
         String fileName = getFileName(contentUri);
@@ -148,6 +157,18 @@ public class UriUtils {
             return imageUri.getPath();
         }
         return null;
+    }
+
+    private static byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 
     //此方法 只能用于4.4以下的版本

@@ -3,11 +3,16 @@ package cn.snowt.diary.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -20,10 +25,14 @@ import org.litepal.LitePalApplication;
 import java.io.File;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.service.DiaryService;
+import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.MD5Utils;
+import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.SimpleResult;
 
 /**
  * @Author: HibaraAi
@@ -31,6 +40,7 @@ import cn.snowt.diary.util.MD5Utils;
  * @Description: 设置
  */
 public class SettingsActivity extends AppCompatActivity {
+    public static final String TAG = "SettingsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +74,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+//        SharedPreferences sharedPreferences = BaseUtils.getDefaultSharedPreferences();
+//        boolean testFun = sharedPreferences.getBoolean("testFun", false);
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -78,6 +90,11 @@ public class SettingsActivity extends AppCompatActivity {
             clearROMPreference.setSummary(FileUtils.getStringForDirSize(
                     Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath()
             ));
+            //测试区功能
+            boolean openTestFun = BaseUtils.getSharedPreference().getBoolean("openTestFun", false);
+            findPreference("backupDiary").setEnabled(openTestFun);
+            findPreference("recoveryDiary").setEnabled(openTestFun);
+            findPreference("customDate").setEnabled(openTestFun);
         }
 
         @Override
@@ -136,6 +153,73 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 case "useEncode":{
                     BaseUtils.alertDialogToShow(context,"提示","你已更改日记的存储安全策略，请立马重启软件。\n如果你还没有修改过加密密钥，则此项设置无效");
+                    break;
+                }
+                case "backupDiary":{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("设置读取密钥");
+                    builder.setMessage("为备份文件设置读取口令\n（提示：\n1.从备份文件读取日记时，如果日记加密过，还需要提供加密密钥，如果你没有加密密钥，则会读取失败\n2.过程可能需要很长时间(取决于你的日记数量),如果有卡住现象是正常情况，耐心等待）");
+                    EditText pinView = new EditText(context);
+                    pinView.setHint("设置一个读取口令");
+                    pinView.setBackgroundResource(R.drawable.background_input);
+                    pinView.setMinLines(2);
+                    pinView.setMaxLines(2);
+                    builder.setView(pinView);
+                    builder.setCancelable(false);
+                    builder.setPositiveButton("备份", (dialog, which) -> {
+                        String privateKeyInJson;
+                        String publicKeyInJson;
+                        privateKeyInJson = MyConfiguration.getInstance().getPrivateKey();
+                        publicKeyInJson = MyConfiguration.getInstance().getPublicKey();
+                        DiaryService diaryService = new DiaryServiceImpl();
+                        Log.w(TAG,"------此处应该改为service后台进行操作");
+                        String pinInput = pinView.getText().toString();
+                        if("".equals(pinInput)){
+                            BaseUtils.longTipInCoast(context,"口令为空?你在想什么呢?已停止备份");
+                        }else{
+                            SimpleResult result = diaryService.backupDiary(privateKeyInJson, publicKeyInJson,pinInput);
+                            BaseUtils.longTipInCoast(context,result.getMsg());
+                        }
+                    });
+                    builder.setNegativeButton("取消",null);
+                    builder.show();
+                    break;
+                }
+                case "recoveryDiary":{
+                    BaseUtils.gotoActivity((Activity) context,RecoveryDiaryActivity.class);
+                    break;
+                }
+                case "testFun":{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("输入测试码");
+                    builder.setMessage("测试功能仅共开发者测试使用,输入测试码开启");
+                    builder.setCancelable(false);
+                    EditText editText = new EditText(context);
+                    editText.setBackgroundResource(R.drawable.background_input);
+                    editText.setMinLines(2);
+                    editText.setMaxLines(2);
+                    editText.setPadding(30,10,10,30);
+                    builder.setView(editText);
+                    builder.setPositiveButton("开启", (dialog, which) -> {
+                        if(Constant.TEST_FUN_KEY.equals(editText.getText().toString())){
+                            SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+                            edit.putBoolean("openTestFun",true);
+                            edit.apply();
+                            findPreference("backupDiary").setEnabled(true);
+                            findPreference("recoveryDiary").setEnabled(true);
+                            findPreference("customDate").setEnabled(true);
+                        }
+                    });
+                    builder.setNegativeButton("直接关闭测试功能",(dialog, which) -> {
+                        findPreference("backupDiary").setEnabled(false);
+                        findPreference("recoveryDiary").setEnabled(false);
+                        findPreference("customDate").setEnabled(false);
+                        BaseUtils.getDefaultSharedPreferences().edit().putBoolean("customDate",false).apply();
+                        SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+                        edit.putBoolean("openTestFun",false);
+                        edit.apply();
+                    });
+                    builder.show();
                     break;
                 }
                 default:return false;

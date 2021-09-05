@@ -56,10 +56,26 @@ public class Constant {
     public static final int OPEN_ALBUM_TYPE_MAIN_BG = 2;
     public static final int OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC = 3;
 
+    public static final String BACKUP_ARGS_NAME_PRIVATE_KEY = "iudvgdsk";
+    public static final String BACKUP_ARGS_NAME_PUBLIC_KEY = "ogfrlepr";
+    public static final String BACKUP_ARGS_NAME_PIN_KEY = "epifuioew";
+    public static final String BACKUP_ARGS_NAME_DATA_NAME = "wepityweio";
+    public static final String BACKUP_ARGS_NAME_VERSION = "oqiteoqt";
+    public static final String BACKUP_ARGS_NAME_USELESS_ARGS1 = "fwefwef";
+    public static final String BACKUP_ARGS_NAME_USELESS_ARGS2 = "efesef";
+    public static final String BACKUP_ARGS_NAME_USELESS_ARGS3 = "xcvxcvsd";
+    public static final String BACKUP_ARGS_NAME_USELESS_ARGS4 = "eoqigyieog";
+    public static final String BACKUP_ARGS_NAME_UUID = "owqiioqghew";
+    public static final String BACKUP_ARGS_NAME_ENCODE_UUID = "ewrewr";
+
     /**
      * 本应用在外部存储使用的路径名称
      */
     public static final String EXTERNAL_STORAGE_LOCATION = "/Hibara/Diary/";
 
+    /**
+     * 开启测试功能的测试码
+     */
+    public static final String TEST_FUN_KEY = "4869";
 
 }

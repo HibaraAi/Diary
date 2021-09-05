@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,13 +29,17 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import org.litepal.LitePal;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryImageAdapter;
@@ -64,9 +70,11 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     private ImageView loadLocationBtn;
     private ImageView loadWeatherBtn;
     private ImageView addLabelBtn;
+    private ImageView addDateBtn;
     private TextView locationView;
     private TextView weatherView;
     private TextView labelView;
+    private TextView dateView;
     private RecyclerView recyclerView = null;
 
     /**
@@ -121,9 +129,11 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         addLabelBtn = findViewById(R.id.keep_diary_btn_label);
         loadLocationBtn = findViewById(R.id.keep_diary_btn_location);
         loadWeatherBtn = findViewById(R.id.keep_diary_btn_weather);
+        addDateBtn = findViewById(R.id.keep_diary_btn_date);
         locationView = findViewById(R.id.keep_diary_location);
         weatherView = findViewById(R.id.keep_diary_weather);
         labelView = findViewById(R.id.keep_diary_label);
+        dateView = findViewById(R.id.keep_diary_date);
         //处理图片展示区
         imageTempSrcList = new ArrayList<>();
         imageAdapter = new DiaryImageAdapter(imageTempSrcList);
@@ -136,10 +146,21 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         addLabelBtn.setOnClickListener(this);
         loadLocationBtn.setOnClickListener(this);
         loadWeatherBtn.setOnClickListener(this);
+        addDateBtn.setOnClickListener(this);
         findViewById(R.id.keep_diary_btn_image_tip).setOnClickListener(this);
         locationView.setOnClickListener(this);
         weatherView.setOnClickListener(this);
         labelView.setOnClickListener(this);
+        dateView.setOnClickListener(this);
+        //是否允许自定义时间
+        boolean customDate = BaseUtils.getDefaultSharedPreferences().getBoolean("customDate", false);
+        if(customDate){
+            dateView.setVisibility(View.VISIBLE);
+            addDateBtn.setVisibility(View.VISIBLE);
+        }else{
+            dateView.setVisibility(View.GONE);
+            addDateBtn.setVisibility(View.GONE);
+        }
     }
 
     private void initToolbar(){
@@ -178,11 +199,16 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 }else if(diaryInputStr.length()>2000){
                     BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存");
                 }else{
+                    Date date = null;
+                    String dateStr = dateView.getText().toString();
+                    if(!"".equals(dateStr)){
+                        date = BaseUtils.stringToDate(dateStr);
+                    }
                     SimpleResult result = diaryService.addOneByArgs(diaryInputStr,
                             labelView.getText().toString(),
                             locationView.getText().toString(),
                             weatherView.getText().toString(),
-                            imageTempSrcList);
+                            imageTempSrcList,date);
                     if(result.getSuccess()){
                         clearTempPinInEdit();
                         BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"新日记已存储，请手动刷新!");
@@ -291,6 +317,27 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 });
                 dialog.setNegativeButton("取消",null);
                 dialog.show();
+                break;
+            }
+            case R.id.keep_diary_date:
+            case R.id.keep_diary_btn_date:{
+                Calendar calendar = Calendar.getInstance();
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        KeepDiaryActivity.this,
+                        (view, year, month, dayOfMonth) -> {
+
+                            new TimePickerDialog(KeepDiaryActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    String dateStr = year + "-" + (month + 1) + "-" + dayOfMonth + " " + hourOfDay + ":" + minute + ":" + "00";
+                                    dateView.setText(dateStr);
+                                }
+                            }, Calendar.HOUR_OF_DAY, Calendar.MINUTE, true).show();
+                        }, calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.setOnCancelListener(dialog -> dateView.setText(""));
+                datePickerDialog.show();
                 break;
             }
             default:break;

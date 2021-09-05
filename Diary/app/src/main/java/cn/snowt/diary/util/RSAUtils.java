@@ -84,6 +84,24 @@ public class RSAUtils {
 //    }
 
     /**
+     * 测试私钥是否正确
+     * @param privateKey
+     * @return
+     */
+    public static Boolean testPrivateKey(String privateKey){
+        try{
+            byte[] key = Base64.decode(privateKey, Base64.DEFAULT);
+            PKCS8EncodedKeySpec pkcs8KeySpec=new PKCS8EncodedKeySpec(key);
+            KeyFactory keyFactory=KeyFactory.getInstance(RSA_ALGORITHM);
+            //生成私钥
+            PrivateKey truePrivateKey=keyFactory.generatePrivate(pkcs8KeySpec);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    /**
      * 使用自定义密钥加密
      * @param s 需要加密的数据
      * @param encodeKey 加密密钥

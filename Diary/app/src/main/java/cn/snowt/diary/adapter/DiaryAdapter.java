@@ -2,9 +2,7 @@ package cn.snowt.diary.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.text.TextUtils;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.DiaryListActivity;
 import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.CommentServiceImpl;
@@ -140,6 +140,40 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                     .show();
             return true;
         });
+        viewHolder.content.setOnLongClickListener(v->{
+            BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
+            BaseUtils.shortTipInSnack(viewHolder.content,"日记已复制");
+            return true;
+        });
+        //点击标签
+        viewHolder.label.setOnClickListener(v->{
+            String allLabel = viewHolder.label.getText().toString();
+            AtomicReference<String> selectLabel = new AtomicReference<>();
+            final String[] items = allLabel.split("##");
+            if(items.length>1){
+                items[0] = items[0]+"#";
+                items[items.length-1] = "#"+items[items.length-1];
+            }
+            if(items.length>=3){
+                for(int i=1;i<=items.length-2;i++){
+                    items[i] = "#"+items[i]+"#";
+                }
+            }
+            selectLabel.set(items[0]);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("按标签查看日记");
+            builder.setTitle("请选择一个标签,将展示同标签的所有日记");
+            builder.setSingleChoiceItems(items, 0, (dialogInterface, i) -> selectLabel.set(items[i]));
+            builder.setPositiveButton("查看", (dialog, which) -> {
+                Intent intent = new Intent(context, DiaryListActivity.class);
+                intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_SEARCH_LABEL);
+                intent.putExtra("label",selectLabel.get());
+                context.startActivity(intent);
+            });
+            builder.setNegativeButton("取消",null);
+            builder.setCancelable(false);
+            builder.show();
+        });
         return viewHolder;
     }
 
@@ -161,6 +195,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             newHolder.label.setVisibility(View.GONE);
         }else{
             newHolder.label.setText(diaryVo.getLabelStr());
+            newHolder.label.setVisibility(View.VISIBLE);
         }
         newHolder.content.setText(diaryVo.getContent());
         //处理图片展示

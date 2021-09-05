@@ -43,7 +43,7 @@ public class DiaryCommentAdapter extends RecyclerView.Adapter{
         }
         View view = LayoutInflater.from(context).inflate(R.layout.diary_comment_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.commentArea.setOnClickListener(v-> BaseUtils.shortTipInSnack(viewHolder.commentArea,"长按评论删除"));
+        viewHolder.commentArea.setOnClickListener(v-> BaseUtils.shortTipInSnack(viewHolder.commentArea,"长按评论框进行删除"));
         viewHolder.commentArea.setOnLongClickListener(v->{
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("确认删除此条评论吗?");
@@ -57,6 +57,12 @@ public class DiaryCommentAdapter extends RecyclerView.Adapter{
                 }
             });
             builder.show();
+            return true;
+        });
+        viewHolder.content.setOnClickListener(v->BaseUtils.shortTipInSnack(viewHolder.content,"长按评论文字进行复制"));
+        viewHolder.content.setOnLongClickListener(v->{
+            BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
+            BaseUtils.shortTipInSnack(viewHolder.content,"评论已复制");
             return true;
         });
         return viewHolder;

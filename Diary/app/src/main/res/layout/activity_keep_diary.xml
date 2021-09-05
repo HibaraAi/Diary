@@ -107,5 +107,25 @@
         android:paddingRight="5dp"
         android:hint="今天的天气"/>
 
+    <ImageView
+        android:id="@+id/keep_diary_btn_date"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_date"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/keep_diary_btn_weather"
+        android:padding="9dp"/>
+    <TextView
+        android:id="@+id/keep_diary_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toTopOf="@+id/keep_diary_btn_date"
+        app:layout_constraintBottom_toBottomOf="@+id/keep_diary_btn_date"
+        app:layout_constraintLeft_toRightOf="@+id/keep_diary_btn_date"
+        app:layout_constraintRight_toRightOf="parent"
+        android:paddingRight="5dp"
+        android:hint="自定义日记时间"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

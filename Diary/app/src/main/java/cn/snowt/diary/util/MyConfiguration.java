@@ -70,10 +70,20 @@ public class MyConfiguration {
         return bgImg;
     }
 
+    /**
+     * 获取私钥(长密钥)
+     * 如果没有设置，则返回""
+     * @return
+     */
     public String getPrivateKey() {
         return privateKey;
     }
 
+    /**
+     * 获取公钥(短密钥)
+     * 如果没有设置，则返回""
+     * @return
+     */
     public String getPublicKey() {
         return publicKey;
     }

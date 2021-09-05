@@ -8,13 +8,6 @@
             app:summaryOn="显示你的用户名\n软件重启后生效"/>
 
         <SwitchPreferenceCompat
-            app:key="saveImageInExRom"
-            app:defaultValue="true"
-            app:summaryOff="当前:使用图片原始地址，节约ROM使用。如果选中图片被删除/移动/修改名字则日记展示失效。\n此修改仅对今后新增日记生效。"
-            app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"
-            app:title="日记图片额外存储" />
-
-        <SwitchPreferenceCompat
             app:key="notAllowScreenshot"
             app:title="日记界面不允许截屏"
             app:defaultValue="true"
@@ -44,6 +37,39 @@
             app:dependency="useEncode"
             app:title="修改加密密钥"
             app:summary="日记加密/解密用到的密钥。仅可修改一次"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="测试区">
+        <Preference
+            app:key="testFun"
+            app:title="开启/关闭测试功能" />
+        <Preference
+            app:key="backupDiary"
+            app:title="备份日记"
+            app:enabled="false"
+            app:summary="导出一个仅能由本软件读取的备份文件"/>
+
+        <Preference
+            app:key="recoveryDiary"
+            app:title="恢复日记"
+            app:enabled="false"
+            app:summary="从备份文件加载日记"/>
+
+        <SwitchPreferenceCompat
+            app:key="saveImageInExRom"
+            app:defaultValue="true"
+            app:enabled="false"
+            app:summaryOff="当前:使用图片原始地址，节约ROM使用。如果选中图片被删除/移动/修改名字则日记展示失效。\n此修改仅对今后新增日记生效。"
+            app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"
+            app:title="日记图片额外存储"/>
+
+        <SwitchPreferenceCompat
+            app:key="customDate"
+            app:defaultValue="false"
+            app:enabled="false"
+            app:title="日记自定义日期"
+            app:summary="写日记时可以自行输入日期时间" />
 
     </PreferenceCategory>
 </PreferenceScreen>

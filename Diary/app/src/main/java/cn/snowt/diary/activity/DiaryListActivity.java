@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -47,6 +48,7 @@ public class DiaryListActivity extends AppCompatActivity {
     public static final int OPEN_FROM_TIME_AXIS = 1;
     public static final int OPEN_FROM_TEMP_DIARY = 2;
     public static final int OPEN_FROM_SEARCH_DIARY = 3;
+    public static final int OPEN_FROM_SEARCH_LABEL = 4;
 
     private final DiaryService diaryService = new DiaryServiceImpl();
 
@@ -80,6 +82,10 @@ public class DiaryListActivity extends AppCompatActivity {
             }
             case OPEN_FROM_SEARCH_DIARY:{
                 showSimpleDiary(intent.getIntegerArrayListExtra("ids"),intent.getStringExtra("searchValue"));
+                break;
+            }
+            case OPEN_FROM_SEARCH_LABEL:{
+                showSimpleDiary(intent.getStringExtra("label"));
                 break;
             }
             default:break;
@@ -176,6 +182,22 @@ public class DiaryListActivity extends AppCompatActivity {
     private void showSimpleDiary(ArrayList<Integer> ids,String searchValue){
         diaryList = diaryService.getSimpleDiaryByIds(ids);
         tipView.setText("在标签中或未加密日记中，包含字符["+searchValue+"]的日记共有"+diaryList.size()+"条");
+        adapter = new DiaryAxisAdapter(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+    }
+
+    /**
+     * 展示从标签选择来的数据
+     * @param labelStr
+     */
+    private void showSimpleDiary(String labelStr){
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle(labelStr);
+        diaryList = diaryService.getSimpleDiaryByLabel(labelStr);
+        tipView.setText("含有标签["+labelStr+"]的日记共有"+diaryList.size()+"条");
         adapter = new DiaryAxisAdapter(diaryList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

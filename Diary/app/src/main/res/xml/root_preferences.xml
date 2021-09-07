@@ -4,8 +4,8 @@
         <SwitchPreferenceCompat
             app:key="showUsernameInBar"
             app:title="顶部工具栏显示用户名"
-            app:summaryOff="显示“Diary”\n软件重启后生效"
-            app:summaryOn="显示你的用户名\n软件重启后生效"/>
+            app:summaryOff="当前: 显示“Diary”\n软件重启后生效"
+            app:summaryOn="当前: 显示你的用户名\n软件重启后生效"/>
 
         <SwitchPreferenceCompat
             app:key="notAllowScreenshot"
@@ -15,8 +15,22 @@
             app:summaryOn="当前：不允许截屏/录屏\n软件重启后生效"/>
 
         <Preference
+            app:key="setDiarySize"
+            app:title="修改字体大小" />
+
+        <Preference
             app:key="setPassword"
             app:title="修改登录密码" />
+
+        <Preference
+            app:key="backupDiary"
+            app:title="备份日记"
+            app:summary="导出一个仅能由本软件读取的备份文件"/>
+
+        <Preference
+            app:key="recoveryDiary"
+            app:title="恢复日记"
+            app:summary="从备份文件加载日记"/>
 
         <Preference
             app:key="clearCache"
@@ -44,17 +58,6 @@
         <Preference
             app:key="testFun"
             app:title="开启/关闭测试功能" />
-        <Preference
-            app:key="backupDiary"
-            app:title="备份日记"
-            app:enabled="false"
-            app:summary="导出一个仅能由本软件读取的备份文件"/>
-
-        <Preference
-            app:key="recoveryDiary"
-            app:title="恢复日记"
-            app:enabled="false"
-            app:summary="从备份文件加载日记"/>
 
         <SwitchPreferenceCompat
             app:key="saveImageInExRom"

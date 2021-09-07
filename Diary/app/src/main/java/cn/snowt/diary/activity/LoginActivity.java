@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Random;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.LoginService;
+import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.SimpleResult;
@@ -145,6 +147,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //第一次使用本程序
             //创建数据库
             LitePal.getDatabase();
+            //写入帮助日记
+            new DiaryServiceImpl().addHelpDiary();
             //申请存储权限
             applyPermission();
         }

@@ -81,7 +81,7 @@ public class SetPasswordActivity extends AppCompatActivity {
         ActionBar supportActionBar = getSupportActionBar();
         if(null!=supportActionBar){
             supportActionBar.setDisplayHomeAsUpEnabled(true);
-            supportActionBar.setTitle("重置密码");
+            supportActionBar.setTitle("重置登录密码");
         }
     }
 
@@ -97,7 +97,7 @@ public class SetPasswordActivity extends AppCompatActivity {
             tip = "\t提示:\n\t第一次使用本软件，请为本软件设置启动密码。\n\t请牢记密码，本软件不支持密码找回!";
             oldPassword.setVisibility(View.GONE);
         }else{
-            tip = new String("\t提示:\n\t凭就密码修改启动密码。\n\t请牢记密码，本软件不支持密码找回!");
+            tip = new String("\t提示:\n\t凭旧密码修改启动密码。\n\t请牢记密码，本软件不支持密码找回!");
         }
         textTip.setText(tip);
         return firstUse;

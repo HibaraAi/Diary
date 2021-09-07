@@ -271,7 +271,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
                 dialog.setTitle("暂时不支持读取当地天气信息，请手动选择");
                 String[] items = {Weather.WEATHER_CLOUDY,Weather.WEATHER_RAIN,
-                        Weather.WEATHER_SUNNY,Weather.WEATHER_OVERCAST,
+                        Weather.WEATHER_SUNNY,Weather.WEATHER_HOT,Weather.WEATHER_OVERCAST,
                         Weather.WEATHER_SNOW,Weather.WEATHER_HAIL};
                 dialog.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                     @Override

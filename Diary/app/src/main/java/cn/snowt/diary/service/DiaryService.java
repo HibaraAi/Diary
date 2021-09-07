@@ -95,4 +95,9 @@ public interface DiaryService {
      * @return diaryVo仅包含id，经过处理后的时间Str，截取正文内容Str，和一张图片src(如果有)
      */
     List<DiaryVo> getSimpleDiaryByLabel(String labelStr);
+
+    /**
+     * 用于生成第一次使用本程序的帮助日记。
+     */
+    void addHelpDiary();
 }

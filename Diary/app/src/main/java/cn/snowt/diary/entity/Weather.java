@@ -25,6 +25,7 @@ public class Weather extends LitePalSupport implements Serializable {
     public static final String WEATHER_CLOUDY = "多云";
     public static final String WEATHER_RAIN = "下雨";
     public static final String WEATHER_SUNNY = "晴";
+    public static final String WEATHER_HOT = "太阳火辣";
     public static final String WEATHER_OVERCAST = "阴天";
     public static final String WEATHER_SNOW = "下雪";
     public static final String WEATHER_HAIL = "下冰雹";

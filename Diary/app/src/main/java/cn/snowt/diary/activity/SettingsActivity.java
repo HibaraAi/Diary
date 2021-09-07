@@ -92,9 +92,14 @@ public class SettingsActivity extends AppCompatActivity {
             ));
             //测试区功能
             boolean openTestFun = BaseUtils.getSharedPreference().getBoolean("openTestFun", false);
-            findPreference("backupDiary").setEnabled(openTestFun);
-            findPreference("recoveryDiary").setEnabled(openTestFun);
             findPreference("customDate").setEnabled(openTestFun);
+            //读取当前字体大小
+            float fontSize = MyConfiguration.getInstance().getFontSize();
+            if(fontSize!=-1){
+                findPreference("setDiarySize").setSummary("当前字体大小："+fontSize+"dp");
+            }else{
+                findPreference("setDiarySize").setSummary("当前为默认字体大小");
+            }
         }
 
         @Override
@@ -158,7 +163,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case "backupDiary":{
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("设置读取密钥");
-                    builder.setMessage("为备份文件设置读取口令\n（提示：\n1.从备份文件读取日记时，如果日记加密过，还需要提供加密密钥，如果你没有加密密钥，则会读取失败\n2.过程可能需要很长时间(取决于你的日记数量),如果有卡住现象是正常情况，耐心等待）");
+                    builder.setMessage("为备份文件设置读取口令\n（提示：\n1.从备份文件读取日记时，如果日记加密过，还需要提供加密密钥，如果你没有加密密钥，则会读取失败\n2.过程可能需要很长时间(取决于你的日记数量),如果有卡住现象是正常情况，耐心等待\n3.备份文件的安全性很差，此功能的设计初衷是为了设备间的数据转移。）");
                     EditText pinView = new EditText(context);
                     pinView.setHint("设置一个读取口令");
                     pinView.setBackgroundResource(R.drawable.background_input);
@@ -205,14 +210,10 @@ public class SettingsActivity extends AppCompatActivity {
                             SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
                             edit.putBoolean("openTestFun",true);
                             edit.apply();
-                            findPreference("backupDiary").setEnabled(true);
-                            findPreference("recoveryDiary").setEnabled(true);
                             findPreference("customDate").setEnabled(true);
                         }
                     });
                     builder.setNegativeButton("直接关闭测试功能",(dialog, which) -> {
-                        findPreference("backupDiary").setEnabled(false);
-                        findPreference("recoveryDiary").setEnabled(false);
                         findPreference("customDate").setEnabled(false);
                         BaseUtils.getDefaultSharedPreferences().edit().putBoolean("customDate",false).apply();
                         SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
@@ -220,6 +221,10 @@ public class SettingsActivity extends AppCompatActivity {
                         edit.apply();
                     });
                     builder.show();
+                    break;
+                }
+                case "setDiarySize":{
+                    BaseUtils.gotoActivity((Activity) context,SetDiarySizeActivity.class);
                     break;
                 }
                 default:return false;

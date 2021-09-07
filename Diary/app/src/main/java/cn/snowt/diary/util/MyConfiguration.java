@@ -15,6 +15,7 @@ public class MyConfiguration {
     private static String privateKey;
     private static String publicKey;
     private static boolean requiredAndAbleToEncode;
+    private static float fontSize;
 
     private static MyConfiguration myConfiguration;
     private MyConfiguration() {
@@ -42,6 +43,7 @@ public class MyConfiguration {
             haveSetEncodeKey = true;
         }
         requiredAndAbleToEncode = (useEncode && haveSetEncodeKey);
+        fontSize = BaseUtils.getSharedPreference().getFloat(Constant.SHARE_PREFERENCES_DIARY_FONT_SIZE,-1.0F);
         return myConfiguration;
     }
 
@@ -90,5 +92,9 @@ public class MyConfiguration {
 
     public boolean isRequiredAndAbleToEncode() {
         return requiredAndAbleToEncode;
+    }
+
+    public float getFontSize() {
+        return fontSize;
     }
 }

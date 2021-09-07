@@ -45,7 +45,7 @@ public class HelpActivity extends AppCompatActivity {
         helpContent.setAdapter(adapter);
         helpContent.setOnItemLongClickListener((parent, view, position, id) -> {
             if(1==position){
-                if (BaseUtils.copyInClipboard(this,"https://github.com/HibaraAi/PasswordManager")) {
+                if (BaseUtils.copyInClipboard(this,"https://github.com/HibaraAi/Diary")) {
                     BaseUtils.shortTipInCoast(HelpActivity.this,"开源代码的网址已复制");
                 }
             }

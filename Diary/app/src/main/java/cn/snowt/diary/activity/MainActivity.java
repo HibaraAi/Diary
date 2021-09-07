@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -42,6 +45,7 @@ import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
 import com.scwang.smart.refresh.layout.wrapper.RefreshFooterWrapper;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import cn.snowt.diary.R;
@@ -144,15 +148,37 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_time:{
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("查找指定时间段的日记");
-                    builder.setMessage("请输入时间段，日期格式必须为:2021-09-01");
-                    EditText timeOne = new EditText(MainActivity.this);
-                    EditText timeTwo = new EditText(MainActivity.this);
-                    timeOne.setInputType(EditorInfo.TYPE_CLASS_DATETIME);
+                    builder.setMessage("提示：如果时间段内的日记数量很多，则查找过程可能会很久，尽量缩短查找时间段。\n");
+                    TextView timeOne = new TextView(MainActivity.this);
+                    TextView timeTwo = new TextView(MainActivity.this);
+                    timeOne.setOnClickListener(v->{
+                        Calendar calendar = Calendar.getInstance();
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                                MainActivity.this,
+                                (view, year, month, dayOfMonth) -> {
+                                    timeOne.setText(year+"-"+(month+1)+"-"+dayOfMonth);
+                                }, calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH));
+                        datePickerDialog.setCancelable(false);
+                        datePickerDialog.show();
+                    });
+                    timeTwo.setOnClickListener(v->{
+                        Calendar calendar = Calendar.getInstance();
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                                MainActivity.this,
+                                (view, year, month, dayOfMonth) -> {
+                                    timeTwo.setText(year+"-"+(month+1)+"-"+dayOfMonth);
+                                }, calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH));
+                        datePickerDialog.setCancelable(false);
+                        datePickerDialog.show();
+                    });
                     timeOne.setBackgroundResource(R.drawable.background_input);
-                    timeOne.setHint("例如:2021-09-01");
+                    timeOne.setHint("点击选择日期一");
                     timeTwo.setBackgroundResource(R.drawable.background_input);
-                    timeTwo.setInputType(EditorInfo.TYPE_CLASS_DATETIME);
-                    timeTwo.setHint("例如:2021-01-01");
+                    timeTwo.setHint("点击选择日期二");
                     LinearLayout linearLayout = new LinearLayout(this);
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                     linearLayout.addView(timeOne);

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.SetDiarySizeActivity"
+    android:orientation="vertical">
+
+    <include layout="@layout/defalut_toolbar" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="30dp"
+        android:layout_margin="5dp"
+        android:textColor="?attr/colorPrimary"
+        android:text="点击下方字体选择一个大小"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text=""/>
+
+    <TextView
+        android:id="@+id/diary_size_11"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="11dp"
+        android:text="仅对日记正文生效。大小：11dp"/>
+
+    <TextView
+        android:id="@+id/diary_size_13"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="13dp"
+        android:text="仅对日记正文生效。大小：13dp"/>
+
+    <TextView
+        android:id="@+id/diary_size_default"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="仅对日记正文生效。我是默认字体大小"/>
+
+    <TextView
+        android:id="@+id/diary_size_16"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="16dp"
+        android:text="仅对日记正文生效。大小：16dp"/>
+
+    <TextView
+        android:id="@+id/diary_size_18"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="18dp"
+        android:text="仅对日记正文生效。大小：18dp"/>
+
+    <TextView
+        android:id="@+id/diary_size_20"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="20dp"
+        android:text="仅对日记正文生效。大小：20dp"/>
+
+
+</LinearLayout>

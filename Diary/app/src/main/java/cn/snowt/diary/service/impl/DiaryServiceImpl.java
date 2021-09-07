@@ -217,8 +217,14 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public SimpleResult getSimpleDiaryByDate(Date date1, Date date2) {
+        String date1ToString = BaseUtils.dateToString(date1);
+        String date2ToString = BaseUtils.dateToString(date2);
+        String s = date1ToString.replaceAll("00:00:00", "00:00:01");
+        String s1 = date2ToString.replaceAll("00:00:00", "23:59:59");
+        date1 = BaseUtils.stringToDate(s);
+        date2 = BaseUtils.stringToDate(s1);
         List<Diary> diaryList = LitePal.select("id,content,modifiedDate,encryption")
-                .where("modifiedDate > ? AND modifiedDate < ?", date1.getTime()+"", date2.getTime()+"")
+                .where("modifiedDate >= ? AND modifiedDate <= ?", date1.getTime()+"", date2.getTime()+"")
                 .order("modifiedDate desc")
                 .find(Diary.class);
         List<DiaryVo> voList = new ArrayList<>();
@@ -255,6 +261,8 @@ public class DiaryServiceImpl implements DiaryService {
         if(diary.getEncryption()){
             //需要解密
             vo.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+        }else{
+            vo.setContent(diary.getContent());
         }
         vo.setModifiedDate(BaseUtils.dateToString(diary.getModifiedDate()));
         vo.setLabelStr(diary.getLabel());
@@ -459,6 +467,32 @@ public class DiaryServiceImpl implements DiaryService {
             voList.add(vo);
         });
         return voList;
+    }
+
+    @Override
+    public void addHelpDiary() {
+        Weather weather = new Weather(null, Weather.WEATHER_SUNNY, null, null);
+        weather.save();
+        Location location = new Location(null,null,null,"广东省河源市");
+        location.save();
+        Diary diary1 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_1,new Date(), weather.getId(),location.getId(),false);
+        Diary diary2 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_2,new Date(),weather.getId(),location.getId(),false);
+        Diary diary3 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_3,new Date(),weather.getId(),location.getId(),false);
+        Diary diary4 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_4,new Date(),weather.getId(),location.getId(),false);
+        Diary diary5 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_5,new Date(),weather.getId(),location.getId(),false);
+        Diary diary6 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_6,new Date(),weather.getId(),location.getId(),false);
+        Diary diary7 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_7,new Date(),weather.getId(),location.getId(),false);
+        Diary diary8 = new Diary(null,"#初次使用软件指引#",Constant.STRING_ABOUT,new Date(),weather.getId(),location.getId(),false);
+        Diary diary9 = new Diary(null, "#初次使用软件指引#", "看完并删除软件指引就开始使用“消消乐吧”", new Date(), weather.getId(), location.getId(), false);
+        diary1.save();
+        diary2.save();
+        diary3.save();
+        diary4.save();
+        diary5.save();
+        diary6.save();
+        diary7.save();
+        diary8.save();
+        diary9.save();
     }
 
     /**

@@ -140,6 +140,11 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                     .show();
             return true;
         });
+        //设置字体大小
+        float fontSize = MyConfiguration.getInstance().getFontSize();
+        if(fontSize!=-1){
+            viewHolder.content.setTextSize(fontSize);
+        }
         viewHolder.content.setOnLongClickListener(v->{
             BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
             BaseUtils.shortTipInSnack(viewHolder.content,"日记已复制");

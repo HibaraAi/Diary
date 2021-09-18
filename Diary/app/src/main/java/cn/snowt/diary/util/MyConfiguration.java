@@ -16,6 +16,7 @@ public class MyConfiguration {
     private static String publicKey;
     private static boolean requiredAndAbleToEncode;
     private static float fontSize;
+    private static boolean autoOpenCommentArea;
 
     private static MyConfiguration myConfiguration;
     private MyConfiguration() {
@@ -30,9 +31,9 @@ public class MyConfiguration {
             }
         }
         SharedPreferences sharedPreference = BaseUtils.getSharedPreference();
-        username = sharedPreference.getString(Constant.SHARE_PREFERENCES_USERNAME,"到侧滑菜单中编辑用户名");
+        username = sharedPreference.getString(Constant.SHARE_PREFERENCES_USERNAME,"用户名");
         headImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_HEAD_SRC,null);
-        motto = sharedPreference.getString(Constant.SHARE_PREFERENCES_MOTTO,"到侧滑菜单中编辑个性签名");
+        motto = sharedPreference.getString(Constant.SHARE_PREFERENCES_MOTTO,"个性签名");
         bgImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_MAIN_IMG_BG,null);
         privateKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PRIVATE_KEY, "");
         publicKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PUBLIC_KEY,"");
@@ -44,6 +45,7 @@ public class MyConfiguration {
         }
         requiredAndAbleToEncode = (useEncode && haveSetEncodeKey);
         fontSize = BaseUtils.getSharedPreference().getFloat(Constant.SHARE_PREFERENCES_DIARY_FONT_SIZE,-1.0F);
+        autoOpenCommentArea = BaseUtils.getDefaultSharedPreferences().getBoolean("openCommentArea",false);
         return myConfiguration;
     }
 
@@ -96,5 +98,9 @@ public class MyConfiguration {
 
     public float getFontSize() {
         return fontSize;
+    }
+
+    public boolean isAutoOpenComment() {
+        return autoOpenCommentArea;
     }
 }

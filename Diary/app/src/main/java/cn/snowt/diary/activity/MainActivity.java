@@ -50,6 +50,7 @@ import java.util.List;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
+import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_time:{
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("查找指定时间段的日记");
-                    builder.setMessage("提示：如果时间段内的日记数量很多，则查找过程可能会很久，尽量缩短查找时间段。\n");
+                    builder.setMessage("提示：如果时间段内的日记数量很多，则查找过程可能会很久，尽量缩短查找时间段。\n只选一个日期则查找当天的日记\n");
                     TextView timeOne = new TextView(MainActivity.this);
                     TextView timeTwo = new TextView(MainActivity.this);
                     timeOne.setOnClickListener(v->{
@@ -188,12 +189,19 @@ public class MainActivity extends AppCompatActivity {
                     builder.setPositiveButton("确定", (dialog1, which) -> {
                         String timeOneStr = timeOne.getText().toString();
                         String timeTwoStr = timeTwo.getText().toString();
-                        if(!"".equals(timeOneStr) && !"".equals(timeTwoStr)){
+                        if(!"".equals(timeOneStr) || !"".equals(timeTwoStr)){
+                            if("".equals(timeOneStr)){
+                                timeOneStr = timeTwoStr;
+                            }else if("".equals(timeTwoStr)){
+                                timeTwoStr = timeOneStr;
+                            }
                             Intent intent = new Intent(MainActivity.this, DiaryListActivity.class);
                             intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_TIME_AXIS);
                             intent.putExtra(DiaryListActivity.DATE_ONE,timeOneStr);
                             intent.putExtra(DiaryListActivity.DATE_TWO,timeTwoStr);
                             startActivity(intent);
+                        }else{
+                            BaseUtils.longTipInCoast(MainActivity.this,"一个日期都不选？就是你这种不按照正常逻辑使用软件的人，才导致我们程序员要考虑各种各样的奇怪情况！");
                         }
                     });
                     builder.setNegativeButton("取消",null);
@@ -203,6 +211,16 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_temp:{
                     Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
                     intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_TEMP_DIARY);
+                    startActivity(intent);
+                    break;
+                }
+                case R.id.nav_asc:{
+                    BaseUtils.gotoActivity(MainActivity.this,TimeAscActivity.class);
+                    break;
+                }
+                case R.id.nav_label:{
+                    Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
+                    intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_LABEL_LIST);
                     startActivity(intent);
                     break;
                 }
@@ -386,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
         List<DiaryVo> diaryVoList = diaryService.getDiaryVoList(nowIndex, 5);
         if(diaryVoList.size()==0){
             BaseUtils.shortTipInSnack(recyclerView,"没有更多日记了。");
-            refreshLayout.setNoMoreData(true);
+            //refreshLayout.setNoMoreData(true);
         }else{
             voList.addAll(diaryVoList);
             nowIndex += diaryVoList.size();
@@ -432,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setMessage("仅搜索日记标签和未加密的日记内容");
                 EditText editText = new EditText(MainActivity.this);
                 editText.setBackgroundResource(R.drawable.background_input);
-                editText.setHint("输入搜索内容，标签不需要加#");
+                editText.setHint("输入搜索内容");
                 editText.setMaxLines(3);
                 editText.setMinLines(3);
                 builder.setView(editText);
@@ -465,6 +483,15 @@ public class MainActivity extends AppCompatActivity {
     private void getDiaryForFirstShow(){
         voList.addAll(diaryService.getDiaryVoList(0, 5));
         nowIndex = voList.size();
+        //查询置顶日记
+        int topDiaryId = BaseUtils.getSharedPreference().getInt("topDiary", -1);
+        if(-1!=topDiaryId){
+            DiaryVo vo = (DiaryVo) diaryService.getDiaryVoById(topDiaryId).getData();
+            if(null!=vo){
+                vo.setLabelStr("置顶日记");
+                voList.add(0, vo);
+            }
+        }
     }
 
     @Override

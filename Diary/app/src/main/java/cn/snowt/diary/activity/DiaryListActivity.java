@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAxisAdapter;
@@ -49,6 +50,7 @@ public class DiaryListActivity extends AppCompatActivity {
     public static final int OPEN_FROM_TEMP_DIARY = 2;
     public static final int OPEN_FROM_SEARCH_DIARY = 3;
     public static final int OPEN_FROM_SEARCH_LABEL = 4;
+    public static final int OPEN_FROM_LABEL_LIST = 5;
 
     private final DiaryService diaryService = new DiaryServiceImpl();
 
@@ -86,6 +88,10 @@ public class DiaryListActivity extends AppCompatActivity {
             }
             case OPEN_FROM_SEARCH_LABEL:{
                 showSimpleDiary(intent.getStringExtra("label"));
+                break;
+            }
+            case OPEN_FROM_LABEL_LIST:{
+                showAllLabel();
                 break;
             }
             default:break;
@@ -155,24 +161,20 @@ public class DiaryListActivity extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        if(null==date1 || null==date2){
-            BaseUtils.shortTipInCoast(DiaryListActivity.this,"输入的时间格式有误，请返回后重新输入");
-            tipView.setText("输入的时间格式有误，请返回后重新输入");
-        }else{
-            //date1在前
-            if(date2.before(date1)){
-                Date temp = date1;
-                date1 = date2;
-                date2 = temp;
-            }
-            SimpleResult result = diaryService.getSimpleDiaryByDate(date1,date2);
-            diaryList = (List<DiaryVo>) result.getData();
-            tipView.setText("在"+dateOneStr+"到"+dateTwoStr+"的时间段内，共有"+diaryList.size()+"条日记");
-            adapter = new DiaryAxisAdapter(diaryList);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
+        //date1在前
+        assert date2 != null;
+        if(date2.before(date1)){
+            Date temp = date1;
+            date1 = date2;
+            date2 = temp;
         }
+        SimpleResult result = diaryService.getSimpleDiaryByDate(date1,date2);
+        diaryList = (List<DiaryVo>) result.getData();
+        tipView.setText("在"+dateOneStr+"到"+dateTwoStr+"的时间段内，共有"+diaryList.size()+"条日记");
+        adapter = new DiaryAxisAdapter(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
     /**
@@ -180,6 +182,9 @@ public class DiaryListActivity extends AppCompatActivity {
      * @param ids
      */
     private void showSimpleDiary(ArrayList<Integer> ids,String searchValue){
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle("搜索结果");
         diaryList = diaryService.getSimpleDiaryByIds(ids);
         tipView.setText("在标签中或未加密日记中，包含字符["+searchValue+"]的日记共有"+diaryList.size()+"条");
         adapter = new DiaryAxisAdapter(diaryList);
@@ -202,6 +207,35 @@ public class DiaryListActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+    }
+
+    /**
+     * 展示所有标签
+     */
+    private void showAllLabel(){
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle("标签集");
+        Set<String> labels = diaryService.getAllLabels();
+        if(labels.isEmpty()){
+            tipView.setText("系统中还没有日记加过标签");
+        }else{
+            tipView.setText("所有日记中，共统计到["+labels.size()+"]个标签。\n点击标签即可查询该标签下的所有日记");
+            List<DiaryVo> vos = new ArrayList<>();
+            labels.forEach(label -> {
+                DiaryVo vo = new DiaryVo();
+                vo.setId(-1);
+                vo.setContent(label);
+                vo.setModifiedDate("");
+                vo.setPicSrcList(new ArrayList<>());
+                vos.add(vo);
+            });
+            diaryList = vos;
+            adapter = new DiaryAxisAdapter(diaryList);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     @Override

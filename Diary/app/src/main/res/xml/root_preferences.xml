@@ -3,7 +3,7 @@
     <PreferenceCategory app:title="软件设置">
         <SwitchPreferenceCompat
             app:key="showUsernameInBar"
-            app:title="顶部工具栏显示用户名"
+            app:title="主界面工具栏显示用户名"
             app:summaryOff="当前: 显示“Diary”\n软件重启后生效"
             app:summaryOn="当前: 显示你的用户名\n软件重启后生效"/>
 
@@ -18,9 +18,21 @@
             app:key="setDiarySize"
             app:title="修改字体大小" />
 
+        <SwitchPreferenceCompat
+            app:key="openCommentArea"
+            app:title="自动展开评论区"
+            app:defaultValue="false"
+            app:summary="如果该日记有评论，自动展开评论区" />
+
         <Preference
             app:key="setPassword"
-            app:title="修改登录密码" />
+            app:title="修改登录密码"
+            app:summary="我也要有灰字提示QaQ"/>
+
+        <Preference
+            app:key="txtOutput"
+            app:title="导出日记"
+            app:summary="纯明文的将所有日记导出到一个txt文件" />
 
         <Preference
             app:key="backupDiary"

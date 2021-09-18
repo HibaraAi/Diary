@@ -7,15 +7,18 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import org.litepal.LitePal;
+import org.litepal.LitePalApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,8 @@ import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.Constant;
+import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.mine.MineGameActivity;
 
@@ -124,7 +129,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     this.finish();
                 }else{
                     tip.setText(result.getMsg());
-                    BaseUtils.shortTipInCoast(this,result.getMsg());
+                    //BaseUtils.shortTipInCoast(this,result.getMsg());
                 }
                 break;
             }

@@ -2,6 +2,8 @@ package cn.snowt.diary.util;
 
 import android.os.Environment;
 
+import org.litepal.LitePalApplication;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,6 +16,38 @@ import java.io.IOException;
 public class FileUtils {
 
     private static long countSize = 0;
+
+    /**
+     * 将String保存到文件
+     * 保存在本应用专属文件夹(Android/data)下
+     * @param content 要保存的String
+     * @param fileName 要保存的文件名字
+     * @return
+     */
+    public static boolean saveAsFileWriter2(String content,String fileName) {
+        boolean flag = false;
+        FileWriter writer = null;
+        try {
+            File externalDirectory = LitePalApplication.getContext().getExternalFilesDir("");
+            if (!externalDirectory.exists()){
+                externalDirectory.mkdirs();
+            }
+            File file = new File(externalDirectory.getAbsolutePath() + "/" + fileName);
+            writer = new FileWriter(file);
+            writer.write(content);
+            flag = true;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                writer.flush();
+                writer.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return flag;
+    }
 
     /**
      * 将String保存到文件

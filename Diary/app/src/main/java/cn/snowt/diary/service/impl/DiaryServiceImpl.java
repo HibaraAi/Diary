@@ -1,6 +1,7 @@
 package cn.snowt.diary.service.impl;
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.os.Environment;
 import android.util.Log;
 
@@ -8,20 +9,25 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import org.litepal.LitePal;
+import org.litepal.LitePalApplication;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.entity.Diary;
@@ -294,7 +300,11 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public SimpleResult searchDiary(String searchValue) {
-        List<Diary> diaryList = LitePal.select("id").where("(label like ? OR (encryption = 0 AND content like ?))",("%"+searchValue+"%"),("%"+searchValue+"%")).find(Diary.class);
+        List<Diary> diaryList = LitePal
+                .select("id")
+                .where("(label like ? OR (encryption = 0 AND content like ?))",("%"+searchValue+"%"),("%"+searchValue+"%"))
+                .order("modifiedDate desc")
+                .find(Diary.class);
         if(diaryList.isEmpty()){
             return SimpleResult.error().msg("没有符合搜索值为["+searchValue+"]的日记");
         }else{
@@ -385,7 +395,7 @@ public class DiaryServiceImpl implements DiaryService {
             boolean saveFlag = FileUtils.saveAsFileWriter(mapJson, fileName);
             if(saveFlag){
                 String absolutePath = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION + "output/").getAbsolutePath();
-                result.setMsg("备份文件保存至["+absolutePath+fileName+"],建议马上移动文件到其他文件夹,用完之后应及时删除.");
+                result.setMsg("备份文件保存至["+absolutePath+"/"+fileName+"],建议马上移动文件到其他文件夹,用完之后应及时删除.");
                 result.setSuccess(true);
             }else{
                 result.setSuccess(false);
@@ -525,6 +535,153 @@ public class DiaryServiceImpl implements DiaryService {
         diary7.save();
         diary8.save();
         diary9.save();
+    }
+
+    @Override
+    public SimpleResult outputForTxt(String pinInput) {
+        //肯定pinInput已不为null和""
+        SimpleResult result = new SimpleResult();
+        //验证密码
+        boolean flag = BaseUtils.getSharedPreference().getString("loginPassword", "").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX + pinInput));
+        if(flag){
+            StringBuilder sb = new StringBuilder();
+            List<Diary> ids = LitePal.select("id").order("modifiedDate").find(Diary.class);
+            int diaryCount = ids.size();
+            for(int i=0;i<diaryCount;i++){
+                SimpleResult diaryVo = getDiaryVoById(ids.get(i).getId());
+                DiaryVo data = (DiaryVo) diaryVo.getData();
+                sb.append("第(").append(i+1).append("/").append(diaryCount).append(")条日记\n");
+                sb.append("日记头:").append(data.getModifiedDate()).append("   ")
+                        .append(data.getWeatherStr()).append("   ")
+                        .append(data.getLocationStr()).append("\n");
+                sb.append("标签:").append(data.getLabelStr()).append("\n");
+                sb.append("正文:").append(data.getContent()).append("\n");
+                if (!data.getCommentList().isEmpty()) {
+                    sb.append("评论:\n");
+                    data.getCommentList().forEach(comment -> {
+                        sb.append("\t")
+                                .append(BaseUtils.dateToString(comment.getModifiedDate())).append("  ")
+                                .append(comment.getContent()).append("\n");
+                    });
+                }
+                sb.append("\n\n");
+            }
+            String txtStr = sb.toString();
+            //3.输出文件
+            String fileName = "导出日记_"+BaseUtils.dateToString(new Date())+".txt";
+            boolean saveFlag = FileUtils.saveAsFileWriter2(txtStr, fileName);
+            if(saveFlag){
+                String absolutePath = LitePalApplication.getContext().getExternalFilesDir("").getAbsolutePath();
+                result.setMsg("txt文件导出至["+absolutePath+"/"+fileName+"]\n\n提示：请立马转移该文件，否则应用卸载时将会删除此文件。");
+                result.setSuccess(true);
+            }else{
+                result.setSuccess(false);
+                result.setMsg("导出txt失败,请重试");
+            }
+        }else{
+            result.setSuccess(false);
+            result.setMsg("登录密码校验失败");
+        }
+        return result;
+    }
+
+    @Override
+    public List<DiaryVo> getDiaryVoListAsc(int startIndex, int needNum) {
+        List<DiaryVo> voList = new ArrayList<>();
+        //此方法的查询应该更改为连表查询
+        List<Diary> all = LitePal.order("modifiedDate").limit(needNum).offset(startIndex).find(Diary.class);
+        all.forEach(diary -> {
+            DiaryVo vo = new DiaryVo();
+            vo.setId(diary.getId());
+            if(diary.getEncryption()){
+                //此条记录被加密过
+                vo.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+            }else{
+                vo.setContent(diary.getContent());
+            }
+            //vo.setContent(diary.getContent());
+            vo.setModifiedDate(BaseUtils.dateToString(diary.getModifiedDate()));
+            vo.setLabelStr(diary.getLabel());
+            //地址
+            if(null!=diary.getLocationId()){
+                Location location = LitePal.find(Location.class, diary.getLocationId());
+                vo.setLocationStr(location.getLocationString());
+            }
+            //天气
+            if(null!=diary.getWeatherId()){
+                Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
+                vo.setWeatherStr(weather.getWeather());
+            }
+            //图片
+            List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class);
+            List<String> picSrcList = new ArrayList<>();
+            drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
+            vo.setPicSrcList(picSrcList);
+            //评论
+            List<Comment> commentList = LitePal.where("diaryId = ?",diary.getId()+"").order("modifiedDate desc").find(Comment.class);
+            commentList.forEach(comment ->{
+                if (comment.getEncryption()){
+                    //此条记录需要解密
+                    comment.setContent(RSAUtils.decode(comment.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+                }
+            });
+            vo.setCommentList(commentList);
+            voList.add(vo);
+        });
+        return voList;
+    }
+
+    @Override
+    public Set<String> getAllLabels() {
+        Log.w(TAG,"请优化这里。1.这里没有使用distinct 2.标签应该单独成表，而不是现在这样解析");
+        Set<String> labelSet = new HashSet<>();
+        List<Diary> labels = LitePal.select("label").find(Diary.class);
+        Set<String> tempSet = new HashSet<>();
+        labels.forEach(l->{
+            if(null!=l.getLabel() && !"".equals(l.getLabel())){
+                tempSet.add(l.getLabel());
+            }
+        });
+        tempSet.forEach(labelStr->{
+            final String[] items = labelStr.split("##");
+            if(items.length>1){
+                items[0] = items[0]+"#";
+                items[items.length-1] = "#"+items[items.length-1];
+            }
+            if(items.length>=3){
+                for(int i=1;i<=items.length-2;i++){
+                    items[i] = "#"+items[i]+"#";
+                }
+            }
+            labelSet.addAll(Arrays.asList(items));
+        });
+        return labelSet;
+    }
+
+    @Override
+    public SimpleResult updateDiaryContentById(Diary diary) {
+        //此方法目前仅用于更新日记文本，修改错别字，仅此而已
+        SimpleResult result = new SimpleResult();
+        Diary diaryInDb = LitePal.find(Diary.class, diary.getId());
+        if(null==diaryInDb){
+            result.setSuccess(false);
+            result.setMsg("没有找到需要更新的日记");
+        }else{
+            if(MyConfiguration.getInstance().isRequiredAndAbleToEncode()){
+                diaryInDb.setContent(RSAUtils.encode(diary.getContent(),MyConfiguration.getInstance().getPublicKey()));
+            }else{
+                diaryInDb.setContent(diary.getContent());
+            }
+            int update = diaryInDb.update(diaryInDb.getId());
+            if(1==update){
+                result.setSuccess(true);
+                result.setMsg("更新成功，请刷新");
+            }else{
+                result.setSuccess(false);
+                result.setMsg("数据库更新失败，请重试");
+            }
+        }
+        return result;
     }
 
     /**

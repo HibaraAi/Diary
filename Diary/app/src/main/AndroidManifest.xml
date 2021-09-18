@@ -20,6 +20,9 @@
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
         <activity
+            android:name=".activity.TimeAscActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.SetDiarySizeActivity"
             android:exported="true" />
         <activity

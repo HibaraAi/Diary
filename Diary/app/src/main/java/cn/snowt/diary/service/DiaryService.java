@@ -1,10 +1,13 @@
 package cn.snowt.diary.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 
@@ -100,4 +103,34 @@ public interface DiaryService {
      * 用于生成第一次使用本程序的帮助日记。
      */
     void addHelpDiary();
+
+    /**
+     * 将所有日记以明文的形式导出到txt文本，需验证登录密码
+     * @param pinInput 用户输入的登陆密码
+     * @return 成功与否都将提示写入result.msg
+     */
+    SimpleResult outputForTxt(String pinInput);
+
+    /**
+     * 时间升序获取指定条数的DiaryVo。
+     * 与getDiaryVoList完全一样，应该修改该方法的参数，而不是另起一个方法
+     * @param startIndex
+     * @param needNum
+     * @return
+     */
+    List<DiaryVo> getDiaryVoListAsc(int startIndex, int needNum);
+
+    /**
+     * 展示系统中已有的所有标签
+     * 应该使用一张表将所有标签存起来，而不是现在这样直接存字符串，现在找所有标签还得一条一条解析。。。
+     * @return
+     */
+    Set<String> getAllLabels();
+
+    /**
+     * 更新日记文本
+     * @param diary
+     * @return
+     */
+    SimpleResult updateDiaryContentById(Diary diary);
 }

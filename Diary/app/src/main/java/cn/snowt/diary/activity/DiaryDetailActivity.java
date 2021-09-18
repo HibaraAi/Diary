@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
 
     private int diaryId = -1;
     private DiaryAdapter adapter;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +84,11 @@ public class DiaryDetailActivity extends AppCompatActivity {
         if(null!=supportActionBar){
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+        fab = findViewById(R.id.detail_fab);
+        fab.setOnClickListener(v->{
+            showDiaryDetail();
+            BaseUtils.shortTipInSnack(this.recyclerView,"日记已刷新");
+        });
     }
 
     @Override

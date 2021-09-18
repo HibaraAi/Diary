@@ -20,6 +20,7 @@ import java.util.Random;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.DiaryDetailActivity;
+import cn.snowt.diary.activity.DiaryListActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.vo.DiaryVo;
@@ -67,8 +68,14 @@ public class DiaryAxisAdapter extends RecyclerView.Adapter{
         viewHolder.view.setOnClickListener(v->{
             Intent intent;
             if(viewHolder.isTempDiary){
-                intent = new Intent(context, KeepDiaryActivity.class);
-                intent.putExtra(KeepDiaryActivity.OPEN_FROM_TYPE,KeepDiaryActivity.OPEN_FROM_TEMP_DIARY);
+                if(-1==viewHolder.diaryId){
+                    intent = new Intent(context, DiaryListActivity.class);
+                    intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_SEARCH_LABEL);
+                    intent.putExtra("label",viewHolder.diaryCutView.getText().toString());
+                }else{
+                    intent = new Intent(context, KeepDiaryActivity.class);
+                    intent.putExtra(KeepDiaryActivity.OPEN_FROM_TYPE,KeepDiaryActivity.OPEN_FROM_TEMP_DIARY);
+                }
             }else{
                 intent = new Intent(context, DiaryDetailActivity.class);
             }

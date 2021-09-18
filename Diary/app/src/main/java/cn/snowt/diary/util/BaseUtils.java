@@ -30,6 +30,7 @@ import org.litepal.LitePalApplication;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -94,7 +95,26 @@ public class BaseUtils {
      */
     public static String dateToString(Date date){
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat(Constant.DATE_FORMAT);
-        return sdf.format(date);
+        String format = sdf.format(date);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int weekday = calendar.get(Calendar.DAY_OF_WEEK);
+        if (weekday == 1) {
+            format += " 星期天";
+        } else if (weekday == 2) {
+            format += " 星期一";
+        } else if (weekday == 3) {
+            format += " 星期二";
+        } else if (weekday == 4) {
+            format += " 星期三";
+        } else if (weekday == 5) {
+            format += " 星期四";
+        } else if (weekday == 6) {
+            format += " 星期五";
+        } else if (weekday == 7) {
+            format += " 星期六";
+        }
+        return format;
     }
 
     /**

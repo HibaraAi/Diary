@@ -20,6 +20,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -43,6 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryImageAdapter;
+import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.DiaryService;
@@ -51,6 +54,7 @@ import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
+import cn.snowt.diary.vo.DiaryVo;
 
 /**
  * @Author: HibaraAi
@@ -62,6 +66,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     public static final String TAG = "KeepDiaryActivity";
     public static final String OPEN_FROM_TYPE = "openFrom";
     public static final int OPEN_FROM_TEMP_DIARY = 1;
+    public static final int OPEN_FROM_UPDATE_DIARY = 2;
 
     public static final int CHOOSE_PICTURE = 1;
 
@@ -92,6 +97,11 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
      */
     private int tempDiaryId = -1;
 
+    /**
+     * 需要更新的日记ID
+     */
+    private int updateDiaryId = -1;
+
     private DiaryService diaryService = new DiaryServiceImpl();
 
 
@@ -115,6 +125,29 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     if(!tempDiaries.isEmpty()){
                         diaryInputView.setText(tempDiaries.get(0).getContent());
                     }
+                    break;
+                }
+                case OPEN_FROM_UPDATE_DIARY:{
+                    //从编辑已有日记来,将日记内容回写到输入框
+                    updateDiaryId = intent.getIntExtra("id", -1);
+                    SimpleResult result = diaryService.getDiaryVoById(updateDiaryId);
+                    if(result!=null){
+                        DiaryVo vo = (DiaryVo)result.getData();
+                        diaryInputView.setText(vo.getContent());
+                    }
+                    addPicBtn.setEnabled(false);
+                    addLabelBtn.setEnabled(false);
+                    loadLocationBtn.setEnabled(false);
+                    loadWeatherBtn.setEnabled(false);
+                    addDateBtn.setEnabled(false);
+                    findViewById(R.id.keep_diary_btn_image_tip).setEnabled(false);
+                    locationView.setEnabled(false);
+                    weatherView.setEnabled(false);
+                    labelView.setEnabled(false);
+                    dateView.setEnabled(false);
+                    ActionBar actionBar = getSupportActionBar();
+                    actionBar.setTitle("修改日记错别字");
+                    BaseUtils.alertDialogToShow(KeepDiaryActivity.this,"提示","此功能仅用于修改日记正文中的错别字，其他的均不能改。后续可能会删除此功能。");
                     break;
                 }
                 default:break;
@@ -161,6 +194,26 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             dateView.setVisibility(View.GONE);
             addDateBtn.setVisibility(View.GONE);
         }
+        //输入字数监听
+        diaryInputView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length()>1950){
+                    ActionBar actionBar = getSupportActionBar();
+                    actionBar.setTitle(s.length()+"(MAX:2000)");
+                }
+            }
+        });
     }
 
     private void initToolbar(){
@@ -170,7 +223,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         ActionBar actionBar = getSupportActionBar();
         if(null!=actionBar){
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Keep A Diary");
+            actionBar.setTitle("日记编辑");
         }
     }
 
@@ -204,14 +257,25 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     if(!"".equals(dateStr)){
                         date = BaseUtils.stringToDate(dateStr);
                     }
-                    SimpleResult result = diaryService.addOneByArgs(diaryInputStr,
-                            labelView.getText().toString(),
-                            locationView.getText().toString(),
-                            weatherView.getText().toString(),
-                            imageTempSrcList,date);
+                    SimpleResult result;
+                    if(-1!=updateDiaryId){
+                        Diary diary = new Diary();
+                        diary.setContent(diaryInputStr);
+                        diary.setId(updateDiaryId);
+                        result = diaryService.updateDiaryContentById(diary);
+                    }else{
+                        result = diaryService.addOneByArgs(diaryInputStr,
+                                labelView.getText().toString(),
+                                locationView.getText().toString(),
+                                weatherView.getText().toString(),
+                                imageTempSrcList,date);
+                    }
                     if(result.getSuccess()){
                         clearTempPinInEdit();
                         BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"新日记已存储，请手动刷新!");
+                        if(-1!=tempDiaryId){
+                            LitePal.delete(TempDiary.class,tempDiaryId);
+                        }
                         finish();
                     }else{
                         BaseUtils.shortTipInSnack(diaryInputView,result.getMsg());
@@ -373,6 +437,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     public void onBackPressed() {
         if(!"".equals(diaryInputView.getText().toString())){
             askSave(diaryInputView.getText().toString());
+        }else{
+            finish();
         }
     }
 
@@ -380,37 +446,42 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
      * 询问是否保存到草稿箱
      */
     private void askSave(String content){
-        AlertDialog.Builder builder=new AlertDialog.Builder(KeepDiaryActivity.this);
-        builder.setTitle("提示：");
-        builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？\n如果你是从草稿箱打开这个页面，不保存的话，草稿箱中的记录会被删除!");
-        builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
-            if(content.length()>2000){
-                BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存");
-            }else{
-                boolean saveSuccess = false;
-                TempDiary tempDiary = new TempDiary(null, content);
-                if(tempDiaryId!=-1){
-                    int update = tempDiary.update(tempDiaryId);
-                    if(0!=update){
-                        saveSuccess = true;
+        if(updateDiaryId==-1){
+            //==-1表示非更新日记，才需要问
+            AlertDialog.Builder builder=new AlertDialog.Builder(KeepDiaryActivity.this);
+            builder.setTitle("提示：");
+            builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？\n如果你是从草稿箱打开这个页面，不保存的话，草稿箱中的记录会被删除!");
+            builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
+                if(content.length()>2000){
+                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存");
+                }else{
+                    boolean saveSuccess = false;
+                    TempDiary tempDiary = new TempDiary(null, content);
+                    if(tempDiaryId!=-1){
+                        int update = tempDiary.update(tempDiaryId);
+                        if(0!=update){
+                            saveSuccess = true;
+                        }
+                    }else{
+                        saveSuccess = tempDiary.save();
                     }
-                }else{
-                    saveSuccess = tempDiary.save();
+                    if(saveSuccess){
+                        finish();
+                    }else{
+                        BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
+                    }
                 }
-                if(saveSuccess){
-                    finish();
-                }else{
-                    BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
+            });
+            builder.setPositiveButton("直接退出",(dialog, which) -> {
+                if(-1!=tempDiaryId){
+                    LitePal.delete(TempDiary.class,tempDiaryId);
                 }
-            }
-        });
-        builder.setPositiveButton("直接退出",(dialog, which) -> {
-            if(-1!=tempDiaryId){
-                LitePal.delete(TempDiary.class,tempDiaryId);
-            }
+                finish();
+            });
+            builder.show();
+        }else{
             finish();
-        });
-        builder.show();
+        }
     }
 
     /**

@@ -10,9 +10,17 @@
             android:icon="@drawable/nav_temp"
             android:title="草稿箱" />
         <item
+            android:id="@+id/nav_asc"
+            android:icon="@drawable/ic_date"
+            android:title="时间升序浏览" />
+        <item
             android:id="@+id/nav_time"
             android:icon="@drawable/nav_time"
             android:title="时间轴" />
+        <item
+            android:id="@+id/nav_label"
+            android:icon="@drawable/ic_label"
+            android:title="标签集" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/nav_settings"

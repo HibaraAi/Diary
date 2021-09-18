@@ -1,8 +1,10 @@
 package cn.snowt.diary.service.impl;
 
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 import org.litepal.LitePal;
+import org.litepal.LitePalApplication;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -10,6 +12,7 @@ import java.util.Date;
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
+import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.MD5Utils;
 import cn.snowt.diary.util.SimpleResult;
 
@@ -101,7 +104,10 @@ public class LoginServiceImpl implements LoginService {
             int punishmentLevel = sharedPreferences.getInt("punishmentLevel", 1);
             if(punishmentLevel>=Constant.MAX_PUNISHMENT_LEVEL){
                 //删除数据库
-
+                LitePal.deleteDatabase("diary");
+                String path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath();
+                FileUtils.deleteFolder(path);
+                BaseUtils.longTipInCoast(LitePalApplication.getContext(),"你输入错误密码的次数太多了，程序已自动删除所有存储的数据,密码已无意义，请卸载本程序。");
             }
             int tempLevel = Math.min((punishmentLevel), 10);
             Calendar cal = Calendar.getInstance();

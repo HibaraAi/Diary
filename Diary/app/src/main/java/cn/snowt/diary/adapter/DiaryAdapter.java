@@ -1,8 +1,10 @@
 package cn.snowt.diary.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.DiaryListActivity;
+import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.CommentServiceImpl;
@@ -56,7 +60,6 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         RecyclerView imageView;
         RecyclerView commentView;
         Button comment;
-        Button del;
         Button submitCommentBtn;
         EditText commentInput;
         Boolean visible;
@@ -74,13 +77,12 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             label = itemView.findViewById(R.id.item_label);
             content = itemView.findViewById(R.id.item_content);
             comment = itemView.findViewById(R.id.item_btn_comment);
-            del = itemView.findViewById(R.id.item_btn_del);
             imageView = itemView.findViewById(R.id.item_pic_area);
             commentView = itemView.findViewById(R.id.item_comment_area);
             diaryView = itemView;
             submitCommentBtn = itemView.findViewById(R.id.item_comment_input_btn);
             commentInput = itemView.findViewById(R.id.item_comment_input);
-
+            //评论区可见标记
             visible = false;
         }
     }
@@ -98,6 +100,13 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             context = parent.getContext();
         }
         final ViewHolder viewHolder = new ViewHolder(view);
+        //头像及用户名是每个item都一样，且不会有点击事件
+        if(null== MyConfiguration.getInstance().getHeadImg()){
+            viewHolder.headImg.setImageResource(R.drawable.nav_icon);
+        }else{
+            Glide.with(viewHolder.diaryView).load(MyConfiguration.getInstance().getHeadImg()).into(viewHolder.headImg);
+        }
+        viewHolder.username.setText(MyConfiguration.getInstance().getUsername());
         //展开或收起评论区
         viewHolder.comment.setOnClickListener(v->{
             if(viewHolder.visible){
@@ -122,32 +131,83 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                 }
             }
         });
-        viewHolder.del.setOnClickListener(v->{
-            BaseUtils.shortTipInSnack(viewHolder.diaryView,"长按删除日记");
-        });
-        viewHolder.del.setOnLongClickListener(v->{
-            new AlertDialog.Builder(context)
-                    .setTitle("确定要删除这条日记吗?")
-                    .setPositiveButton("确认删除", (dialog, which) -> {
-                        SimpleResult result = diaryService.deleteById(viewHolder.diaryId);
-                        if(result.getSuccess()){
-                            BaseUtils.shortTipInSnack(viewHolder.diaryView,"删除成功，刷新后将正常展示");
-                        }else{
-                            BaseUtils.shortTipInSnack(viewHolder.diaryView,result.getMsg());
-                        }
-                    })
-                    .setNegativeButton("刚刚点错了",null)
-                    .show();
-            return true;
-        });
         //设置字体大小
         float fontSize = MyConfiguration.getInstance().getFontSize();
         if(fontSize!=-1){
             viewHolder.content.setTextSize(fontSize);
         }
+        //长按日记文字
         viewHolder.content.setOnLongClickListener(v->{
-            BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
-            BaseUtils.shortTipInSnack(viewHolder.content,"日记已复制");
+            AtomicReference<String> select = new AtomicReference<>();
+            final String[] items = {"复制日记","删除","查看详情","编辑日记","置顶日记"};
+            select.set(items[0]);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("日记菜单");
+            builder.setSingleChoiceItems(items, 0, (dialogInterface, i) -> {
+                select.set(items[i]);
+            });
+            builder.setPositiveButton("确定", (dialog, which) -> {
+                switch (select.get()) {
+                    case "复制日记":{
+                        BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
+                        BaseUtils.shortTipInSnack(viewHolder.content,"日记已复制");
+                        break;
+                    }
+                    case "删除":{
+                        new AlertDialog.Builder(context)
+                                .setTitle("确定要删除这条日记吗?")
+                                .setPositiveButton("确认删除", (dialog1, which1) -> {
+                                    SimpleResult result = diaryService.deleteById(viewHolder.diaryId);
+                                    if(result.getSuccess()){
+                                        BaseUtils.shortTipInSnack(viewHolder.diaryView,"删除成功，刷新后将正常展示");
+                                    }else{
+                                        BaseUtils.shortTipInSnack(viewHolder.diaryView,result.getMsg());
+                                    }
+                                })
+                                .setNegativeButton("刚刚点错了",null)
+                                .show();
+                        break;
+                    }
+                    case "查看详情":{
+                        Intent intent = new Intent(context, DiaryDetailActivity.class);
+                        intent.putExtra("id",viewHolder.diaryId);
+                        context.startActivity(intent);
+                        break;
+                    }
+                    case "编辑日记":{
+                        Intent intent = new Intent(context, KeepDiaryActivity.class);
+                        intent.putExtra(KeepDiaryActivity.OPEN_FROM_TYPE,KeepDiaryActivity.OPEN_FROM_UPDATE_DIARY);
+                        intent.putExtra("id",viewHolder.diaryId);
+                        context.startActivity(intent);
+                        break;
+                    }
+                    case "置顶日记":{
+                        new AlertDialog.Builder(context)
+                                .setTitle("说明")
+                                .setMessage("将此条日记置顶。\n特殊地，如果对置顶日记本身执行此操作则视为取消置顶\n另外，置顶只是提前展示，你仍会在浏览时看到该日记真身。如果删除置顶日记，则视为真正删除该日记。")
+                                .setPositiveButton("继续", (dialog1, which1) -> {
+                                    int topDiaryId = BaseUtils.getSharedPreference().getInt("topDiary", -1);
+                                    SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+                                    if(viewHolder.diaryId==topDiaryId){
+                                        //就是这一条，取消置顶
+                                        edit.putInt("topDiary",-1);
+                                    }else{
+                                        //设置为置顶
+                                        edit.putInt("topDiary",viewHolder.diaryId);
+                                    }
+                                    edit.apply();
+                                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"已更新置顶日记，刷新后即生效。");
+                                })
+                                .setNegativeButton("取消",null)
+                                .show();
+                        break;
+                    }
+                    default:break;
+                }
+            });
+            builder.setNegativeButton("取消",null);
+            builder.setCancelable(false);
+            builder.show();
             return true;
         });
         //点击标签
@@ -182,17 +242,18 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         return viewHolder;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ViewHolder newHolder = (ViewHolder)holder;
         DiaryVo diaryVo = diaryVoList.get(position);
         newHolder.diaryId = diaryVo.getId();
-        if(null== MyConfiguration.getInstance().getHeadImg()){
-            newHolder.headImg.setImageResource(R.drawable.nav_icon);
-        }else{
-            Glide.with(newHolder.diaryView).load(MyConfiguration.getInstance().getHeadImg()).into(newHolder.headImg);
-        }
-        newHolder.username.setText(MyConfiguration.getInstance().getUsername());
+//        if(null== MyConfiguration.getInstance().getHeadImg()){
+//            newHolder.headImg.setImageResource(R.drawable.nav_icon);
+//        }else{
+//            Glide.with(newHolder.diaryView).load(MyConfiguration.getInstance().getHeadImg()).into(newHolder.headImg);
+//        }
+//        newHolder.username.setText(MyConfiguration.getInstance().getUsername());
         newHolder.modifyDate.setText(diaryVo.getModifiedDate());
         newHolder.weather.setText(diaryVo.getWeatherStr());
         newHolder.location.setText(diaryVo.getLocationStr());
@@ -215,6 +276,19 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         GridLayoutManager layoutManager2 = new GridLayoutManager(context, 1);
         commentRecyclerView.setAdapter(commentAdapter);
         commentRecyclerView.setLayoutManager(layoutManager2);
+        if(!diaryVo.getCommentList().isEmpty()){
+            newHolder.comment.setText("评论("+diaryVo.getCommentList().size()+")");
+            //改为可见
+            if(MyConfiguration.getInstance().isAutoOpenComment()){
+                newHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.VISIBLE);
+                newHolder.visible = true;
+            }
+        }else{
+            newHolder.comment.setText("评论");
+            //改为不可见
+            newHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.GONE);
+            newHolder.visible = false;
+        }
         holder = newHolder;
     }
 

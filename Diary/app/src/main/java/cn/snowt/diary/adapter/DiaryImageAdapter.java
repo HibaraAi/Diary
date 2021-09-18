@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
@@ -94,7 +95,11 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
         ViewHolder newHolder = (ViewHolder)holder;
         String imageSrc = imageSrcList.get(position);
         newHolder.imageSrc = imageSrc;
-        Glide.with(context).load(imageSrc).into(newHolder.diaryImage);
+        RequestOptions options = new RequestOptions()
+                .placeholder(R.drawable.load_image)//图片加载出来前，显示的图片
+                .fallback( R.drawable.bad_image) //url为空的时候,显示的图片
+                .error(R.drawable.bad_image);//图片加载失败后，显示的图片
+        Glide.with(context).load(imageSrc).apply(options).into(newHolder.diaryImage);
     }
 
     @Override

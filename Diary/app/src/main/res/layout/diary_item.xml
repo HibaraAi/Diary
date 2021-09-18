@@ -130,14 +130,6 @@
         app:layout_constraintRight_toLeftOf="@id/blank_area_right"
         app:layout_constraintTop_toBottomOf="@+id/item_pic_area"
         android:text="评论"/>
-    <Button
-        android:id="@+id/item_btn_del"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintRight_toLeftOf="@id/item_btn_comment"
-        app:layout_constraintTop_toBottomOf="@+id/item_pic_area"
-        android:layout_marginRight="5dp"
-        android:text="删除"/>
     <!--评论区-->
     <androidx.cardview.widget.CardView
         android:id="@+id/item_comment_area_parent"

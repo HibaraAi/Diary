@@ -2,11 +2,11 @@
     <!-- Base application theme. -->
     <style name="Theme.消消乐" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#3A5168</item>
+        <item name="colorPrimary">#395F84</item>
         <item name="colorPrimaryVariant">#20374D</item>
         <item name="colorOnPrimary">#314047</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">#4B525A</item>
+        <item name="colorSecondary">#5D6670</item>
         <item name="colorSecondaryVariant">#373D43</item>
         <item name="colorOnSecondary">#314047</item>
         <!-- Status bar color. -->

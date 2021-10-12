@@ -17,19 +17,12 @@ public class MyConfiguration {
     private static boolean requiredAndAbleToEncode;
     private static float fontSize;
     private static boolean autoOpenCommentArea;
+    private static int nightStart;
+    private static int nightEnd;
+    private static boolean autoNight;
 
     private static MyConfiguration myConfiguration;
     private MyConfiguration() {
-    }
-
-    public static MyConfiguration getInstance(){
-        if (myConfiguration == null) {
-            synchronized (MyConfiguration.class) {
-                if (myConfiguration == null) {
-                    myConfiguration = new MyConfiguration();
-                }
-            }
-        }
         SharedPreferences sharedPreference = BaseUtils.getSharedPreference();
         username = sharedPreference.getString(Constant.SHARE_PREFERENCES_USERNAME,"用户名");
         headImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_HEAD_SRC,null);
@@ -46,6 +39,19 @@ public class MyConfiguration {
         requiredAndAbleToEncode = (useEncode && haveSetEncodeKey);
         fontSize = BaseUtils.getSharedPreference().getFloat(Constant.SHARE_PREFERENCES_DIARY_FONT_SIZE,-1.0F);
         autoOpenCommentArea = BaseUtils.getDefaultSharedPreferences().getBoolean("openCommentArea",false);
+        autoNight = BaseUtils.getDefaultSharedPreferences().getBoolean("autoNight",false);
+        nightStart = BaseUtils.getSharedPreference().getInt("nightStart",2300);
+        nightEnd = BaseUtils.getSharedPreference().getInt("nightEnd",800);
+    }
+
+    public static MyConfiguration getInstance(){
+        if (myConfiguration == null) {
+            synchronized (MyConfiguration.class) {
+                if (myConfiguration == null) {
+                    myConfiguration = new MyConfiguration();
+                }
+            }
+        }
         return myConfiguration;
     }
 
@@ -102,5 +108,17 @@ public class MyConfiguration {
 
     public boolean isAutoOpenComment() {
         return autoOpenCommentArea;
+    }
+
+    public int getNightStart() {
+        return nightStart;
+    }
+
+    public int getNightEnd() {
+        return nightEnd;
+    }
+
+    public boolean isAutoNight() {
+        return autoNight;
     }
 }

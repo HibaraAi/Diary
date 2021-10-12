@@ -2,27 +2,34 @@ package cn.snowt.diary.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import org.litepal.LitePal;
 import org.litepal.LitePalApplication;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.service.DiaryService;
@@ -32,6 +39,7 @@ import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
+import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.mine.MineGameActivity;
 
@@ -51,10 +59,40 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        autoNight();
         setContentView(R.layout.activity_login);
         bindViewAndSetListener();
         doWhenFirstLogin();
         initKeyboard();
+    }
+
+    /**
+     * 处理自动夜间模式
+     */
+    private void autoNight() {
+        if (MyConfiguration.getInstance().isAutoNight()) {
+            String now = BaseUtils.dateToString(new Date());
+            int nowTimeInt = Integer.parseInt(now.substring(11, 13)+now.substring(14, 16));
+            int nightEnd = MyConfiguration.getInstance().getNightEnd();
+            int nightStart = MyConfiguration.getInstance().getNightStart();
+            if(nightStart > nightEnd){
+                nightEnd += 2400;
+                if(nowTimeInt < nightStart){
+                    nowTimeInt += 2400;
+                }
+            }
+            if(nowTimeInt>=nightStart && nowTimeInt <=nightEnd){
+                if(this.getResources().getConfiguration().uiMode == 0x11){
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    BaseUtils.shortTipInCoast(this,"自动切换为夜间模式");
+                }
+            }else{
+                if(this.getResources().getConfiguration().uiMode == 0x21){
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    BaseUtils.shortTipInCoast(this,"自动切换为白天模式");
+                }
+            }
+        }
     }
 
     /**
@@ -152,8 +190,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //第一次使用本程序
             //创建数据库
             LitePal.getDatabase();
-            //写入帮助日记
-            new DiaryServiceImpl().addHelpDiary();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //写入帮助日记
+                    try {
+                        new DiaryServiceImpl().addHelpDiary();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
             //申请存储权限
             applyPermission();
         }

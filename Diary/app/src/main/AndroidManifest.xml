@@ -20,6 +20,21 @@
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
         <activity
+            android:name=".activity.FunnyInfoActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.AddSpecialDayActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.DayDetailActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.SpecialDayActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.SetSameLabelActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.TimeAscActivity"
             android:exported="true" />
         <activity

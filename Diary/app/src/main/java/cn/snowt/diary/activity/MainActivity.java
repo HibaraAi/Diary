@@ -224,6 +224,16 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     break;
                 }
+                case R.id.nav_former_years:{
+                    Intent intent = new Intent(MainActivity.this,TimeAscActivity.class);
+                    intent.putExtra(TimeAscActivity.OPEN_FROM_TYPE,TimeAscActivity.OPEN_FROM_LABEL_FORMER_YEARS);
+                    startActivity(intent);
+                    break;
+                }
+                case R.id.nav_special_day:{
+                    BaseUtils.gotoActivity(this,SpecialDayActivity.class);
+                    break;
+                }
                 default:{
                     Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
@@ -256,14 +266,15 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(MainActivity.this).load(headImgInSp).into(headImg);
         }
         this.headImg.setOnClickListener(v->{
-            if(null!=headImgInSp){
-                Intent intent = new Intent(MainActivity.this,ZoomImageActivity.class);
-                intent.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,headImgInSp);
-                startActivity(intent);
-                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像");
-            }else{
-                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像\n(但你还没有更换自己的头像)");
-            }
+//            if(null!=headImgInSp){
+//                Intent intent = new Intent(MainActivity.this,ZoomImageActivity.class);
+//                intent.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,headImgInSp);
+//                startActivity(intent);
+//                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像");
+//            }else{
+//                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像\n(但你还没有更换自己的头像)");
+//            }
+            BaseUtils.shortTipInSnack(this.headImg,"长按修改头像 OvO");
         });
         this.headImg.setOnLongClickListener(v -> {
             //判断有没有外部存储的写入权限
@@ -294,8 +305,10 @@ public class MainActivity extends AppCompatActivity {
                 if(!"".equals(s)){
                     configurationService.updateUsername(s);
                     username.setText(s);
+                    BaseUtils.shortTipInCoast(MainActivity.this,"更新成功，建议重启应用");
+                }else{
+                    BaseUtils.shortTipInCoast(this,"不准为空!  (•_•)");
                 }
-                BaseUtils.shortTipInCoast(MainActivity.this,"更新成功，建议重启应用");
             });
             dialog.setNegativeButton("取消",null);
             dialog.show();
@@ -315,6 +328,8 @@ public class MainActivity extends AppCompatActivity {
                 if(!"".equals(s)){
                     configurationService.updateMotto(s);
                     motto.setText(s);
+                }else{
+                    BaseUtils.shortTipInCoast(this,"不准为空!  (•_•)");
                 }
             });
             dialog.setNegativeButton("取消",null);

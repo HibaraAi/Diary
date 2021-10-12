@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -118,6 +119,11 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                 viewHolder.visible = true;
             }
         });
+        //特殊地，如果是日记详情页，自动打开评论区
+        if(parent.getId()==R.id.detail_recyclerview){
+            viewHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.VISIBLE);
+            viewHolder.visible = true;
+        }
         //读取输入的评论
         viewHolder.submitCommentBtn.setOnClickListener(v->{
             String commentInputStr = viewHolder.commentInput.getText().toString();
@@ -139,7 +145,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         //长按日记文字
         viewHolder.content.setOnLongClickListener(v->{
             AtomicReference<String> select = new AtomicReference<>();
-            final String[] items = {"复制日记","删除","查看详情","编辑日记","置顶日记"};
+            final String[] items = {"复制日记","置顶日记","查看详情","编辑日记","删除"};
             select.set(items[0]);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("日记菜单");

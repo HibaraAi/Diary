@@ -215,6 +215,10 @@ public class BaseUtils {
                 BaseUtils.shortTipInCoast(context,"请选择一张你要插入的图片");
                 break;
             }
+            case Constant.OPEN_ALBUM_TYPE_ADD_DAY_ADD_PIC:{
+                BaseUtils.shortTipInCoast(context,"请选择一张图片作为纪念日背景");
+                break;
+            }
             default:return;
         }
         Intent intent = new Intent("android.intent.action.GET_CONTENT");

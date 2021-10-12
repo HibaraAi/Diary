@@ -3,7 +3,7 @@
 
     <dbname value="diary" />
 
-    <version value="3" />
+    <version value="4" />
 
     <list>
         <mapping class="cn.snowt.diary.entity.Comment" />
@@ -12,6 +12,7 @@
         <mapping class="cn.snowt.diary.entity.Location" />
         <mapping class="cn.snowt.diary.entity.Weather" />
         <mapping class="cn.snowt.diary.entity.TempDiary" />
+        <mapping class="cn.snowt.diary.entity.SpecialDay" />
     </list>
 
 </litepal>

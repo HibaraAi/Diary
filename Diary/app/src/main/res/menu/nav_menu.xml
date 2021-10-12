@@ -18,9 +18,17 @@
             android:icon="@drawable/nav_time"
             android:title="时间轴" />
         <item
+            android:id="@+id/nav_former_years"
+            android:icon="@drawable/nav_former_years"
+            android:title="往年今日" />
+        <item
             android:id="@+id/nav_label"
             android:icon="@drawable/ic_label"
             android:title="标签集" />
+        <item
+            android:id="@+id/nav_special_day"
+            android:icon="@drawable/nav_special_day"
+            android:title="纪念日" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/nav_settings"

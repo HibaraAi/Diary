@@ -1,66 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.RecoveryDiaryActivity">
-
-    <include android:id="@+id/s676545346453" layout="@layout/defalut_toolbar" />
-
-    <Button
-        android:id="@+id/re_diary_btn_load"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/s676545346453"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_margin="5dp"
-        android:text="选择备份文件" />
-
-    <Button
-        android:id="@+id/re_diary_btn_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/s676545346453"
-        app:layout_constraintLeft_toRightOf="@+id/re_diary_btn_load"
-        android:layout_margin="5dp"
-        android:enabled="false"
-        android:text="检验口令并恢复日记" />
-
-    <TextView
-        android:id="@+id/re_diary_tip"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/background_input"
-        android:minLines="5"
-        android:maxLines="5"
-        android:layout_margin="5dp"
-        android:padding="10dp"
-        android:hint="提示区"
-        app:layout_constraintTop_toBottomOf="@+id/re_diary_btn_load"/>
+        android:layout_height="match_parent">
+        <include android:id="@+id/s676545346453" layout="@layout/defalut_toolbar" />
 
-    <EditText
-        android:id="@+id/re_diary_private"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/background_input"
-        android:minLines="10"
-        android:maxLines="10"
-        android:layout_margin="5dp"
-        android:padding="5dp"
-        app:layout_constraintTop_toBottomOf="@id/re_diary_tip"
-        android:hint="输入长密钥"/>
+        <Button
+            android:id="@+id/re_diary_btn_load"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/s676545346453"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_margin="5dp"
+            android:text="选择备份文件" />
 
-    <EditText
-        android:id="@+id/re_diary_pin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/background_input"
-        android:minLines="3"
-        android:maxLines="3"
-        android:layout_margin="5dp"
-        android:padding="5dp"
-        app:layout_constraintTop_toBottomOf="@id/re_diary_private"
-        android:hint="(必填项)输入备份文件的口令"/>
+        <Button
+            android:id="@+id/re_diary_btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/s676545346453"
+            app:layout_constraintLeft_toRightOf="@+id/re_diary_btn_load"
+            android:layout_margin="5dp"
+            android:enabled="false"
+            android:text="检验口令并恢复日记" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/re_diary_tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_input"
+            android:minLines="5"
+            android:maxLines="5"
+            android:layout_margin="5dp"
+            android:padding="10dp"
+            android:hint="提示区"
+            app:layout_constraintTop_toBottomOf="@+id/re_diary_btn_load"/>
+
+        <EditText
+            android:id="@+id/re_diary_private"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/background_input"
+            android:minLines="10"
+            android:maxLines="10"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            app:layout_constraintTop_toBottomOf="@id/re_diary_tip"
+            android:hint="输入长密钥"/>
+
+        <EditText
+            android:id="@+id/re_diary_pin"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/background_input"
+            android:minLines="3"
+            android:maxLines="3"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            app:layout_constraintTop_toBottomOf="@id/re_diary_private"
+            android:hint="(必填项)输入备份文件的口令"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -3,6 +3,7 @@ package cn.snowt.diary.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +18,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.List;
+import java.util.UUID;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.activity.MainActivity;
 import cn.snowt.diary.activity.ZoomImageActivity;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.UriUtils;
 
 /**
  * @Author: HibaraAi
@@ -83,7 +89,25 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 builder.show();
             }else if(recyclerView.getId()==R.id.item_pic_area){
                 //主屏幕区的图片
-                BaseUtils.shortTipInSnack(viewHolder.diaryImage,"别长按，屏幕按爆了也没反应 >_<");
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                builder.setTitle("二次确认");
+                builder.setMessage("即将把这张图保存到你的系统相册");
+                builder.setNegativeButton("手滑了",null);
+                builder.setPositiveButton("保存", (dialog, which) -> {
+                    String absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath()+"/消消乐/";
+                    File file = new File(absolutePath);
+                    if(!file.exists()){
+                        file.mkdirs();
+                    }
+                    String finalName = absolutePath + UUID.randomUUID().toString() + ".jpg";
+                    try {
+                        UriUtils.copyStream(new FileInputStream(viewHolder.imageSrc),new FileOutputStream(finalName));
+                        BaseUtils.shortTipInSnack(viewHolder.itemView,"应该保存成功了😂");
+                    } catch (Exception e) {
+                        BaseUtils.shortTipInSnack(viewHolder.itemView,"保存失败!");
+                    }
+                });
+                builder.show();
             }
             return true;
         });

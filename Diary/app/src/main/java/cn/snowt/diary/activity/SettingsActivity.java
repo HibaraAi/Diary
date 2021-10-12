@@ -3,8 +3,11 @@ package cn.snowt.diary.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -26,10 +31,16 @@ import androidx.preference.PreferenceFragmentCompat;
 import org.litepal.LitePalApplication;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.entity.FunnyInfo;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
+import cn.snowt.diary.service.impl.FunnyInfoServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
@@ -103,6 +114,29 @@ public class SettingsActivity extends AppCompatActivity {
             }else{
                 findPreference("setDiarySize").setSummary("当前为默认字体大小");
             }
+            SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
+            String autoNightTime = "";
+            try {
+                int nightStart = MyConfiguration.getInstance().getNightStart();
+                int nightEnd = MyConfiguration.getInstance().getNightEnd();
+                Date parse;
+                if(nightStart<1000){
+                    parse = sdf.parse("0" + nightStart);
+                }else{
+                    parse = sdf.parse(String.valueOf(nightStart));
+                }
+                Date parse1;
+                if(nightEnd<1000){
+                    parse1 = sdf.parse("0"+nightEnd);
+                }else{
+                    parse1 = sdf.parse(String.valueOf(nightEnd));
+                }
+                autoNightTime = sdf2.format(parse)+"——"+sdf2.format(parse1);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            findPreference("autoNightTime").setSummary(autoNightTime);
         }
 
         @Override
@@ -129,7 +163,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case "clearROM":{
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("警告");
-                    builder.setMessage("此操作仅供卸载前执行。清除外存数据会删除所有软件图片，包括日记图片等数据。请输入登录密码确认此操作");
+                    builder.setMessage("此操作仅供卸载前执行。清除外存数据会删除所有软件数据，包括但不限于日记图片、备份文件、密钥文件。\n请输入登录密码确认此操作");
                     EditText editText = new EditText(context);
                     editText.setBackgroundResource(R.drawable.background_input);
                     editText.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD | InputType.TYPE_CLASS_NUMBER );
@@ -171,7 +205,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("设置读取密钥");
-                        builder.setMessage("为备份文件设置读取口令\n（提示：\n1.从备份文件读取日记时，如果日记加密过，还需要提供加密密钥，如果你没有加密密钥，则会读取失败\n2.过程可能需要很长时间(取决于你的日记数量),如果有卡住现象是正常情况，耐心等待\n3.备份文件的安全性很差，此功能的设计初衷是为了设备间的数据转移。）");
+                        builder.setMessage("为备份文件设置读取口令\n（提示：\n1.从备份文件读取日记时，如果日记加密过，还需要提供加密密钥，如果你没有加密密钥，则会读取失败\n2.过程可能需要很长时间(取决于你加密日记的数量),如果有卡住现象是正常情况，耐心等待\n3.备份文件的安全性很差，此功能的设计初衷是为了设备间的数据转移。）");
                         EditText pinView = new EditText(context);
                         pinView.setHint("设置一个读取口令");
                         pinView.setBackgroundResource(R.drawable.background_input);
@@ -226,6 +260,8 @@ public class SettingsActivity extends AppCompatActivity {
                             edit.putBoolean("openTestFun",true);
                             edit.apply();
                             findPreference("customDate").setEnabled(true);
+                        }else{
+                            BaseUtils.shortTipInCoast(context,"测试码不正确 UoU");
                         }
                     });
                     builder.setNegativeButton("直接关闭测试功能",(dialog, which) -> {
@@ -266,6 +302,68 @@ public class SettingsActivity extends AppCompatActivity {
                     });
                     builder.setNegativeButton("取消",null);
                     builder.show();
+                    break;
+                }
+                case "autoNightTime":{
+                    final int[] startTimeInt = {-1};
+                    final int[] endTimeInt = {-1};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("设置起止时间");
+                    TextView timeOne = new TextView(context);
+                    TextView timeTwo = new TextView(context);
+                    timeOne.setOnClickListener(v->{
+                        new TimePickerDialog(context,
+                                (view, hourOfDay, minute) ->{
+                                    startTimeInt[0] = hourOfDay*100+minute;
+                                    timeOne.setText(hourOfDay+":"+minute);
+                                },
+                                Calendar.HOUR_OF_DAY,
+                                Calendar.MINUTE,
+                                true)
+                                .show();
+                    });
+                    timeTwo.setOnClickListener(v->{
+                        new TimePickerDialog(context,
+                                (view, hourOfDay, minute) ->{
+                                    endTimeInt[0] = hourOfDay*100+minute;
+                                    timeTwo.setText(hourOfDay+":"+minute);
+                                },
+                                Calendar.HOUR_OF_DAY,
+                                Calendar.MINUTE,
+                                true)
+                                .show();
+                    });
+                    timeOne.setBackgroundResource(R.drawable.background_input);
+                    timeOne.setHint("开始时间");
+                    timeTwo.setBackgroundResource(R.drawable.background_input);
+                    timeTwo.setHint("结束时间");
+                    LinearLayout linearLayout = new LinearLayout(context);
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    linearLayout.addView(timeOne);
+                    linearLayout.addView(timeTwo);
+                    builder.setView(linearLayout);
+                    builder.setCancelable(false);
+                    builder.setPositiveButton("确定", (dialog1, which) -> {
+                        if(startTimeInt[0]!=endTimeInt[0] && (startTimeInt[0]!=-1 && endTimeInt[0]!=-1)){
+                            SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+                            edit.putInt("nightStart",startTimeInt[0]);
+                            edit.putInt("nightEnd",endTimeInt[0]);
+                            edit.apply();
+                            BaseUtils.shortTipInCoast(context,"设置成功，以后启动将会生效");
+                        }else{
+                            BaseUtils.shortTipInCoast(context,"起止时间不能相同也不能为空");
+                        }
+                    });
+                    builder.setNegativeButton("取消",null);
+                    builder.show();
+                    break;
+                }
+                case "funnyInfo":{
+                    BaseUtils.gotoActivity((Activity) context,FunnyInfoActivity.class);
+                    break;
+                }
+                case "sameLabel":{
+                    BaseUtils.gotoActivity((Activity) context,SetSameLabelActivity.class);
                     break;
                 }
                 default:return false;

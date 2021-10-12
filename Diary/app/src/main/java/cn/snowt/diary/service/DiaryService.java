@@ -10,6 +10,7 @@ import java.util.Set;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
+import cn.snowt.diary.vo.DiaryVoForFunny;
 
 /**
  * @Author: HibaraAi
@@ -102,7 +103,7 @@ public interface DiaryService {
     /**
      * 用于生成第一次使用本程序的帮助日记。
      */
-    void addHelpDiary();
+    void addHelpDiary() throws InterruptedException;
 
     /**
      * 将所有日记以明文的形式导出到txt文本，需验证登录密码
@@ -133,4 +134,17 @@ public interface DiaryService {
      * @return
      */
     SimpleResult updateDiaryContentById(Diary diary);
+
+    /**
+     * 获取全部DiaryVoForFunny形式的日记
+     * @return
+     */
+    List<DiaryVoForFunny> getDiaryVoForFunny();
+
+    /**
+     * 获取某天的所有日记
+     * @param date
+     * @return
+     */
+    List<DiaryVo> getDiaryVoByDate(Date date);
 }

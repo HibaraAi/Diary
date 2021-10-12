@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.DayDetailActivity"
+    android:background="@drawable/day_detail_bg">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include android:id="@+id/a8765132453" layout="@layout/defalut_toolbar" />
+
+        <ImageView
+            android:id="@+id/day_detail_img"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/nav_icon"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/a8765132453" />
+
+        <TextView
+            android:id="@+id/day_detail_daySum"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            app:layout_constraintLeft_toRightOf="@+id/day_detail_img"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/day_detail_img"
+            app:layout_constraintBottom_toBottomOf="@+id/day_detail_img"
+            android:layout_marginRight="20dp"
+            android:textSize="70dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="#6C5F4C"/>
+
+        <TextView
+            android:id="@+id/day_detail_date_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/day_detail_date"
+            app:layout_constraintRight_toLeftOf="@+id/day_detail_date"
+            app:layout_constraintLeft_toLeftOf="@+id/day_detail_img"
+            android:text="起始时间: "
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/day_detail_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/day_detail_img"
+            app:layout_constraintLeft_toRightOf="@+id/day_detail_date_help"
+            android:layout_marginTop="50dp"
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/day_detail_date_end_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/day_detail_date_end"
+            app:layout_constraintRight_toLeftOf="@+id/day_detail_date_end"
+            app:layout_constraintLeft_toLeftOf="@+id/day_detail_img"
+            android:text="结束时间: "
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/day_detail_date_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/day_detail_date"
+            app:layout_constraintLeft_toRightOf="@+id/day_detail_date_end_help"
+            android:layout_marginTop="20dp"
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/day_detail_daySum_small_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/day_detail_daySum_small"
+            app:layout_constraintLeft_toLeftOf="@+id/day_detail_img"
+            app:layout_constraintRight_toLeftOf="@+id/day_detail_daySum_small"
+            android:textSize="20dp"
+            android:textColor="#6C5F4C"
+            android:text="累计: "/>
+
+        <TextView
+            android:id="@+id/day_detail_daySum_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@+id/day_detail_date_end"
+            app:layout_constraintLeft_toRightOf="@+id/day_detail_daySum_small_help"
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/day_detail_dis_now_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/day_detail_dis_now"
+            app:layout_constraintLeft_toLeftOf="@+id/day_detail_img"
+            app:layout_constraintRight_toLeftOf="@+id/day_detail_dis_now"
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"
+            android:text="距今: "/>
+
+        <TextView
+            android:id="@+id/day_detail_dis_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@+id/day_detail_daySum_small"
+            app:layout_constraintLeft_toRightOf="@+id/day_detail_dis_now_help"
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/day_detail_remark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/day_detail_dis_now"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textColor="#6C5F4C"
+            android:padding="20dp"
+            android:textSize="20dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

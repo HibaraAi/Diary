@@ -1,5 +1,8 @@
 package cn.snowt.diary.service;
 
+import java.util.List;
+
+import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.util.SimpleResult;
 
 /**
@@ -29,4 +32,11 @@ public interface CommentService {
      * @return
      */
     SimpleResult deleteByDiaryId(Integer diaryId);
+
+    /**
+     * 根据日记ID，获取该日记的所有评论，解密后返回
+     * @param diaryId 日记Id
+     * @return
+     */
+    List<Comment> getDecodeCommentByDiaryId(Integer diaryId);
 }

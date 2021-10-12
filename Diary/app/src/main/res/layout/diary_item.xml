@@ -158,7 +158,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="2dp"
                 android:text="发送评论"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/item_comment_area"

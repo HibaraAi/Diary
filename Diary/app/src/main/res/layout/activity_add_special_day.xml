@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.AddSpecialDayActivity"
+    android:background="@drawable/day_detail_bg">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include android:id="@+id/g78941346543212" layout="@layout/defalut_toolbar" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/g78941346543212"
+            android:paddingLeft="20dp"
+            android:textStyle="italic"
+            android:text="TIP:点击文字设置对应项,有横线的为必填项" />
+
+        <TextView
+            android:id="@+id/day_add_startDate_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选一个日期："
+            app:layout_constraintTop_toBottomOf="@id/g78941346543212"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="40dp"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/day_add_startDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/day_add_startDate_help"
+            app:layout_constraintLeft_toRightOf="@+id/day_add_startDate_help"
+            android:textSize="20dp"
+            android:text="___________________"/>
+
+        <TextView
+            android:id="@+id/day_add_title_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/day_add_startDate_help"
+            app:layout_constraintLeft_toLeftOf="@+id/day_add_startDate_help"
+            android:text="起一个标题："
+            android:textSize="20dp"
+            android:layout_marginTop="30dp" />
+
+        <TextView
+            android:id="@+id/day_add_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/day_add_title_help"
+            app:layout_constraintLeft_toRightOf="@+id/day_add_title_help"
+            android:textSize="20dp"
+            android:text="___________________"/>
+
+        <TextView
+            android:id="@+id/day_add_remark_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/day_add_title_help"
+            app:layout_constraintLeft_toLeftOf="@+id/day_add_title_help"
+            android:text="写一个备注："
+            android:textSize="20dp"
+            android:layout_marginTop="50dp" />
+
+        <TextView
+            android:id="@+id/day_add_remark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/day_add_remark_help"
+            app:layout_constraintTop_toTopOf="@+id/day_add_remark_help"
+            app:layout_constraintLeft_toRightOf="@+id/day_add_remark_help"
+            app:layout_constraintRight_toRightOf="parent"
+            android:maxLines="6"
+            android:scrollbars="vertical"/>
+
+        <TextView
+            android:id="@+id/day_add_img_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/day_add_remark_help"
+            app:layout_constraintLeft_toLeftOf="@+id/day_add_remark_help"
+            android:text="配一个封面："
+            android:textSize="20dp"
+            android:layout_marginTop="45dp" />
+
+        <ImageView
+            android:id="@+id/day_add_img"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintTop_toTopOf="@+id/day_add_img_help"
+            app:layout_constraintLeft_toRightOf="@+id/day_add_img_help" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</ScrollView>

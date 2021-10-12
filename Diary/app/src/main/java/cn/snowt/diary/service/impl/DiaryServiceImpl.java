@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,8 @@ import cn.snowt.diary.entity.Location;
 import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.DiaryService;
+import cn.snowt.diary.service.DrawingService;
+import cn.snowt.diary.service.LabelService;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
@@ -46,6 +49,7 @@ import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
 import cn.snowt.diary.vo.DiaryVo;
 import cn.snowt.diary.vo.DiaryVoForBackup;
+import cn.snowt.diary.vo.DiaryVoForFunny;
 
 /**
  * @Author: HibaraAi
@@ -56,6 +60,8 @@ public class DiaryServiceImpl implements DiaryService {
     public static final String TAG = "DiaryServiceImpl";
 
     private final CommentService commentService = new CommentServiceImpl();
+    private final LabelService labelService = new LabelServiceImpl();
+    private final DrawingService drawingService = new DrawIngServiceImpl();
 
     @Override
     public List<DiaryVo> getDiaryVoList(int startIndex, int needNum) {
@@ -452,10 +458,29 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public List<DiaryVo> getSimpleDiaryByLabel(String labelStr) {
-        List<Diary> diaryList = LitePal.select("id,content,modifiedDate,encryption")
-                .where("label LIKE ?", "%"+labelStr+"%")
-                .order("modifiedDate desc")
-                .find(Diary.class);
+        //查询同名标签
+        List<String> sameLabels = labelService.getSameLabelsByOne(labelStr);
+        List<Diary> diaryList = new ArrayList<>();
+        sameLabels.forEach(label->{
+            diaryList.addAll(
+                    LitePal.select("id,content,modifiedDate,encryption")
+                        .where("label LIKE ?", "%"+label+"%")
+                        .order("modifiedDate desc")
+                        .find(Diary.class)
+            );
+        });
+        //多个同名标签，结果集按时间排序
+        if(sameLabels.size()>1){
+            diaryList.sort((o1, o2) -> {
+                if(o1.getModifiedDate().before(o2.getModifiedDate())){
+                    return 1;
+                }else if (o1.getModifiedDate().after(o2.getModifiedDate())){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            });
+        }
         List<DiaryVo> voList = new ArrayList<>();
         diaryList.forEach(diary -> {
             DiaryVo vo = new DiaryVo();
@@ -480,7 +505,7 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
-    public void addHelpDiary() {
+    public void addHelpDiary() throws InterruptedException {
         Weather weather1 = new Weather(null, Weather.WEATHER_SUNNY, null, null);
         weather1.save();
         Location location1 = new Location(null,null,null,"广东省河源市");
@@ -517,15 +542,54 @@ public class DiaryServiceImpl implements DiaryService {
         weather9.save();
         Location location9 = new Location(null,null,null,"广东省河源市");
         location9.save();
-        Diary diary1 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_1,new Date(), weather1.getId(),location1.getId(),false);
-        Diary diary2 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_2,new Date(),weather2.getId(),location2.getId(),false);
-        Diary diary3 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_3,new Date(),weather3.getId(),location3.getId(),false);
-        Diary diary4 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_4,new Date(),weather4.getId(),location4.getId(),false);
-        Diary diary5 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_5,new Date(),weather5.getId(),location5.getId(),false);
-        Diary diary6 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_6,new Date(),weather6.getId(),location6.getId(),false);
-        Diary diary7 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_7,new Date(),weather7.getId(),location7.getId(),false);
-        Diary diary8 = new Diary(null,"#初次使用软件指引#",Constant.STRING_ABOUT,new Date(),weather8.getId(),location8.getId(),false);
-        Diary diary9 = new Diary(null, "#初次使用软件指引#", "看完并删除软件指引就开始使用“消消乐吧”", new Date(), weather9.getId(), location9.getId(), false);
+        Diary diary1 = new Diary(null,"#初次使用软件指引#",Constant.STRING_ABOUT,new Date(), weather1.getId(),location1.getId(),false);
+        Thread.sleep(1000);
+        Diary diary2 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_7,new Date(),weather2.getId(),location2.getId(),false);
+        Thread.sleep(1000);
+        Diary diary3 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_6,new Date(),weather3.getId(),location3.getId(),false);
+        Thread.sleep(1000);
+        Diary diary4 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_5,new Date(),weather4.getId(),location4.getId(),false);
+        Thread.sleep(1000);
+        Diary diary5 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_4,new Date(),weather5.getId(),location5.getId(),false);
+        Thread.sleep(1000);
+        Diary diary6 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_3,new Date(),weather6.getId(),location6.getId(),false);
+        Thread.sleep(1000);
+        Diary diary7 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_2,new Date(),weather7.getId(),location7.getId(),false);
+        Thread.sleep(1000);
+        Diary diary8 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_1,new Date(),weather8.getId(),location8.getId(),false);
+        Thread.sleep(1000);
+        String s = "前言\n" +
+                "    作者很早就想自己做一个日记类的软件了，“正经人谁写日记啊”说是这么说，" +
+                "但我始终认为写日记还是很有必要的，每天一记或者几天一记，记录自己经历过的人和事，" +
+                "如果长期坚持，十年、五十年甚至一生，你的日记就是你整个一生的记录，如果装册成书，" +
+                "我无法想象会有多厚。\n" +
+                "    本来从小学我就有记日记的习惯，当时还是用纸质记录呢，无奈老有人要偷看我的日记，" +
+                "后来我就很长很长一段时间不记录了，而且我现在也找不到那个时候日记本了，属实可惜，" +
+                "现在唯一能找到一本还是高中在校记录的，这个暑假(2021-07)被我无意翻出来了，" +
+                "看到当时记录的发生的所有，除了感到有趣、好笑外，更多的就是感慨时间过的真快。" +
+                "刚好那本日记本有些旧了，重抄一份是不可能的了，所以就激发了我做这个软件的念想。\n" +
+                "    上了大学，有了自己的手机电脑就更没手写过日记了，现在就更不可能手写的了。" +
+                "我想更多的人应该是把朋友圈/QQ/微博当作记录生活吧，但是数据始终的是存储在别人的地方，" +
+                "很多秘密的事情也不可能记录在那些地方，更可恶的是，他们三者都没有数据导出的功能，" +
+                "特别是微信，数以亿计的用户体量，竟然不给用户导出聊天记录、朋友圈等用户自己的数据，" +
+                "真是可笑至极，我们所有的数据都是腾讯垄断的砝码罢了。所以我是坚决不会把日记这种" +
+                "私密信息记录在别人的软件上的。\n" +
+                "    在着手设计这个软件的时候，我也参考了很多同类型的软件，市面上也有很多日记类软件，" +
+                "但它们大多都是有联网的，指不定数据就会被偷偷上传，这是我所顾虑的，所以我做的这款一定" +
+                "不能有网络服务。然后就是记录形式，本来是打算像知乎回答那样的富文本编辑，我就搜索怎么" +
+                "用安卓实现，不看不知道，一看吓一跳。这么复杂的吗？比电脑端复杂太多了吧。我用在这个" +
+                "软件项目的时间不能很多，我要快速开发出来，不学这个。中途我还看到一个博主的吐槽，" +
+                "他说“你越描述越像word，怎么你要自己实现word编辑器吗？你这么折腾干啥呢？" +
+                "是不是word不好用？”哈哈哈哈哈，给我尬住了。他说的好有道理啊。东找西凑后决定使用" +
+                "朋友圈那样的信息流做主界面，整个布局学(chao)习(xi)share的，配色当然要学习BiliBili的" +
+                "猛男色，就这样东学一下西抄一下做出了这个软件。其实Github上也有类似的本地日记记录软件，" +
+                "但它们不是界面我不满意就是功能我不满意，所以自己动手丰衣足食。\n" +
+                "    取名“消消乐”是因为作者做的大部分软件都是AAB式的词语，而且消消乐也蛮有寓意的，" +
+                "不管你开心的不开心的都记下来，消消就乐了。“消消乐”所有数据都是本地存储，支持加密，" +
+                "对你绝对忠诚。你可以把它当树洞，也可以当成一个守口如瓶的、你专属的聆听者，你所有的所有" +
+                "都可以和它分享。\n\n" +
+                "    接下来还有8条软件指引。是直接从“帮助&关于”搬过来的。可以看也可以不看。删除完软件指引就开始使用“消消乐吧”";
+        Diary diary9 = new Diary(null, "#初次使用软件指引#", s, new Date(), weather9.getId(), location9.getId(), false);
         diary1.save();
         diary2.save();
         diary3.save();
@@ -635,7 +699,7 @@ public class DiaryServiceImpl implements DiaryService {
     public Set<String> getAllLabels() {
         Log.w(TAG,"请优化这里。1.这里没有使用distinct 2.标签应该单独成表，而不是现在这样解析");
         Set<String> labelSet = new HashSet<>();
-        List<Diary> labels = LitePal.select("label").find(Diary.class);
+        List<Diary> labels = LitePal.select("label").order("modifiedDate desc").find(Diary.class);
         Set<String> tempSet = new HashSet<>();
         labels.forEach(l->{
             if(null!=l.getLabel() && !"".equals(l.getLabel())){
@@ -682,6 +746,62 @@ public class DiaryServiceImpl implements DiaryService {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<DiaryVoForFunny> getDiaryVoForFunny() {
+        List<DiaryVoForFunny> voList = new ArrayList<>();
+        List<Diary> all = LitePal.order("modifiedDate desc").find(Diary.class);
+        all.forEach(diary -> {
+            DiaryVoForFunny vo = new DiaryVoForFunny();
+            vo.setId(diary.getId());
+            if(diary.getEncryption()){
+                //此条记录被加密过
+                vo.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+            }else{
+                vo.setContent(diary.getContent());
+            }
+            vo.setModifiedDate(diary.getModifiedDate());
+            vo.setLabelList(labelService.parseLabelFromStr(diary.getLabel()));
+            //地址
+            if(null!=diary.getLocationId()){
+                Location location = LitePal.find(Location.class, diary.getLocationId());
+                vo.setLocationStr(location.getLocationString());
+            }
+            //天气
+            if(null!=diary.getWeatherId()){
+                Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
+                vo.setWeatherStr(weather.getWeather());
+            }
+            vo.setPicNum(drawingService.getDrawingsByDiaryId(vo.getId()).size());
+            List<Comment> commentList = commentService.getDecodeCommentByDiaryId(vo.getId());
+            List<String> commentStrList = new ArrayList<>();
+            commentList.forEach(comment -> commentStrList.add(comment.getContent()));
+            vo.setCommentList(commentStrList);
+            voList.add(vo);
+        });
+        return voList;
+    }
+
+    @Override
+    public List<DiaryVo> getDiaryVoByDate(Date date) {
+        List<DiaryVo> vos = new ArrayList<>();
+        Date date1;
+        Date date2;
+        String date1ToString = BaseUtils.dateToString(date);
+        String substring = date1ToString.substring(0, 10);
+        String s = substring+" 00:00:01";
+        String s1 = substring+" 23:59:59";
+        date1 = BaseUtils.stringToDate(s);
+        date2 = BaseUtils.stringToDate(s1);
+        List<Diary> diaryList = LitePal.select("id")
+                .where("modifiedDate >= ? AND modifiedDate <= ?", date1.getTime()+"", date2.getTime()+"")
+                .order("modifiedDate desc")
+                .find(Diary.class);
+        diaryList.forEach(diary -> {
+            vos.add((DiaryVo) getDiaryVoById(diary.getId()).getData());
+        });
+        return vos;
     }
 
     /**

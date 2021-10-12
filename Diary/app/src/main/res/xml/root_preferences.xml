@@ -1,18 +1,11 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="软件设置">
+    <PreferenceCategory app:title="软件UI">
         <SwitchPreferenceCompat
             app:key="showUsernameInBar"
             app:title="主界面工具栏显示用户名"
             app:summaryOff="当前: 显示“Diary”\n软件重启后生效"
             app:summaryOn="当前: 显示你的用户名\n软件重启后生效"/>
-
-        <SwitchPreferenceCompat
-            app:key="notAllowScreenshot"
-            app:title="日记界面不允许截屏"
-            app:defaultValue="true"
-            app:summaryOff="当前：允许截屏/录屏\n软件重启后生效"
-            app:summaryOn="当前：不允许截屏/录屏\n软件重启后生效"/>
 
         <Preference
             app:key="setDiarySize"
@@ -23,12 +16,57 @@
             app:title="自动展开评论区"
             app:defaultValue="false"
             app:summary="如果该日记有评论，自动展开评论区" />
+        <SwitchPreferenceCompat
+            app:key="autoNight"
+            app:title="自动暗色模式"
+            app:defaultValue="false"
+            app:summary="启用后,暗色模式不再跟随系统" />
+
+        <Preference
+            app:key="autoNightTime"
+            app:title="暗色模式时间段"
+            app:dependency="autoNight"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="安全相关">
+        <SwitchPreferenceCompat
+            app:key="notAllowScreenshot"
+            app:title="日记界面不允许截屏"
+            app:defaultValue="true"
+            app:summaryOff="当前：允许截屏/录屏\n软件重启后生效"
+            app:summaryOn="当前：不允许截屏/录屏\n软件重启后生效"/>
 
         <Preference
             app:key="setPassword"
             app:title="修改登录密码"
-            app:summary="我也要有灰字提示QaQ"/>
+            app:summary="我也要有灰字提示QaQ😤"/>
 
+        <SwitchPreferenceCompat
+            app:key="useEncode"
+            app:defaultValue="false"
+            app:title="启用加密"
+            app:summaryOn="当前: 已启用。更安全但运行速度更慢(仅对今后新增日记生效)"
+            app:summaryOff="当前: 未开启。响应更快速(仅对今后新增日记生效)"/>
+        <Preference
+            app:key="changeEncodeKey"
+            app:dependency="useEncode"
+            app:title="修改加密密钥"
+            app:summary="日记加密/解密用到的密钥。仅可修改一次"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="还没想到名字">
+        <Preference
+            app:key="sameLabel"
+            app:title="同名标签设置"
+            app:summary="我的提示很长,你进来再看🤭" />
+
+        <Preference
+            app:key="funnyInfo"
+            app:title="数据分析"
+            app:summary="“消消乐”为你分析了一些有趣的数据"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="导出/导入">
         <Preference
             app:key="txtOutput"
             app:title="导出日记"
@@ -43,7 +81,9 @@
             app:key="recoveryDiary"
             app:title="恢复日记"
             app:summary="从备份文件加载日记"/>
+    </PreferenceCategory>
 
+    <PreferenceCategory app:title="存储相关">
         <Preference
             app:key="clearCache"
             app:title="清除缓存"/>
@@ -51,19 +91,6 @@
         <Preference
             app:key="clearROM"
             app:title="清除外部存储数据"/>
-
-        <SwitchPreferenceCompat
-            app:key="useEncode"
-            app:defaultValue="false"
-            app:title="启用加密"
-            app:summaryOn="当前: 已启用\n更安全但运行速度更慢(仅对今后新增日记生效)"
-            app:summaryOff="当前: 未开启\n响应更快速(仅对今后新增日记生效)"/>
-        <Preference
-            app:key="changeEncodeKey"
-            app:dependency="useEncode"
-            app:title="修改加密密钥"
-            app:summary="日记加密/解密用到的密钥。仅可修改一次"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory app:title="测试区">

@@ -69,4 +69,16 @@ public class CommentServiceImpl implements CommentService {
         }
         return SimpleResult.ok();
     }
+
+    @Override
+    public List<Comment> getDecodeCommentByDiaryId(Integer diaryId) {
+        List<Comment> commentList = LitePal.where("diaryId = ?",diaryId+"").order("modifiedDate desc").find(Comment.class);
+        commentList.forEach(comment ->{
+            if (comment.getEncryption()){
+                //此条记录需要解密
+                comment.setContent(RSAUtils.decode(comment.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+            }
+        });
+        return commentList;
+    }
 }

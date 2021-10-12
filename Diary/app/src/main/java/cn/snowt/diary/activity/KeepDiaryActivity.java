@@ -272,7 +272,12 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     }
                     if(result.getSuccess()){
                         clearTempPinInEdit();
-                        BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"新日记已存储，请手动刷新!");
+                        //又判断一次？？？？吃饱了撑？？？
+                        if(-1!=updateDiaryId){
+                            BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"日记的文本内容已更新，请手动刷新!");
+                        }else{
+                            BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"新日记已存储，请手动刷新!");
+                        }
                         if(-1!=tempDiaryId){
                             LitePal.delete(TempDiary.class,tempDiaryId);
                         }

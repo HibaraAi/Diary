@@ -34,7 +34,7 @@ public class LoginServiceImpl implements LoginService {
             //需要制裁走这里
             int punishmentLevel = sharedPreferences.getInt("punishmentLevel", 1);
             String allowDateStr = sharedPreferences.getString("allowDateStr", "");
-            tip = "密码错误次数过多, 已受到"+(punishmentLevel-1)+"级制裁。\n请于"+allowDateStr+"后再试。\n(制裁效果会越来越严重,请注意)";
+            tip = "密码错误次数过多, 已受到"+(punishmentLevel-1)+"级制裁。\n请于"+allowDateStr+"后再试。\n现在是:"+BaseUtils.dateToString(new Date())+"。\n(制裁效果会越来越严重,请注意)";
             result.setSuccess(false);
             result.setMsg(tip);
         }else{

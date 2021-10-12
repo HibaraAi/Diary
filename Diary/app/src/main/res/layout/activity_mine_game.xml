@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/mine_best_time"
-            android:text="当前用时:0s"
+            android:text="当前用时(秒):0.0"
             android:textColor="#94A9BC"/>
         <TextView
             android:id="@+id/mine_mine_num"

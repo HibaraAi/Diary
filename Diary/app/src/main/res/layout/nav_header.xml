@@ -10,7 +10,8 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:src="@drawable/nav_icon"
-        android:layout_centerInParent="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
 
     <TextView
         android:id="@+id/nav_header_motto"

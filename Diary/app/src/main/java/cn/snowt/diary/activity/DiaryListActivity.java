@@ -15,7 +15,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import org.litepal.LitePal;
@@ -35,6 +37,7 @@ import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.ChineseCharUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 
@@ -61,11 +64,14 @@ public class DiaryListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TextView tipView;
     private Toolbar toolbar;
+    private SearchView searchView;
 
     private List<DiaryVo> diaryList;
     private DiaryAxisAdapter adapter;
     private Integer openType;
 
+    private List<String> searchHelp = new ArrayList<>();
+    private List<DiaryVo> diaryListBackup;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +102,7 @@ public class DiaryListActivity extends AppCompatActivity {
                 break;
             }
             case OPEN_FROM_LABEL_LIST:{
+                searchView.setVisibility(View.VISIBLE);
                 showAllLabel();
                 break;
             }
@@ -108,11 +115,37 @@ public class DiaryListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.axis_recyclerview);
         tipView = findViewById(R.id.axis_tip);
         toolbar = findViewById(R.id.axis_toolbar);
+        searchView = findViewById(R.id.axis_search);
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if(null!=supportActionBar){
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if("".equals(newText)){
+                    diaryList.clear();
+                    diaryList.addAll(diaryListBackup);
+                }else{
+                    diaryList.clear();
+                    searchHelp.forEach(s->{
+                        if(s.contains(newText)){
+                            int index = searchHelp.indexOf(s);
+                            diaryList.add(diaryListBackup.get(index));
+                        }
+                    });
+                }
+                adapter.notifyDataSetChanged();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -241,7 +274,7 @@ public class DiaryListActivity extends AppCompatActivity {
         if(labels.isEmpty()){
             tipView.setText("系统中还没有日记加过标签");
         }else{
-            tipView.setText("所有日记中，共统计到["+labels.size()+"]个标签。\n点击标签即可查询该标签下的所有日记");
+            tipView.setText("在所有日记中，共统计到["+labels.size()+"]个标签。\n搜索只支持输入小写字母。");
             List<DiaryVo> vos = new ArrayList<>();
             labels.forEach(label -> {
                 DiaryVo vo = new DiaryVo();
@@ -256,6 +289,11 @@ public class DiaryListActivity extends AppCompatActivity {
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
+            diaryListBackup = new ArrayList<>(diaryList.size());
+            diaryList.forEach(diaryVo -> {
+                searchHelp.add(ChineseCharUtils.getAllFirstLetter(diaryVo.getContent()).toLowerCase());
+                diaryListBackup.add(diaryVo);
+            });
         }
     }
 

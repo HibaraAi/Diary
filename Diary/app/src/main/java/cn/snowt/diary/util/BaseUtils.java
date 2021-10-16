@@ -1,10 +1,14 @@
 package cn.snowt.diary.util;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -22,6 +26,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -225,5 +230,51 @@ public class BaseUtils {
         intent.setType("image/*");
         AppCompatActivity appCompatActivity = (AppCompatActivity) context;
         appCompatActivity.startActivityForResult(intent,requestCode);
+    }
+
+    /**
+     * 简单的系统任务栏通知
+     * 只能显示一行字，没有点击操作
+     * @param context
+     * @param notice
+     */
+    public static void simpleSysNotice(Context context, String notice){
+        String channelId = "ChannelId"; // 通知渠道
+        Notification notification = new Notification.Builder(context,channelId)
+                .setChannelId(channelId)
+                .setAutoCancel(true)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentText(notice)
+                .build();
+        // 2. 获取系统的通知管理器(必须设置channelId)
+        NotificationManager notificationManager = (NotificationManager) context
+                .getSystemService(NOTIFICATION_SERVICE);
+        NotificationChannel channel = new NotificationChannel(
+                channelId,
+                "消消乐提示",
+                NotificationManager.IMPORTANCE_LOW);
+        notificationManager.createNotificationChannel(channel);
+        // 3. 发送通知(Notification与NotificationManager的channelId必须对应)
+        notificationManager.notify(1, notification);
+    }
+
+
+    public static void longTextSysNotice(Context context,String notice){
+        NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        NotificationChannel channel = new NotificationChannel(
+                "channelId",
+                "消消乐提示",
+                NotificationManager.IMPORTANCE_LOW);
+        manager.createNotificationChannel(channel);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelId")
+                .setContentText("回到通知栏上也是一样，每个开发者都只想着尽可能地去宣传自己的App，最后用户的手机就乱得跟鸡窝一样了。但")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setAutoCancel(true);
+        //创建大文本样式
+        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+        bigTextStyle.bigText(notice);
+        builder.setStyle(bigTextStyle); //设置大文本样式
+        Notification notification = builder.build();
+        manager.notify(1, notification);
     }
 }

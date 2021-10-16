@@ -42,4 +42,17 @@ public interface SpecialDayService {
      * @return
      */
     Integer getCount();
+
+    /**
+     * 今天有纪念日逢整百天/整年吗？，如果有返回String提示。
+     * 如“开学的第100天，完成项目的第2年”
+     * @return 如果没有则返回""
+     */
+    String haveSpecialCount();
+
+    /**
+     * 更改日期的提醒
+     * @param needNotice true-需要提醒
+     */
+    void changeNoticeState(Integer id,boolean needNotice);
 }

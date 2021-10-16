@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -356,7 +357,7 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
-    public SimpleResult backupDiary(String privateKey, String publicKey,String pinKey) {
+    public SimpleResult backupDiary(String publicKey,String pinKey) {
         SimpleResult result = new SimpleResult();
         List<Diary> diaryList = LitePal.findAll(Diary.class);
         if(diaryList.isEmpty()){
@@ -386,14 +387,9 @@ public class DiaryServiceImpl implements DiaryService {
             String uuid = UUID.randomUUID().toString();
             map.put(Constant.BACKUP_ARGS_NAME_UUID,uuid);
             map.put(Constant.BACKUP_ARGS_NAME_DATA_NAME,vos);
-            map.put(Constant.BACKUP_ARGS_NAME_USELESS_ARGS3,privateKey.replaceAll("w","g"));
             map.put(Constant.BACKUP_ARGS_NAME_PUBLIC_KEY,publicKey);
             map.put(Constant.BACKUP_ARGS_NAME_PIN_KEY, MD5Utils.encrypt(Constant.PASSWORD_PREFIX+pinKey));
             map.put(Constant.BACKUP_ARGS_NAME_VERSION,Constant.INTERNAL_VERSION);
-            map.put(Constant.BACKUP_ARGS_NAME_USELESS_ARGS1,privateKey.replaceAll("s","a"));
-            map.put(Constant.BACKUP_ARGS_NAME_PRIVATE_KEY,privateKey);
-            map.put(Constant.BACKUP_ARGS_NAME_USELESS_ARGS2,publicKey.replaceAll("s","r"));
-            map.put(Constant.BACKUP_ARGS_NAME_USELESS_ARGS4,publicKey.replaceAll("h","q"));
             map.put(Constant.BACKUP_ARGS_NAME_ENCODE_UUID,MD5Utils.encrypt(Constant.PASSWORD_PREFIX+uuid));
             String mapJson = JSON.toJSONString(map);
             //3.输出文件
@@ -430,6 +426,7 @@ public class DiaryServiceImpl implements DiaryService {
             if(isBadPin || isBadKey){
                 result.setSuccess(false);
                 result.setMsg("输入的口令或密钥不正确!");
+                Log.i(TAG,"输入的口令或密钥不正确!");
                 //这里处理多次口令错误的文件自毁操作
                 //破坏UUID的加密值、破坏正确密钥的值、拉黑UUID等
             }else{
@@ -447,9 +444,11 @@ public class DiaryServiceImpl implements DiaryService {
                 if(flag.get()){
                     result.setSuccess(true);
                     result.setMsg("从备份文件恢复成功，共写入"+successNum+"条日记");
+                    Log.i(TAG,"从备份文件恢复成功，共写入"+successNum+"条日记");
                 }else{
                     result.setSuccess(false);
                     result.setMsg("文件读取成功，但数据库存储失败，请重试");
+                    Log.i(TAG,"文件读取成功，但数据库存储失败，请重试");
                 }
             }
         }
@@ -559,35 +558,35 @@ public class DiaryServiceImpl implements DiaryService {
         Diary diary8 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_1,new Date(),weather8.getId(),location8.getId(),false);
         Thread.sleep(1000);
         String s = "前言\n" +
-                "    作者很早就想自己做一个日记类的软件了，“正经人谁写日记啊”说是这么说，" +
-                "但我始终认为写日记还是很有必要的，每天一记或者几天一记，记录自己经历过的人和事，" +
-                "如果长期坚持，十年、五十年甚至一生，你的日记就是你整个一生的记录，如果装册成书，" +
-                "我无法想象会有多厚。\n" +
-                "    本来从小学我就有记日记的习惯，当时还是用纸质记录呢，无奈老有人要偷看我的日记，" +
-                "后来我就很长很长一段时间不记录了，而且我现在也找不到那个时候日记本了，属实可惜，" +
-                "现在唯一能找到一本还是高中在校记录的，这个暑假(2021-07)被我无意翻出来了，" +
-                "看到当时记录的发生的所有，除了感到有趣、好笑外，更多的就是感慨时间过的真快。" +
-                "刚好那本日记本有些旧了，重抄一份是不可能的了，所以就激发了我做这个软件的念想。\n" +
-                "    上了大学，有了自己的手机电脑就更没手写过日记了，现在就更不可能手写的了。" +
-                "我想更多的人应该是把朋友圈/QQ/微博当作记录生活吧，但是数据始终的是存储在别人的地方，" +
-                "很多秘密的事情也不可能记录在那些地方，更可恶的是，他们三者都没有数据导出的功能，" +
-                "特别是微信，数以亿计的用户体量，竟然不给用户导出聊天记录、朋友圈等用户自己的数据，" +
-                "真是可笑至极，我们所有的数据都是腾讯垄断的砝码罢了。所以我是坚决不会把日记这种" +
-                "私密信息记录在别人的软件上的。\n" +
-                "    在着手设计这个软件的时候，我也参考了很多同类型的软件，市面上也有很多日记类软件，" +
-                "但它们大多都是有联网的，指不定数据就会被偷偷上传，这是我所顾虑的，所以我做的这款一定" +
-                "不能有网络服务。然后就是记录形式，本来是打算像知乎回答那样的富文本编辑，我就搜索怎么" +
-                "用安卓实现，不看不知道，一看吓一跳。这么复杂的吗？比电脑端复杂太多了吧。我用在这个" +
-                "软件项目的时间不能很多，我要快速开发出来，不学这个。中途我还看到一个博主的吐槽，" +
-                "他说“你越描述越像word，怎么你要自己实现word编辑器吗？你这么折腾干啥呢？" +
-                "是不是word不好用？”哈哈哈哈哈，给我尬住了。他说的好有道理啊。东找西凑后决定使用" +
-                "朋友圈那样的信息流做主界面，整个布局学(chao)习(xi)share的，配色当然要学习BiliBili的" +
-                "猛男色，就这样东学一下西抄一下做出了这个软件。其实Github上也有类似的本地日记记录软件，" +
-                "但它们不是界面我不满意就是功能我不满意，所以自己动手丰衣足食。\n" +
-                "    取名“消消乐”是因为作者做的大部分软件都是AAB式的词语，而且消消乐也蛮有寓意的，" +
-                "不管你开心的不开心的都记下来，消消就乐了。“消消乐”所有数据都是本地存储，支持加密，" +
-                "对你绝对忠诚。你可以把它当树洞，也可以当成一个守口如瓶的、你专属的聆听者，你所有的所有" +
-                "都可以和它分享。\n\n" +
+//                "    作者很早就想自己做一个日记类的软件了，“正经人谁写日记啊”说是这么说，" +
+//                "但我始终认为写日记还是很有必要的，每天一记或者几天一记，记录自己经历过的人和事，" +
+//                "如果长期坚持，十年、五十年甚至一生，你的日记就是你整个一生的记录，如果装册成书，" +
+//                "我无法想象会有多厚。\n" +
+//                "    本来从小学我就有记日记的习惯，当时还是用纸质记录呢，无奈老有人要偷看我的日记，" +
+//                "后来我就很长很长一段时间不记录了，而且我现在也找不到那个时候日记本了，属实可惜，" +
+//                "现在唯一能找到一本还是高中在校记录的，这个暑假(2021-07)被我无意翻出来了，" +
+//                "看到当时记录的发生的所有，除了感到有趣、好笑外，更多的就是感慨时间过的真快。" +
+//                "刚好那本日记本有些旧了，重抄一份是不可能的了，所以就激发了我做这个软件的念想。\n" +
+//                "    上了大学，有了自己的手机电脑就更没手写过日记了，现在就更不可能手写的了。" +
+//                "我想更多的人应该是把朋友圈/QQ/微博当作记录生活吧，但是数据始终的是存储在别人的地方，" +
+//                "很多秘密的事情也不可能记录在那些地方，更可恶的是，他们三者都没有数据导出的功能，" +
+//                "特别是微信，数以亿计的用户体量，竟然不给用户导出聊天记录、朋友圈等用户自己的数据，" +
+//                "真是可笑至极，我们所有的数据都是腾讯垄断的砝码罢了。所以我是坚决不会把日记这种" +
+//                "私密信息记录在别人的软件上的。\n" +
+//                "    在着手设计这个软件的时候，我也参考了很多同类型的软件，市面上也有很多日记类软件，" +
+//                "但它们大多都是有联网的，指不定数据就会被偷偷上传，这是我所顾虑的，所以我做的这款一定" +
+//                "不能有网络服务。然后就是记录形式，本来是打算像知乎回答那样的富文本编辑，我就搜索怎么" +
+//                "用安卓实现，不看不知道，一看吓一跳。这么复杂的吗？比电脑端复杂太多了吧。我用在这个" +
+//                "软件项目的时间不能很多，我要快速开发出来，不学这个。中途我还看到一个博主的吐槽，" +
+//                "他说“你越描述越像word，怎么你要自己实现word编辑器吗？你这么折腾干啥呢？" +
+//                "是不是word不好用？”哈哈哈哈哈，给我尬住了。他说的好有道理啊。东找西凑后决定使用" +
+//                "朋友圈那样的信息流做主界面，整个布局学(chao)习(xi)share的，配色当然要学习BiliBili的" +
+//                "猛男色，就这样东学一下西抄一下做出了这个软件。其实Github上也有类似的本地日记记录软件，" +
+//                "但它们不是界面我不满意就是功能我不满意，所以自己动手丰衣足食。\n" +
+//                "    取名“消消乐”是因为作者做的大部分软件都是AAB式的词语，而且消消乐也蛮有寓意的，" +
+//                "不管你开心的不开心的都记下来，消消就乐了。“消消乐”所有数据都是本地存储，支持加密，" +
+//                "对你绝对忠诚。你可以把它当树洞，也可以当成一个守口如瓶的、你专属的聆听者，你所有的所有" +
+//                "都可以和它分享。\n\n" +
                 "    接下来还有8条软件指引。是直接从“帮助&关于”搬过来的。可以看也可以不看。删除完软件指引就开始使用“消消乐吧”";
         Diary diary9 = new Diary(null, "#初次使用软件指引#", s, new Date(), weather9.getId(), location9.getId(), false);
         diary1.save();
@@ -802,6 +801,28 @@ public class DiaryServiceImpl implements DiaryService {
             vos.add((DiaryVo) getDiaryVoById(diary.getId()).getData());
         });
         return vos;
+    }
+
+    @Override
+    public List<DiaryVo> getFormerYear(Date date) {
+        List<DiaryVo> voList = new ArrayList<>();
+        if(null==date){
+            Log.e(TAG,"提供的date为null");
+            return voList;
+        }
+        Calendar calendar = Calendar.getInstance();
+        //获取第一条日记的时间
+        Date firstDate = BaseUtils.stringToDate(getDiaryVoListAsc(0, 1).get(0).getModifiedDate());
+        calendar.setTime(firstDate);
+        calendar.add(Calendar.DAY_OF_MONTH,-1);
+        firstDate = calendar.getTime();
+        calendar.setTime(date);
+        while(date.after(firstDate)){
+            voList.addAll(getDiaryVoByDate(date));
+            calendar.add(Calendar.YEAR,-1);
+            date = calendar.getTime();
+        }
+        return voList;
     }
 
     /**

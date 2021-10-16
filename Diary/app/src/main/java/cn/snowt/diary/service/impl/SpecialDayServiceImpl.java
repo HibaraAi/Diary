@@ -30,6 +30,10 @@ public class SpecialDayServiceImpl implements SpecialDayService {
             vo.setTitle(specialDay.getTitle());
             vo.setRemark(specialDay.getRemark());
             vo.setStop(null != specialDay.getStopDate());
+            if(specialDay.getNeedNotice()==null){
+                specialDay.setNeedNotice(false);
+            }
+            vo.setNeedNotice(!vo.getStop() && specialDay.getNeedNotice());
             //计算距今的
             vo.setDistanceNow(twoDatesDistance(specialDay.getStartDate(),new Date()));
             vo.setDistanceNowYear(twoDatesDistanceYearStr(specialDay.getStartDate(),new Date()));
@@ -74,6 +78,35 @@ public class SpecialDayServiceImpl implements SpecialDayService {
     @Override
     public Integer getCount() {
         return LitePal.count(SpecialDay.class);
+    }
+
+    @Override
+    public String haveSpecialCount() {
+        StringBuilder result = new StringBuilder();
+        List<SpecialDayVo> allDays = getAllDays();
+        for (SpecialDayVo dayVo : allDays) {
+            if(!dayVo.getStop() && dayVo.getNeedNotice()){  //没有停止计数
+                if(dayVo.getSumDay()<=300){  //可能整百
+                    if(dayVo.getSumDay()%100==0){  //确实整百
+                        result.append("["+dayVo.getTitle()).append("]的第").append(dayVo.getSumDay()).append("天。\n");
+                    }
+                } else{  //可能整年
+                    if(dayVo.getSumDayYear().contains("年整")){
+                        result.append("[").append(dayVo.getTitle()).append("]已经").append(dayVo.getSumDayYear().replaceAll("年整","")).append("周年了。\n");
+                    }
+                }
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
+    public void changeNoticeState(Integer id,boolean needNotice) {
+        SpecialDay specialDay = LitePal.find(SpecialDay.class, id);
+        if(null!=specialDay){
+            specialDay.setNeedNotice(needNotice);
+            specialDay.save();
+        }
     }
 
     /**

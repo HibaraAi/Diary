@@ -55,6 +55,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="还没想到名字">
+        <SwitchPreferenceCompat
+            app:key="firstLoginNotice"
+            app:title="每日首次登录的通知"
+            app:defaultValue="false"
+            app:summaryOff="已关闭。"
+            app:summaryOn="已开启"/>
+
         <Preference
             app:key="sameLabel"
             app:title="同名标签设置"

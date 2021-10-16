@@ -47,4 +47,9 @@ public class SpecialDayVo implements Serializable {
      * 距离现在的天数(年的形式)
      */
     private String distanceNowYear;
+
+    /**
+     * 有没有开启提醒
+     */
+    private Boolean needNotice;
 }

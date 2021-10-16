@@ -3,7 +3,6 @@ package cn.snowt.diary.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,13 +18,10 @@ import com.scwang.smart.refresh.footer.BallPulseFooter;
 import com.scwang.smart.refresh.header.BezierRadarHeader;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
-import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
-import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
-
-import org.litepal.LitePalApplication;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +30,6 @@ import cn.snowt.diary.adapter.DiaryAdapter;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
-import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 
 /**
@@ -44,7 +39,8 @@ import cn.snowt.diary.vo.DiaryVo;
  */
 public class TimeAscActivity extends AppCompatActivity {
     public static final String OPEN_FROM_TYPE = "openFrom";
-    public static final int OPEN_FROM_LABEL_FORMER_YEARS = 1;
+    public static final int OPEN_FROM_FORMER_YEARS = 1;
+    public static final int OPEN_FROM_SIMPLE_DIARY_LIST = 2;
     private List<DiaryVo> voList = new ArrayList<>();
     private DiaryService diaryService = new DiaryServiceImpl();
     private DiaryAdapter diaryAdapter;
@@ -68,17 +64,16 @@ public class TimeAscActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int intExtra = intent.getIntExtra(OPEN_FROM_TYPE, -1);
         switch (intExtra){
-            case OPEN_FROM_LABEL_FORMER_YEARS:{
+            case OPEN_FROM_FORMER_YEARS:{
                 actionBar.setTitle("往年今日");
-                refreshLayout.setOnRefreshListener(refreshLayout -> {
-                    BaseUtils.shortTipInSnack(recyclerView,"不支持刷新");
-                    refreshLayout.finishRefresh();
-                });
-                refreshLayout.setOnLoadMoreListener(refreshLayout -> {
-                    BaseUtils.shortTipInSnack(recyclerView,"没有更多了");
-                    refreshLayout.finishLoadMore();
-                });
+                stopRefreshLayout();
                 showForMerYears();
+                break;
+            }
+            case OPEN_FROM_SIMPLE_DIARY_LIST:{
+                actionBar.setTitle("临时信息流");
+                stopRefreshLayout();
+                showByIds(intent.getIntegerArrayListExtra("ids"),intent.getIntExtra("sortType",1));
                 break;
             }
             default:{
@@ -90,6 +85,43 @@ public class TimeAscActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(diaryAdapter);
+    }
+
+    /**
+     * 展示给定的几个id
+     * @param ids
+     * @param sortType 排序类型，1为时间倒序，2为时间顺序
+     */
+    private void showByIds(ArrayList<Integer> ids,int sortType) {
+        ids.forEach(id->voList.add((DiaryVo) diaryService.getDiaryVoById(id).getData()));
+        if(sortType==2){
+            System.out.println("************-----------------showByIds");
+            voList.sort((o1, o2) -> {
+                Date o1Date = BaseUtils.stringToDate(o1.getModifiedDate());
+                Date o2Date = BaseUtils.stringToDate(o2.getModifiedDate());
+                if (o1Date.after(o2Date)) {
+                    return 1;
+                } else if (o1Date.before(o2Date)) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+        }
+    }
+
+    /**
+     * 停用下拉刷新和上拉加载
+     */
+    private void stopRefreshLayout() {
+        refreshLayout.setOnRefreshListener(refreshLayout -> {
+            BaseUtils.shortTipInSnack(recyclerView,"不支持刷新 Orz");
+            refreshLayout.finishRefresh();
+        });
+        refreshLayout.setOnLoadMoreListener(refreshLayout -> {
+            BaseUtils.shortTipInSnack(recyclerView,"没有更多了 QaQ");
+            refreshLayout.finishLoadMore();
+        });
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -158,19 +190,7 @@ public class TimeAscActivity extends AppCompatActivity {
      * 加载往年今日的日记
      */
     private void showForMerYears(){
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        //获取第一条日记的时间
-        Date firstDate = BaseUtils.stringToDate(diaryService.getDiaryVoListAsc(0, 1).get(0).getModifiedDate());
-        calendar.setTime(firstDate);
-        calendar.add(Calendar.DAY_OF_MONTH,-1);
-        firstDate = calendar.getTime();
-        calendar.setTime(date);
-        while(date.after(firstDate)){
-            voList.addAll(diaryService.getDiaryVoByDate(date));
-            calendar.add(Calendar.YEAR,-1);
-            date = calendar.getTime();
-        }
+        voList = diaryService.getFormerYear(new Date());
         if(voList.isEmpty()){
             BaseUtils.shortTipInSnack(recyclerView,"往年的今日没有记录 UnU");
         }

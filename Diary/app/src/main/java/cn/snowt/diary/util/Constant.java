@@ -10,7 +10,7 @@ public class Constant {
     /**
      * 软件内部版本
      */
-    public static final Integer INTERNAL_VERSION = 1;
+    public static final Integer INTERNAL_VERSION = 3;
     /**
      * MD5加密的前缀
      */
@@ -38,7 +38,7 @@ public class Constant {
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
             "QQ：3192233122\n" +
             "版本: 1.2\n" +
-            "更新日期: 2021-10-12\n" +
+            "更新日期: 2021-10-16\n" +
             "开源代码(长按复制): https://github.com/HibaraAi/Diary";
 
     /**
@@ -60,12 +60,11 @@ public class Constant {
             "攻击者攻击不了你，还攻击不了软件吗。在破解了root权限或USB调试(ADB调试)模式下，攻击者可以轻易获取你的密钥，" +
             "获取你的日记内容，有了密钥，加密就形同虚设。因此，你不应该破解root权限，不应该开启“开发者模式”。" +
             "这种安全问题是“消消乐”采用本地存储导致的，无法避免。\n" +
-            "备份文件的安全性，备份文件的数据直接从数据库中导出，如果你的日记没有加密那就没有加密，" +
-            "虽然导出备份文件需要设置一个口令，但那个口令也是虚设的，还是那句话，有存就有取，" +
-            "“消消乐”目前备份的情况就是将所有数据一次性写出到一个备份文件中，那攻击者也可以破解备份文件本身。" +
-            "况且这个备份功能的设计目的只是为了将数据转移，将这个手机的日记转移到那个手机而已。" +
-            "如果真要备份，建议将备份文件存储在别的设备上。" +
-            "另外，在手机系统更新的时候，建议你备份一次，免得系统更新出什么岔子将数据弄丢了。\n";
+            "备份文件的安全性，备份文件的数据直接从数据库中导出，如果你的日记没有加密那就没有加密。" +
+            "如果有加密，必须配合密钥文件才能读取。备份文件的后缀名虽然改了，但它本质还是txt文件，你可以" +
+            "以文本的方式打开看看加密与不加密的日记长啥样。" +
+            "另外，在手机系统更新的时候，建议你备份一次，免得系统更新出什么岔子将数据弄丢了。\n" +
+            "导出文件的安全性，你可以理解成导出文件就是取消了加密的备份文件，\n";
     public static final String STRING_HELP_3 = "\n三、权限使用说明\n" +
             "目前，敏感权限仅使用了“存储权限”，也就是外部存储的读写权限。你当然可以拒绝授权，" +
             "但你就只能使用部分功能了。其实想想也知道，日记配图肯定要从手机相册读取，这就用到了读权限，" +
@@ -91,7 +90,7 @@ public class Constant {
             "生成的密钥文件和生成的备份文件。谨慎使用。另外，本软件的外部存储地址为“内部存储根目录\\Hibara\\Diary”\n" +
             "“启用加密”和“修改加密密钥”，字面意思，启用加密后，新增的日记和评论都会被加密存储。" +
             "但是这个加密只有在修改加密密钥后才有效，而且加密密钥只能修改一次，只能导出密钥一次。" +
-            "加密和解密使用不同的密钥，而且密钥非常长，因此密钥都是导出到txt文件中存储的，" +
+            "加密和解密使用不同的密钥(加密使用短密钥，解密使用长密钥)，而且密钥非常长，因此密钥都是导出到txt文件中存储的，" +
             "你不能修改txt的任何信息，包括里面的换行符。你应该在密钥导出后就将其移动到其他地方存储，" +
             "并妥善保管。密钥一旦丢失，你将来不能备份和恢复日记。\n" +
             "测试区的功能并未开放，开启需要测试码，如何获得测试码自行猜测。\n";
@@ -104,7 +103,7 @@ public class Constant {
             "例如查询所有日记时，很多日记需要解密，要花大量时间，合格软件应该提供进度条展示，" +
             "而本软件没有进度提示(没错，我太菜，还懒得学)，只能干等，所以还请耐心等待。关闭加密应该会流畅很多。\n"+
             "Q：为什么我点了“回到顶部”按钮并没有回到顶部？\n" +
-            "A：别问，问就是BUG，目前来看这不是大BUG，不修。多点一下就可以回到顶部。\n" +
+            "A：别问，问就是BUG，目前来看这是偶发BUG，问题不大，不修。多点一下就可以回到顶部。\n" +
             "Q：为什么有的图片不能保存？\n" +
             "A：日记配图是支持保存的，其他图片不能保存。" +
             "如果你特别想存某张图，可以到Hibara\\Diary\\image目录下根据文件日期找原始文件，" +
@@ -129,10 +128,12 @@ public class Constant {
             "1.本软件不会盗取你任何数据，下面有开源代码可查。同样的，" +
             "如果你在使用本软件的过程中，产生无论何种形式的损失，都与本作者无关。\n" +
             "2.更多软件功能并没有在这里写明，你可以自行发现，例如可以长按日记文本进行复制等操作。\n" +
-            "3.软件兼容性，目前在Honor V10上使用正常，1080p屏幕使用应该不会有什么问题，其他分辨率设备没试。Android 10以下的设备不能安装。\n" +
+            "3.软件兼容性，1080p屏幕使用应该不会有什么问题，其他分辨率设备没试。Android 10以下的设备不能安装。\n" +
+            "4.不要去系统中手动“删除数据”，“删除数据”相当于重装，这会删除软件所有的已存储数据。“清空缓存”可以，但是本应用提供了缓存清除功能。其实缓存归安卓系统自动管理，你大可不必自己去清空\n" +
             "\n八、本次更新内容\n" +
             "自动暗色模式、日记详情页自动展开评论、支持保存日记配图、新增纪念日功能、" +
-            "新增同名标签设置、新增往年今日、修改设置界面的布局、新增数据分析。\n";
+            "新增同名标签设置、新增往年今日、修改设置界面的布局、新增数据分析、" +
+            "简易日记列表跳转成信息流展示。\n";
     public static final String STRING_HELP = STRING_HELP_1+STRING_HELP_2+STRING_HELP_3+STRING_HELP_4+STRING_HELP_5+STRING_HELP_6+STRING_HELP_7;
 
     public static final String SHARE_PREFERENCES_HEAD_SRC = "headSrc";
@@ -153,10 +154,6 @@ public class Constant {
     public static final String BACKUP_ARGS_NAME_PIN_KEY = "epifuioew";
     public static final String BACKUP_ARGS_NAME_DATA_NAME = "wepityweio";
     public static final String BACKUP_ARGS_NAME_VERSION = "oqiteoqt";
-    public static final String BACKUP_ARGS_NAME_USELESS_ARGS1 = "fwefwef";
-    public static final String BACKUP_ARGS_NAME_USELESS_ARGS2 = "efesef";
-    public static final String BACKUP_ARGS_NAME_USELESS_ARGS3 = "xcvxcvsd";
-    public static final String BACKUP_ARGS_NAME_USELESS_ARGS4 = "eoqigyieog";
     public static final String BACKUP_ARGS_NAME_UUID = "owqiioqghew";
     public static final String BACKUP_ARGS_NAME_ENCODE_UUID = "ewrewr";
 

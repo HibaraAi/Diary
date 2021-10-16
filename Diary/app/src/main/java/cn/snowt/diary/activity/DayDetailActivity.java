@@ -3,6 +3,7 @@ package cn.snowt.diary.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -18,6 +19,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -54,6 +56,7 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
     private TextView daySumSmall;
     private TextView disNow;
     private TextView remark;
+    private SwitchCompat notice;
 
     private SpecialDayService specialDayService = new SpecialDayServiceImpl();
 
@@ -104,6 +107,10 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
         daySumSmall.setText(dayVo.getSumDay()+"天 ("+ dayVo.getSumDayYear()+")");
         disNow.setText(dayVo.getDistanceNow()+"天 ("+ dayVo.getDistanceNowYear()+")");
         remark.setText(dayVo.getRemark());
+        notice.setChecked(dayVo.getNeedNotice());
+        if(dayVo.getStop()){
+            notice.setVisibility(View.GONE);
+        }
     }
 
     private void bindViewAndSetListener() {
@@ -122,10 +129,15 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
         daySumSmall = findViewById(R.id.day_detail_daySum_small);
         disNow = findViewById(R.id.day_detail_dis_now);
         remark = findViewById(R.id.day_detail_remark);
+        notice = findViewById(R.id.day_detail_notice);
         startDate.setOnClickListener(this);
         endDate.setOnClickListener(this);
         startDateHelp.setOnClickListener(this);
         endDateHelp.setOnClickListener(this);
+        notice.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            specialDayService.changeNoticeState(dayVo.getId(),isChecked);
+            dayVo.setNeedNotice(isChecked);
+        });
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -171,6 +183,8 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
                     builder.setNegativeButton("刚刚手滑了",null);
                     builder.setPositiveButton("停止计数", (dialog, which) -> {
                         specialDayService.stopSpecialDayById(dayVo.getId());
+                        notice.setChecked(false);
+                        notice.setEnabled(false);
                     });
                     builder.setCancelable(false);
                     builder.show();

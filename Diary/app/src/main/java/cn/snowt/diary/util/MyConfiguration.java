@@ -20,6 +20,7 @@ public class MyConfiguration {
     private static int nightStart;
     private static int nightEnd;
     private static boolean autoNight;
+    private static boolean needFirstLoginNotice;
 
     private static MyConfiguration myConfiguration;
     private MyConfiguration() {
@@ -42,6 +43,7 @@ public class MyConfiguration {
         autoNight = BaseUtils.getDefaultSharedPreferences().getBoolean("autoNight",false);
         nightStart = BaseUtils.getSharedPreference().getInt("nightStart",2300);
         nightEnd = BaseUtils.getSharedPreference().getInt("nightEnd",800);
+        needFirstLoginNotice = BaseUtils.getDefaultSharedPreferences().getBoolean("firstLoginNotice",false);
     }
 
     public static MyConfiguration getInstance(){
@@ -120,5 +122,9 @@ public class MyConfiguration {
 
     public boolean isAutoNight() {
         return autoNight;
+    }
+
+    public boolean isNeedFirstLoginNotice() {
+        return needFirstLoginNotice;
     }
 }

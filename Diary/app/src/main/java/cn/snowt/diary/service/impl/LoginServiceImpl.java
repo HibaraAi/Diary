@@ -8,6 +8,7 @@ import org.litepal.LitePalApplication;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.util.BaseUtils;
@@ -15,6 +16,7 @@ import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.MD5Utils;
 import cn.snowt.diary.util.SimpleResult;
+import cn.snowt.diary.vo.DiaryVo;
 
 /**
  * @Author: HibaraAi
@@ -76,6 +78,46 @@ public class LoginServiceImpl implements LoginService {
             }
         }
         return result;
+    }
+
+    @Override
+    public void doFirstLoginOfTheDay() {
+        String tip = "";
+        //查询往年今日
+        List<DiaryVo> voList = new DiaryServiceImpl().getFormerYear(new Date());
+        if(!voList.isEmpty()){
+            tip = "[往年今日]有"+voList.size()+"条记录。\n";
+        }
+        //查询今天是否是纪念日整百/整年
+        String haveSpecialCount = new SpecialDayServiceImpl().haveSpecialCount();
+        tip += haveSpecialCount;
+        tip = tip.trim();
+        if(!"".equals(tip)){
+            BaseUtils.longTextSysNotice(LitePalApplication.getContext(),tip);
+        }
+    }
+
+    @Override
+    public Boolean isFirstLoginInTheDay() {
+        String keyTag = "lastLoginDate";
+        boolean flag = false;
+        String lastLoginDateStr = BaseUtils.getSharedPreference().getString(keyTag, null);
+        if(lastLoginDateStr==null){
+            flag = true;
+            SharedPreferences.Editor edit = sharedPreferences.edit();
+            edit.putString(keyTag,BaseUtils.dateToString(new Date()).substring(0, 10));
+            edit.apply();
+        }else{
+            Date today = new Date();
+            String todayStr = BaseUtils.dateToString(today).substring(0, 10);
+            if(!todayStr.equals(lastLoginDateStr)){
+                flag = true;
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+                edit.putString(keyTag,todayStr);
+                edit.apply();
+            }
+        }
+        return flag;
     }
 
     /**

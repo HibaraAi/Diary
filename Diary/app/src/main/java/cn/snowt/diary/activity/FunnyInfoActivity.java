@@ -8,8 +8,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -92,7 +90,7 @@ public class FunnyInfoActivity extends AppCompatActivity {
         });
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             BaseUtils.shortTipInSnack(listView,"也别长按，屏幕按爆了也没反应");
-            return false;
+            return true;
         });
     }
 
@@ -135,8 +133,11 @@ public class FunnyInfoActivity extends AppCompatActivity {
                 break;
             }
             case R.id.toolbar_funny_info_refresh:{
-                new Thread(() -> funnyInfoService.refreshFunnyInfo()).start();
-                BaseUtils.alertDialogToShow(this,"提示","后台已经开始分析了，完成后再次访问本界面即可展示最新分析数据(可根据刷新时间判断有没有刷新成功)，在分析完成之前不要再次发起分析请求，也不要关闭本程序(可以浏览其他界面或是最小化到后台)，分析应该会在几分钟内完成，快的话几秒钟。");
+                new Thread(() -> {
+                    funnyInfoService.refreshFunnyInfo();
+                    BaseUtils.simpleSysNotice(this,"数据分析已经完成了");
+                }).start();
+                BaseUtils.alertDialogToShow(this,"提示","后台已经开始分析了，在分析完成之前不要再次发起分析请求，也不要关闭本程序(可以浏览其他界面或是最小化到后台)，分析应该会在几分钟内完成，快的话几秒钟。");
                 break;
             }
             default:break;

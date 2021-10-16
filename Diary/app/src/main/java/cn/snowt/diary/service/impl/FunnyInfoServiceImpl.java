@@ -153,13 +153,15 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
             }
             integer2++;
             mostDiaryInYear.put(yearInt,integer2);
-            Integer hourInt = dateToHourInt(modifiedDate);
-            Integer integer3 = mostFrequentTimeToKeepDiary.get((Integer) hourInt);
-            if(integer3==null){
-                integer3 = 0;
+            if(!isManMadeDate(modifiedDate)){
+                Integer hourInt = dateToHourInt(modifiedDate);
+                Integer integer3 = mostFrequentTimeToKeepDiary.get((Integer) hourInt);
+                if(integer3==null){
+                    integer3 = 0;
+                }
+                integer3++;
+                mostFrequentTimeToKeepDiary.put(hourInt,integer3);
             }
-            integer3++;
-            mostFrequentTimeToKeepDiary.put(hourInt,integer3);
         });
 
         //-------------------------将结果写入info-------//
@@ -282,5 +284,16 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
      */
     private Integer dateToHourInt(Date date){
         return Integer.valueOf(BaseUtils.dateToString(date).substring(11, 13));
+    }
+
+    /**
+     * 是不是人为修改的日记时间
+     * 因为11：12：00是系统自动添加的时间
+     * @param date
+     * @return
+     */
+    private boolean isManMadeDate(Date date){
+        String substring = BaseUtils.dateToString(date).substring(11, 19);
+        return "11:12:00".equals(substring);
     }
 }

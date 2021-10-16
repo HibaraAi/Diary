@@ -17,6 +17,7 @@
             app:layout_constraintTop_toBottomOf="@+id/g78941346543212"
             android:paddingLeft="20dp"
             android:textStyle="italic"
+            android:textColor="#6C5F4C"
             android:text="TIP:点击文字设置对应项,有横线的为必填项" />
 
         <TextView
@@ -28,6 +29,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="40dp"
+            android:textColor="#6C5F4C"
             android:textSize="20dp" />
 
         <TextView
@@ -36,6 +38,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="@+id/day_add_startDate_help"
             app:layout_constraintLeft_toRightOf="@+id/day_add_startDate_help"
+            android:textColor="#6C5F4C"
             android:textSize="20dp"
             android:text="___________________"/>
 
@@ -47,7 +50,8 @@
             app:layout_constraintLeft_toLeftOf="@+id/day_add_startDate_help"
             android:text="起一个标题："
             android:textSize="20dp"
-            android:layout_marginTop="30dp" />
+            android:textColor="#6C5F4C"
+            android:layout_marginTop="50dp" />
 
         <TextView
             android:id="@+id/day_add_title"
@@ -55,15 +59,28 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="@+id/day_add_title_help"
             app:layout_constraintLeft_toRightOf="@+id/day_add_title_help"
+            android:textColor="#6C5F4C"
             android:textSize="20dp"
             android:text="___________________"/>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/day_add_notice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/day_add_title_help"
+            app:layout_constraintLeft_toLeftOf="@+id/day_add_title_help"
+            android:textColor="#6C5F4C"
+            android:text="开一个提醒:  "
+            android:textSize="20dp"
+            android:layout_marginTop="50dp"/>
 
         <TextView
             android:id="@+id/day_add_remark_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/day_add_title_help"
+            app:layout_constraintTop_toBottomOf="@id/day_add_notice"
             app:layout_constraintLeft_toLeftOf="@+id/day_add_title_help"
+            android:textColor="#6C5F4C"
             android:text="写一个备注："
             android:textSize="20dp"
             android:layout_marginTop="50dp" />
@@ -76,6 +93,7 @@
             app:layout_constraintTop_toTopOf="@+id/day_add_remark_help"
             app:layout_constraintLeft_toRightOf="@+id/day_add_remark_help"
             app:layout_constraintRight_toRightOf="parent"
+            android:textColor="#6C5F4C"
             android:maxLines="6"
             android:scrollbars="vertical"/>
 
@@ -85,9 +103,10 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/day_add_remark_help"
             app:layout_constraintLeft_toLeftOf="@+id/day_add_remark_help"
+            android:textColor="#6C5F4C"
             android:text="配一个封面："
             android:textSize="20dp"
-            android:layout_marginTop="45dp" />
+            android:layout_marginTop="50dp" />
 
         <ImageView
             android:id="@+id/day_add_img"

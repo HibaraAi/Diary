@@ -205,7 +205,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("设置读取密钥");
-                        builder.setMessage("为备份文件设置读取口令\n（提示：\n1.从备份文件读取日记时，如果日记加密过，还需要提供加密密钥，如果你没有加密密钥，则会读取失败\n2.过程可能需要很长时间(取决于你加密日记的数量),如果有卡住现象是正常情况，耐心等待\n3.备份文件的安全性很差，此功能的设计初衷是为了设备间的数据转移。）");
+                        builder.setMessage("为备份文件设置读取口令\n（提示：从备份文件读取日记时，如果存在被加密过的日记，还需要提供解密密钥(生成的长密钥)，如果你没有长密钥，则整个备份文件会读取失败。\n");
                         EditText pinView = new EditText(context);
                         pinView.setHint("设置一个读取口令");
                         pinView.setBackgroundResource(R.drawable.background_input);
@@ -214,9 +214,7 @@ public class SettingsActivity extends AppCompatActivity {
                         builder.setView(pinView);
                         builder.setCancelable(false);
                         builder.setPositiveButton("备份", (dialog, which) -> {
-                            String privateKeyInJson;
                             String publicKeyInJson;
-                            privateKeyInJson = MyConfiguration.getInstance().getPrivateKey();
                             publicKeyInJson = MyConfiguration.getInstance().getPublicKey();
                             DiaryService diaryService = new DiaryServiceImpl();
                             Log.w(TAG,"------此处应该改为service后台进行操作");
@@ -224,7 +222,7 @@ public class SettingsActivity extends AppCompatActivity {
                             if("".equals(pinInput)){
                                 BaseUtils.longTipInCoast(context,"口令为空?你在想什么呢?已停止备份");
                             }else{
-                                SimpleResult result = diaryService.backupDiary(privateKeyInJson, publicKeyInJson,pinInput);
+                                SimpleResult result = diaryService.backupDiary(publicKeyInJson,pinInput);
                                 BaseUtils.alertDialogToShow(context,"提示",result.getMsg());
                             }
                         });
@@ -364,6 +362,10 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 case "sameLabel":{
                     BaseUtils.gotoActivity((Activity) context,SetSameLabelActivity.class);
+                    break;
+                }
+                case "firstLoginNotice":{
+                    BaseUtils.alertDialogToShow(context,"提示","开启后，每日首次登录后会检查今天是否有往年今日的消息，是否有逢百天/整年的纪念日，如果有则会通知栏通知，没有则不打扰。");
                     break;
                 }
                 default:return false;

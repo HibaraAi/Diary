@@ -8,9 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAxisAdapter;
@@ -60,6 +64,7 @@ public class DiaryListActivity extends AppCompatActivity {
 
     private List<DiaryVo> diaryList;
     private DiaryAxisAdapter adapter;
+    private Integer openType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +77,7 @@ public class DiaryListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_time_axis);
         bindViewAndSetListener();
         Intent intent = getIntent();
-        int openType = intent.getIntExtra(OPEN_FROM_TYPE, -1);
+        openType = intent.getIntExtra(OPEN_FROM_TYPE, -1);
         switch (openType) {
             case OPEN_FROM_TIME_AXIS:{
                 showSimpleDiary(intent.getStringExtra(DATE_ONE),intent.getStringExtra(DATE_TWO));
@@ -97,7 +102,6 @@ public class DiaryListActivity extends AppCompatActivity {
             default:break;
         }
 
-
     }
 
     private void bindViewAndSetListener(){
@@ -109,6 +113,23 @@ public class DiaryListActivity extends AppCompatActivity {
         if(null!=supportActionBar){
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //根据打开类型判断是否需要展示信息流按钮
+        switch (openType) {
+            case OPEN_FROM_TIME_AXIS:
+            case OPEN_FROM_SEARCH_DIARY:
+            case OPEN_FROM_SEARCH_LABEL:{
+                if(diaryList.size()>=2){
+                    getMenuInflater().inflate(R.menu.toolbar_diary_lits,menu);
+                    break;
+                }
+            }
+            default:break;
+        }
+        return true;
     }
 
     /**
@@ -238,11 +259,45 @@ public class DiaryListActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:{
                 finish();
+                break;
+            }
+            case R.id.toolbar_diary_list_flow:{
+                AtomicReference<String> select = new AtomicReference<>();
+                final String[] items = {"倒序","顺序"};
+                select.set(items[0]);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("改用信息流展示，请先选则顺序类型");
+                builder.setSingleChoiceItems(items, 0, (dialogInterface, i) -> {
+                    select.set(items[i]);
+                });
+                builder.setPositiveButton("确定", (dialog, which) -> {
+                    ArrayList<Integer> ids = new ArrayList<>();
+                    diaryList.forEach(diaryVo -> ids.add(diaryVo.getId()));
+                    Intent intent = new Intent(this, TimeAscActivity.class);
+                    intent.putExtra(TimeAscActivity.OPEN_FROM_TYPE,TimeAscActivity.OPEN_FROM_SIMPLE_DIARY_LIST);
+                    intent.putIntegerArrayListExtra("ids",ids);
+                    switch (select.get()) {
+                        case "倒序":{
+                            intent.putExtra("sortType",1);
+                            break;
+                        }
+                        case "顺序":{
+                            intent.putExtra("sortType",2);
+                            break;
+                        }
+                        default:break;
+                    }
+                    startActivity(intent);
+                });
+                builder.setNegativeButton("取消",null);
+                builder.setCancelable(false);
+                builder.show();
                 break;
             }
             default:break;

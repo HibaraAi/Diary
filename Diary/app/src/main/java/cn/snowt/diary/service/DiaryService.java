@@ -77,12 +77,11 @@ public interface DiaryService {
 
     /**
      *备份日记
-     * @param privateKey privateKey
-     * @param publicKey publicKey
-     * @param pinKey pinKey
+     * @param publicKey publicKey 系统中的加密公钥，用于读取的时候验证解密密钥是否正确
+     * @param pinKey pinKey 设置的口令
      * @return
      */
-    SimpleResult backupDiary(String privateKey,String publicKey,String pinKey);
+    SimpleResult backupDiary(String publicKey,String pinKey);
 
     /**
      * 从已经读取的备份数据恢复日记
@@ -147,4 +146,11 @@ public interface DiaryService {
      * @return
      */
     List<DiaryVo> getDiaryVoByDate(Date date);
+
+    /**
+     * 获取往年今日的日记
+     * @param date 需要提供哪日
+     * @return 如果没有，则返回一个空的list
+     */
+    List<DiaryVo> getFormerYear(Date date);
 }

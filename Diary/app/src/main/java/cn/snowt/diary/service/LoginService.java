@@ -25,4 +25,17 @@ public interface LoginService {
      * @return
      */
     SimpleResult setPassword(Boolean isFirstUse,String oldPassword,String newPassword,String newPasswordAgain);
+
+    /**
+     * 当天第一次登录，执行一些操作
+     * 1.读取是否有往年今日内容
+     * 2.纪念日是否逢整百天整年
+     */
+    void doFirstLoginOfTheDay();
+
+    /**
+     * 判断当天是不是第一次登录
+     * @return
+     */
+    Boolean isFirstLoginInTheDay();
 }

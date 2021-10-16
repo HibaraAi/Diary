@@ -41,4 +41,6 @@ public class SpecialDay extends LitePalSupport implements Serializable {
      * 配图路径
      */
     private String imageSrc;
+
+    private Boolean needNotice;
 }

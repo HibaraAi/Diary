@@ -3,7 +3,7 @@
 
     <dbname value="diary" />
 
-    <version value="4" />
+    <version value="5" />
 
     <list>
         <mapping class="cn.snowt.diary.entity.Comment" />

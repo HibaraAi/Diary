@@ -119,11 +119,22 @@
             android:textColor="#6C5F4C"
             android:textSize="20dp"/>
 
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/day_detail_notice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="整百天/周年提醒: "
+            app:layout_constraintTop_toBottomOf="@+id/day_detail_dis_now_help"
+            app:layout_constraintLeft_toLeftOf="@+id/day_detail_img"
+            android:textColor="#6C5F4C"
+            android:textSize="20dp"
+            android:layout_marginTop="20dp"/>
         <TextView
             android:id="@+id/day_detail_remark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/day_detail_dis_now"
+            app:layout_constraintTop_toBottomOf="@+id/day_detail_notice"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:textColor="#6C5F4C"

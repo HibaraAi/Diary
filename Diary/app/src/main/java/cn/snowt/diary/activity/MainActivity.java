@@ -16,8 +16,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -27,12 +25,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -42,7 +38,6 @@ import com.scwang.smart.refresh.footer.BallPulseFooter;
 import com.scwang.smart.refresh.header.BezierRadarHeader;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
-import com.scwang.smart.refresh.layout.wrapper.RefreshFooterWrapper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,10 +45,11 @@ import java.util.List;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
-import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.service.DiaryService;
+import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
+import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.service.impl.MyConfigurationServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
@@ -104,6 +100,13 @@ public class MainActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
         setContentView(R.layout.activity_main);
+        //读取往年今日等提醒
+        new Thread(() -> {
+            LoginService loginService = new LoginServiceImpl();
+            if (MyConfiguration.getInstance().isNeedFirstLoginNotice() && loginService.isFirstLoginInTheDay()) {
+                loginService.doFirstLoginOfTheDay();
+            }
+        }).start();
         bindViewAndSetListener();
         getDiaryForFirstShow();
         diaryAdapter = new DiaryAdapter(voList);
@@ -226,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 case R.id.nav_former_years:{
                     Intent intent = new Intent(MainActivity.this,TimeAscActivity.class);
-                    intent.putExtra(TimeAscActivity.OPEN_FROM_TYPE,TimeAscActivity.OPEN_FROM_LABEL_FORMER_YEARS);
+                    intent.putExtra(TimeAscActivity.OPEN_FROM_TYPE,TimeAscActivity.OPEN_FROM_FORMER_YEARS);
                     startActivity(intent);
                     break;
                 }

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
@@ -72,6 +73,7 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
     private TextView remarkHelp;
     private TextView imgHelp;
     private ImageView img;
+    private SwitchCompat notice;
 
     private String imgSrc = "";
     private SpecialDayService specialDayService = new SpecialDayServiceImpl();
@@ -99,6 +101,7 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
         remark = findViewById(R.id.day_add_remark);
         imgHelp = findViewById(R.id.day_add_img_help);
         img = findViewById(R.id.day_add_img);
+        notice = findViewById(R.id.day_add_notice);
         date.setOnClickListener(this);
         dateHelp.setOnClickListener(this);
         title.setOnClickListener(this);
@@ -143,15 +146,15 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
                             try {
                                 UriUtils.copyStream(new FileInputStream(imgSrc),new FileOutputStream(finalSavePath));
                                 specialDay.setImageSrc(finalSavePath.getAbsolutePath());
-                                if (specialDayService.addOne(specialDay)) {
-                                    finish();
-                                }else{
-                                    BaseUtils.shortTipInSnack(img,"不明原因导致提交失败了");
-                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 BaseUtils.shortTipInSnack(img,"图片存储失败，已停止保存纪念日");
                             }
+                        }
+                        if (specialDayService.addOne(specialDay)) {
+                            finish();
+                        }else{
+                            BaseUtils.shortTipInSnack(img,"不明原因导致提交失败了");
                         }
 
                     });
@@ -203,6 +206,7 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
         specialDay.setRemark(remarkStr);
         specialDay.setStartDate(startDate);
         specialDay.setStopDate(null);
+        specialDay.setNeedNotice(notice.isChecked());
         return specialDay;
     }
 
@@ -236,6 +240,9 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
                 builder.setNegativeButton("取消",null);
                 builder.setPositiveButton("确定", (dialog, which) -> {
                     title.setText(editText.getText().toString());
+                    if(editText.getText().toString().length()>10){
+                        BaseUtils.shortTipInSnack(title,"标题字数不能大于10个字符");
+                    }
                 });
                 builder.show();
                 break;
@@ -253,6 +260,9 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
                 builder.setNegativeButton("取消",null);
                 builder.setPositiveButton("确定", (dialog, which) -> {
                     remark.setText(editText.getText().toString());
+                    if(editText.getText().toString().length()>100){
+                        BaseUtils.shortTipInSnack(title,"备注字数不能大于100个字符");
+                    }
                 });
                 builder.show();
                 break;

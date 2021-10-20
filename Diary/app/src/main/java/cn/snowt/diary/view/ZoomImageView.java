@@ -175,22 +175,22 @@ public class ZoomImageView
             float scale = 1.0f;
 
             // 图片的宽度大于控件的宽度，图片的高度小于空间的高度，我们将其缩小
-            if (dw > width && dh < height) {
+            if (dw >= width && dh <= height) {
                 scale = width * 1.0f / dw;
             }
 
             // 图片的宽度小于控件的宽度，图片的高度大于空间的高度，我们将其缩小
-            if (dh > height && dw < width) {
+            if (dh >= height && dw <= width) {
                 scale = height * 1.0f / dh;
             }
 
             // 缩小值
-            if (dw > width && dh > height) {
+            if (dw >= width && dh >= height) {
                 scale = Math.min(width * 1.0f / dw, height * 1.0f / dh);
             }
 
             // 放大值
-            if (dw < width && dh < height) {
+            if (dw <= width && dh <= height) {
                 scale = Math.min(width * 1.0f / dw, height * 1.0f / dh);
             }
 
@@ -198,7 +198,7 @@ public class ZoomImageView
              * 得到了初始化时缩放的比例
              */
             mInitScale = scale;
-            mMaxScale = mInitScale * 4;
+            mMaxScale = mInitScale * 6;
             mMidScale = mInitScale * 2;
 
             // 将图片移动至控件的中间

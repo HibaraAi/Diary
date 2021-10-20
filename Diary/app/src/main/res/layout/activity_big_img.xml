@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.ZoomImageActivity"
-    android:background="#353C42">
+    tools:context=".activity.BigImgActivity">
+    <include android:id="@+id/fdsfdsgds98g7dsg9ds" layout="@layout/defalut_toolbar" />
 
-    <cn.snowt.diary.view.ZoomImageView
-        android:id="@+id/zoom_image"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/ac_big_img_vp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+        android:layout_height="0dp"
+        app:layout_constraintVertical_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/fdsfdsgds98g7dsg9ds"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

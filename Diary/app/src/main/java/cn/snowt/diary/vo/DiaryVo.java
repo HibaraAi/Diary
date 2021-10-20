@@ -23,6 +23,6 @@ public class DiaryVo implements Serializable {
     private String weatherStr;
     private String locationStr;
     private String labelStr;
-    private List<String> picSrcList;
+    private List<String> picSrcList; //这个目前只能是ArrayList 2021-10-20留
     private List<Comment> commentList;
 }

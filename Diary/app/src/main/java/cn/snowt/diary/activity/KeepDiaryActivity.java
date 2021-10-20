@@ -169,7 +169,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         dateView = findViewById(R.id.keep_diary_date);
         //处理图片展示区
         imageTempSrcList = new ArrayList<>();
-        imageAdapter = new DiaryImageAdapter(imageTempSrcList);
+        imageAdapter = new DiaryImageAdapter((ArrayList<String>) imageTempSrcList);
         recyclerView = findViewById(R.id.keep_diary_pic_area);
         GridLayoutManager layoutManager = new GridLayoutManager(KeepDiaryActivity.this, 4);
         recyclerView.setAdapter(imageAdapter);

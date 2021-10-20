@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -272,7 +273,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         newHolder.content.setText(diaryVo.getContent());
         //处理图片展示
         RecyclerView imgRecyclerView = newHolder.imageView;
-        DiaryImageAdapter imgAdapter = new DiaryImageAdapter(diaryVo.getPicSrcList());
+        DiaryImageAdapter imgAdapter = new DiaryImageAdapter((ArrayList<String>) diaryVo.getPicSrcList());
         GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
         imgRecyclerView.setAdapter(imgAdapter);
         imgRecyclerView.setLayoutManager(layoutManager);

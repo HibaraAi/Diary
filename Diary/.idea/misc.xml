@@ -34,6 +34,8 @@
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_add_special_day.xml" value="0.4" />
+        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_big_image.xml" value="0.17255434782608695" />
+        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_big_img.xml" value="0.16983695652173914" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_day_detail.xml" value="0.370242214532872" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_funny_info.xml" value="0.1" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_help.xml" value="0.1609375" />
@@ -48,6 +50,8 @@
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_special_day.xml" value="0.1743659420289855" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_time_asc.xml" value="0.2441123188405797" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_time_axis.xml" value="0.1609375" />
+        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_zoom_image.xml" value="0.14550509731232622" />
+        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/big_image_item.xml" value="0.16983695652173914" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/day_item.xml" value="0.38596491228070173" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/defalut_toolbar.xml" value="0.2441123188405797" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/diary_axis_item.xml" value="0.2441123188405797" />

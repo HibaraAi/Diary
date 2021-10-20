@@ -37,8 +37,8 @@ public class Constant {
      */
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
             "QQ：3192233122\n" +
-            "版本: 1.2\n" +
-            "更新日期: 2021-10-16\n" +
+            "版本: 1.2.2\n" +
+            "更新日期: 2021-10-20\n" +
             "开源代码(长按复制): https://github.com/HibaraAi/Diary";
 
     /**
@@ -133,7 +133,7 @@ public class Constant {
             "\n八、本次更新内容\n" +
             "自动暗色模式、日记详情页自动展开评论、支持保存日记配图、新增纪念日功能、" +
             "新增同名标签设置、新增往年今日、修改设置界面的布局、新增数据分析、" +
-            "简易日记列表跳转成信息流展示。\n";
+            "简易日记列表可以跳转成信息流展示、更换查看大图的逻辑和组件。\n";
     public static final String STRING_HELP = STRING_HELP_1+STRING_HELP_2+STRING_HELP_3+STRING_HELP_4+STRING_HELP_5+STRING_HELP_6+STRING_HELP_7;
 
     public static final String SHARE_PREFERENCES_HEAD_SRC = "headSrc";

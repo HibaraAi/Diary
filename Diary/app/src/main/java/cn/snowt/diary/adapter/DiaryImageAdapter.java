@@ -1,5 +1,6 @@
 package cn.snowt.diary.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,10 +22,12 @@ import com.bumptech.glide.request.RequestOptions;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.BigImgActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.activity.MainActivity;
 import cn.snowt.diary.activity.ZoomImageActivity;
@@ -38,12 +41,13 @@ import cn.snowt.diary.util.UriUtils;
  */
 public class DiaryImageAdapter extends RecyclerView.Adapter{
     private Context context;
-    private List<String> imageSrcList;
+    private ArrayList<String> imageSrcList;
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         View imageArea;
         ImageView diaryImage;
         String imageSrc;
+        Integer mPosition;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -52,7 +56,7 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
         }
     }
 
-    public DiaryImageAdapter(List<String> imageSrcList) {
+    public DiaryImageAdapter(ArrayList<String> imageSrcList) {
         this.imageSrcList = imageSrcList;
     }
 
@@ -66,8 +70,9 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 .inflate(R.layout.diary_image_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.diaryImage.setOnClickListener(v->{
-            Intent intent = new Intent(context, ZoomImageActivity.class);
-            intent.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,viewHolder.imageSrc);
+            Intent intent = new Intent(context, BigImgActivity.class);
+            intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,viewHolder.mPosition);
+            intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,imageSrcList);
             context.startActivity(intent);
         });
         viewHolder.diaryImage.setOnLongClickListener(v->{
@@ -115,7 +120,7 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         ViewHolder newHolder = (ViewHolder)holder;
         String imageSrc = imageSrcList.get(position);
         newHolder.imageSrc = imageSrc;
@@ -124,6 +129,7 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 .fallback( R.drawable.bad_image) //url为空的时候,显示的图片
                 .error(R.drawable.bad_image);//图片加载失败后，显示的图片
         Glide.with(context).load(imageSrc).apply(options).into(newHolder.diaryImage);
+        newHolder.mPosition = position;
     }
 
     @Override

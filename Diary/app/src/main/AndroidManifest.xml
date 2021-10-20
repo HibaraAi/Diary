@@ -20,60 +20,80 @@
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
         <activity
-            android:name=".activity.FunnyInfoActivity"
+            android:name=".activity.BigImgActivity"
             android:exported="true" />
+        <activity
+            android:name=".activity.FunnyInfoActivity"
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.AddSpecialDayActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.DayDetailActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SpecialDayActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SetSameLabelActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.TimeAscActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SetDiarySizeActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.RecoveryDiaryActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SetRSAActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.DiaryDetailActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.DiaryListActivity"
             android:exported="true" />
         <activity
             android:name=".activity.KeepDiaryActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SettingsActivity"
             android:exported="true"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.ZoomImageActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name="cn.snowt.mine.MineGameActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.HelpActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SetPasswordActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/TopTransparent" />
         <activity
             android:name=".activity.LoginActivity"

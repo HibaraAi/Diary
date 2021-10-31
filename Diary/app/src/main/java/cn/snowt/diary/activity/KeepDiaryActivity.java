@@ -1,15 +1,5 @@
 package cn.snowt.diary.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -33,6 +23,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.litepal.LitePal;
 
 import java.io.File;
@@ -41,7 +41,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryImageAdapter;
@@ -248,9 +247,9 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.toolbar_diary_send:{
                 String diaryInputStr = diaryInputView.getText().toString();
                 if("".equals(diaryInputStr)){
-                    BaseUtils.shortTipInSnack(diaryInputView,"空白日记有什么好记录的呢?");
+                    BaseUtils.shortTipInSnack(diaryInputView,"空白日记有什么好记录的呢? OvO");
                 }else if(diaryInputStr.length()>2000){
-                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存");
+                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存 ORz");
                 }else{
                     Date date = null;
                     String dateStr = dateView.getText().toString();
@@ -306,7 +305,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
                 }else{
                     if(imageTempSrcList.size()>=8){
-                        BaseUtils.shortTipInSnack(v,"你最多选择8张图片。长按图片可将其移除。");
+                        BaseUtils.shortTipInSnack(v,"你最多选择8张图片。长按图片可将其移除。QaQ");
                     }else{
                         BaseUtils.openAlbum(KeepDiaryActivity.this, Constant.OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC,CHOOSE_PICTURE);
                     }
@@ -341,11 +340,36 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 dialog.setTitle("暂时不支持读取当地天气信息，请手动选择");
                 String[] items = {Weather.WEATHER_CLOUDY,Weather.WEATHER_RAIN,
                         Weather.WEATHER_SUNNY,Weather.WEATHER_HOT,Weather.WEATHER_OVERCAST,
-                        Weather.WEATHER_SNOW,Weather.WEATHER_HAIL};
+                        Weather.WEATHER_SNOW,Weather.WEATHER_HAIL,"自定义"};
                 dialog.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        weatherView.setText(items[which]);
+                        if("自定义".equals(items[which])){
+                            android.app.AlertDialog.Builder dialog2 = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
+                            dialog2.setTitle("手动输入天气");
+                            dialog2.setMessage("15字符以内");
+                            EditText editText = new EditText(KeepDiaryActivity.this);
+                            editText.setBackgroundResource(R.drawable.background_input);
+                            editText.setMinLines(4);
+                            editText.setMaxLines(4);
+                            editText.setGravity(Gravity.START);
+                            editText.setHint("天气情况");
+                            editText.setPadding(30,10,30,10);
+                            dialog2.setView(editText);
+                            dialog2.setCancelable(false);
+                            dialog2.setPositiveButton("添加", (dialog3, which2) -> {
+                                String s = editText.getText().toString();
+                                if(s.length()>15){
+                                    BaseUtils.longTipInCoast(KeepDiaryActivity.this,"都说了自定义天气只能15字符以内咯");
+                                }else{
+                                    weatherView.setText(s);
+                                }
+                            });
+                            dialog2.setNegativeButton("取消",null);
+                            dialog2.show();
+                        }else{
+                            weatherView.setText(items[which]);
+                        }
                     }
                 });
                 dialog.setCancelable(false);
@@ -458,7 +482,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？\n如果你是从草稿箱打开这个页面，不保存的话，草稿箱中的记录会被删除!");
             builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
                 if(content.length()>2000){
-                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存");
+                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存 ORz");
                 }else{
                     boolean saveSuccess = false;
                     TempDiary tempDiary = new TempDiary(null, content);

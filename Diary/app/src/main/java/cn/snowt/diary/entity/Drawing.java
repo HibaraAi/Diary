@@ -20,7 +20,6 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Drawing extends LitePalSupport implements Serializable {
     /**
      * 主键

@@ -1,18 +1,9 @@
 package cn.snowt.diary.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,9 +11,15 @@ import android.view.WindowManager;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.litepal.LitePal;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -310,7 +307,7 @@ public class DiaryListActivity extends AppCompatActivity {
                 final String[] items = {"倒序","顺序"};
                 select.set(items[0]);
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("改用信息流展示，请先选则顺序类型");
+                builder.setTitle("改用信息流展示，请先选则时间排序类型");
                 builder.setSingleChoiceItems(items, 0, (dialogInterface, i) -> {
                     select.set(items[i]);
                 });

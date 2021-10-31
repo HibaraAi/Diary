@@ -1,17 +1,17 @@
 package cn.snowt.diary.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.WindowManager;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.scwang.smart.refresh.footer.BallPulseFooter;
@@ -20,8 +20,6 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -135,7 +133,7 @@ public class TimeAscActivity extends AppCompatActivity {
         fab = findViewById(R.id.asc_fab);
         fab.setOnClickListener(v->{
             recyclerView.scrollToPosition(0);
-            BaseUtils.shortTipInSnack(this.recyclerView,"已返回顶部");
+            BaseUtils.shortTipInSnack(this.recyclerView,"已返回顶部 OvO");
         });
         recyclerView = findViewById(R.id.asc_recyclerview);
         refreshLayout = findViewById(R.id.asc_refresh);
@@ -178,7 +176,7 @@ public class TimeAscActivity extends AppCompatActivity {
     private void loadMoreDiary() {
         List<DiaryVo> diaryVoList = diaryService.getDiaryVoListAsc(nowIndex, 5);
         if(diaryVoList.size()==0){
-            BaseUtils.shortTipInSnack(recyclerView,"没有更多日记了。");
+            BaseUtils.shortTipInSnack(recyclerView,"没有更多日记了。QaQ");
         }else{
             voList.addAll(diaryVoList);
             nowIndex += diaryVoList.size();

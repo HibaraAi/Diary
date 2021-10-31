@@ -2,8 +2,6 @@ package cn.snowt.diary.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
-import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.impl.CommentServiceImpl;
@@ -59,7 +56,7 @@ public class DiaryCommentAdapter extends RecyclerView.Adapter{
                 switch (select.get()) {
                     case "复制评论":{
                         BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
-                        BaseUtils.shortTipInSnack(viewHolder.content,"评论已复制");
+                        BaseUtils.shortTipInSnack(viewHolder.content,"评论已复制 OvO");
                         break;
                     }
                     case "删除评论":{
@@ -69,7 +66,7 @@ public class DiaryCommentAdapter extends RecyclerView.Adapter{
                         builder2.setPositiveButton("确认删除", (dialog2, which2) -> {
                             SimpleResult result = commentService.deleteById(viewHolder.commentId);
                             if(result.getSuccess()){
-                                BaseUtils.shortTipInSnack(viewHolder.commentArea,"删除成功，刷新后即可正常展示");
+                                BaseUtils.shortTipInSnack(viewHolder.commentArea,"删除成功，刷新后即可正常展示 QaQ");
                             }else{
                                 BaseUtils.shortTipInSnack(viewHolder.commentArea,result.getMsg());
                             }

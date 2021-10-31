@@ -18,7 +18,6 @@ import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.FunnyInfoService;
 import cn.snowt.diary.util.BaseUtils;
-import cn.snowt.diary.vo.DiaryVo;
 import cn.snowt.diary.vo.DiaryVoForFunny;
 
 /**

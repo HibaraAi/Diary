@@ -1,7 +1,5 @@
 package cn.snowt.diary.activity;
 
-import static cn.snowt.diary.util.Constant.OPEN_ALBUM_TYPE_ADD_DAY_ADD_PIC;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -13,28 +11,23 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
-import org.litepal.LitePal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,15 +37,11 @@ import java.util.Date;
 import java.util.UUID;
 
 import cn.snowt.diary.R;
-import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.SpecialDay;
-import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.service.SpecialDayService;
 import cn.snowt.diary.service.impl.SpecialDayServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
-import cn.snowt.diary.util.FileUtils;
-import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
 
 /**
@@ -148,13 +137,13 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
                                 specialDay.setImageSrc(finalSavePath.getAbsolutePath());
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                BaseUtils.shortTipInSnack(img,"图片存储失败，已停止保存纪念日");
+                                BaseUtils.shortTipInSnack(img,"图片存储失败，已停止保存纪念日 ORz");
                             }
                         }
                         if (specialDayService.addOne(specialDay)) {
                             finish();
                         }else{
-                            BaseUtils.shortTipInSnack(img,"不明原因导致提交失败了");
+                            BaseUtils.shortTipInSnack(img,"不明原因导致提交失败了 ORz");
                         }
 
                     });
@@ -180,7 +169,7 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
         String startDateStr = date.getText().toString();
         //数据判断
         if(INPUT_LINE.equals(titleStr) || "".equals(titleStr) || titleStr.length()>10){
-            BaseUtils.shortTipInSnack(img,"标题不能为空,且字数不能超过10个字符");
+            BaseUtils.shortTipInSnack(img,"标题不能为空,且字数不能超过10个字符 OvO");
             return null;
         }
         if(remarkStr.length()>100){
@@ -192,13 +181,13 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
             remarkStr = "";
         }
         if(INPUT_LINE.equals(startDateStr) || "".equals(startDateStr)){
-            BaseUtils.shortTipInSnack(img,"纪念日的起始时间不能为空");
+            BaseUtils.shortTipInSnack(img,"纪念日的起始时间不能为空 OvO");
             return null;
         }
         startDateStr = startDateStr+" 00:00:00";
         Date startDate = BaseUtils.stringToDate(startDateStr);
         if(startDate.after(new Date())){
-            BaseUtils.shortTipInSnack(img,"纪念日的起始时间不能晚于当下时间");
+            BaseUtils.shortTipInSnack(img,"纪念日的起始时间不能晚于当下时间 OvO");
             return null;
         }
         specialDay.setTitle(titleStr);

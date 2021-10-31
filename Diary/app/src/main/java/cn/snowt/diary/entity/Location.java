@@ -20,7 +20,6 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Location extends LitePalSupport implements Serializable {
 
     /**

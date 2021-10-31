@@ -86,10 +86,10 @@ public class FunnyInfoActivity extends AppCompatActivity {
                 list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            BaseUtils.shortTipInSnack(listView,"别点了，这么丑的界面，不想做功能");
+            BaseUtils.shortTipInSnack(listView,"别点了，这么丑的界面，不想做功能 ORz");
         });
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
-            BaseUtils.shortTipInSnack(listView,"也别长按，屏幕按爆了也没反应");
+            BaseUtils.shortTipInSnack(listView,"也别长按，屏幕按爆了也没反应 ORz");
             return true;
         });
     }

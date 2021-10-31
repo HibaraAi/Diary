@@ -22,7 +22,6 @@ import java.util.List;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.DayDetailActivity;
-import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.vo.SpecialDayVo;
 
 /**

@@ -55,4 +55,10 @@ public interface SpecialDayService {
      * @param needNotice true-需要提醒
      */
     void changeNoticeState(Integer id,boolean needNotice);
+
+    /**
+     * 通过id删除一个纪念日
+     * @param id
+     */
+    void delById(Integer id);
 }

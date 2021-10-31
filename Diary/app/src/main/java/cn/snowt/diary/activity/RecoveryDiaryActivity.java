@@ -1,9 +1,5 @@
 package cn.snowt.diary.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -82,14 +82,14 @@ public class RecoveryDiaryActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(v->{
             String pinKey = pinKeyView.getText().toString();
             if("".equals(pinKey)){
-                BaseUtils.shortTipInSnack(saveBtn,"没有输入口令，怎么验证？");
+                BaseUtils.shortTipInSnack(saveBtn,"没有输入口令，怎么验证？ ORz");
             }else{
                 //校验口令
                 String pinInMap = (String) map.get(Constant.BACKUP_ARGS_NAME_PIN_KEY);
                 boolean isBadPin = (pinInMap==null || !pinInMap.equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX+pinKey)));
                 if(isBadPin){
                     String tipStr = "你提供的口令是错误的呢";
-                    BaseUtils.shortTipInSnack(tipView,"你提供的口令是错误的呢");
+                    BaseUtils.shortTipInSnack(tipView,"你提供的口令是错误的呢 QaQ");
                     tipView.setText(tipStr);
                 }else{
                     BaseUtils.longTipInCoast(this,"后台已经在执行恢复日记的后续操作，执行结果将在通知栏告知你");

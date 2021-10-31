@@ -87,7 +87,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
         fab = findViewById(R.id.detail_fab);
         fab.setOnClickListener(v->{
             showDiaryDetail();
-            BaseUtils.shortTipInSnack(this.recyclerView,"日记已刷新");
+            BaseUtils.shortTipInSnack(this.recyclerView,"日记已刷新 QaQ");
         });
     }
 

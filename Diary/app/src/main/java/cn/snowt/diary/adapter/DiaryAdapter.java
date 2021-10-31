@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -131,7 +130,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             if(!"".equals(commentInputStr)){
                 SimpleResult result = commentService.addOneByArgs(commentInputStr, viewHolder.diaryId);
                 if(result.getSuccess()){
-                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"评论成功，请手动刷新");
+                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"评论成功，请手动刷新 OvO");
                     viewHolder.commentInput.setText("");
                 }else{
                     BaseUtils.longTipInSnack(viewHolder.diaryView,result.getMsg());
@@ -157,7 +156,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                 switch (select.get()) {
                     case "复制日记":{
                         BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
-                        BaseUtils.shortTipInSnack(viewHolder.content,"日记已复制");
+                        BaseUtils.shortTipInSnack(viewHolder.content,"日记已复制 OvO");
                         break;
                     }
                     case "删除":{
@@ -166,7 +165,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                                 .setPositiveButton("确认删除", (dialog1, which1) -> {
                                     SimpleResult result = diaryService.deleteById(viewHolder.diaryId);
                                     if(result.getSuccess()){
-                                        BaseUtils.shortTipInSnack(viewHolder.diaryView,"删除成功，刷新后将正常展示");
+                                        BaseUtils.shortTipInSnack(viewHolder.diaryView,"删除成功，刷新后将正常展示 OvO");
                                     }else{
                                         BaseUtils.shortTipInSnack(viewHolder.diaryView,result.getMsg());
                                     }
@@ -203,7 +202,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                                         edit.putInt("topDiary",viewHolder.diaryId);
                                     }
                                     edit.apply();
-                                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"已更新置顶日记，刷新后即生效。");
+                                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"已更新置顶日记，刷新后即生效。OvO");
                                 })
                                 .setNegativeButton("取消",null)
                                 .show();

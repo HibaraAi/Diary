@@ -1,7 +1,5 @@
 package cn.snowt.diary.service.impl;
 
-import android.text.format.DateUtils;
-
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
@@ -11,6 +9,7 @@ import java.util.List;
 import cn.snowt.diary.entity.SpecialDay;
 import cn.snowt.diary.service.SpecialDayService;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.vo.SpecialDayVo;
 
 /**
@@ -106,6 +105,16 @@ public class SpecialDayServiceImpl implements SpecialDayService {
         if(null!=specialDay){
             specialDay.setNeedNotice(needNotice);
             specialDay.save();
+        }
+    }
+
+    @Override
+    public void delById(Integer id) {
+        SpecialDay specialDay = LitePal.find(SpecialDay.class, id);
+        specialDay.delete();
+        //还需要删除配图文件
+        if(null!=specialDay.getImageSrc() && !"".equals(specialDay.getImageSrc())){
+            FileUtils.deleteFolder(specialDay.getImageSrc());
         }
     }
 

@@ -1,7 +1,6 @@
 package cn.snowt.diary.util;
 
 import android.util.Base64;
-import android.util.Log;
 
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -16,7 +15,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -122,7 +120,6 @@ public class RSAUtils {
                 System.arraycopy(originalBytes,i*sliceLength,bytes,0, min);
                 byte[] bytes1 = encryptByPublicKey(bytes, trueEncodeKey);
                 System.arraycopy(bytes1,0,encodeResultBytes,i*(sliceLength+1),Math.min(bytes1.length,sliceLength+1));
-                System.out.println();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
                 return null;
@@ -177,81 +174,6 @@ public class RSAUtils {
         System.arraycopy(decodeTempBytes,0,decodeResultBytes,0,trueDecodeResultLength);
         return new String(decodeResultBytes);
     }
-
-//    /**
-//     * 使用默认密钥加密
-//     * @param s 需要加密的数据
-//     * @return 加密后的数据
-//     */
-//    public static String encode(String s){
-//        byte[] trueEncodeKey = Base64.decode(Constant.DEFAULT_PUBLIC_KEY, Base64.DEFAULT);
-//        byte[] originalBytes = s.getBytes();
-//        //分片长度
-//        int sliceLength = (KEY_SIZE / 8)-1;
-//        //分片个数
-//        int sliceNum = (int) Math.ceil((double)originalBytes.length/sliceLength);
-//        byte[] encodeResultBytes = new byte[sliceNum*(sliceLength+1)];
-//        for(int i=0;i<sliceNum;i++){
-//            try {
-//                int min = Math.min(originalBytes.length - (i * sliceLength), sliceLength);
-//                byte[] bytes = new byte[min];
-//                System.arraycopy(originalBytes,i*sliceLength,bytes,0, min);
-//                byte[] bytes1 = encryptByPublicKey(bytes, trueEncodeKey);
-//                System.arraycopy(bytes1,0,encodeResultBytes,i*(sliceLength+1),Math.min(bytes1.length,sliceLength+1));
-//                System.out.println();
-//            } catch (NoSuchAlgorithmException e) {
-//                e.printStackTrace();
-//                return null;
-//            } catch (InvalidKeySpecException e) {
-//                e.printStackTrace();
-//                return null;
-//            } catch (NoSuchPaddingException e) {
-//                e.printStackTrace();
-//                return null;
-//            } catch (BadPaddingException e) {
-//                e.printStackTrace();
-//                return null;
-//            } catch (IllegalBlockSizeException e) {
-//                e.printStackTrace();
-//                return null;
-//            } catch (InvalidKeyException e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//        }
-//        return new String(Base64.encode(encodeResultBytes,Base64.DEFAULT));
-//    }
-
-//    /**
-//     * 使用默认密钥解密
-//     * @param s 需要解密的数据
-//     * @return 解密后的数据
-//     */
-//    public static String decode(String s){
-//        byte[] trueDecodeKey = Base64.decode(Constant.DEFAULT_PRIVATE_KEY, Base64.DEFAULT);
-//        byte[] originalBytes = Base64.decode(s, Base64.DEFAULT);
-//        //分片长度
-//        int sliceLength = (KEY_SIZE / 8)-1;
-//        //分片个数
-//        int sliceNum = originalBytes.length/(sliceLength+1);
-//        byte[] decodeTempBytes = new byte[sliceNum*sliceLength];
-//        int trueDecodeResultLength = 0;
-//        for(int i=0;i<sliceNum;i++){
-//            try{
-//                byte[] bytes = new byte[sliceLength+1];
-//                System.arraycopy(originalBytes,(i*(sliceLength+1)),bytes,0, sliceLength+1);
-//                byte[] bytes1 = decryptByPrivateKey(bytes, trueDecodeKey);
-//                System.arraycopy(bytes1,0,decodeTempBytes,i*sliceLength,Math.min(sliceLength,bytes1.length));
-//                trueDecodeResultLength += Math.min(sliceLength,bytes1.length);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//        }
-//        byte[] decodeResultBytes = new byte[trueDecodeResultLength];
-//        System.arraycopy(decodeTempBytes,0,decodeResultBytes,0,trueDecodeResultLength);
-//        return new String(decodeResultBytes);
-//    }
 
     /**
      * 随机获取一对密钥

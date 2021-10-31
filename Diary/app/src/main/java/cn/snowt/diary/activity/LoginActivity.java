@@ -1,44 +1,32 @@
 package cn.snowt.diary.activity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.os.Environment;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-
-import com.google.android.material.snackbar.Snackbar;
-
 import org.litepal.LitePal;
-import org.litepal.LitePalApplication;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
 
 import cn.snowt.diary.R;
-import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
-import cn.snowt.diary.util.Constant;
-import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.mine.MineGameActivity;

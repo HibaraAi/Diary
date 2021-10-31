@@ -1,14 +1,8 @@
 package cn.snowt.diary.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,7 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.litepal.LitePalApplication;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
@@ -28,7 +25,6 @@ import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.RSAUtils;
-import cn.snowt.diary.util.SimpleResult;
 
 /**
  * @Author: HibaraAi

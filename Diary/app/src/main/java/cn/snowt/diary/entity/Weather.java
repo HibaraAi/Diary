@@ -20,7 +20,6 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Weather extends LitePalSupport implements Serializable {
     public static final String WEATHER_CLOUDY = "多云";
     public static final String WEATHER_RAIN = "下雨";

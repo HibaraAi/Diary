@@ -21,7 +21,6 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class DiaryVoForBackup implements Serializable {
     private Integer id;
     private String content;

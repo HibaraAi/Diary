@@ -21,7 +21,6 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Comment extends LitePalSupport implements Serializable {
     /**
      * 主键

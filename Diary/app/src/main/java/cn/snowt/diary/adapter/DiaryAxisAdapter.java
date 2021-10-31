@@ -13,8 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import org.litepal.LitePalApplication;
-
 import java.util.List;
 import java.util.Random;
 
@@ -22,7 +20,6 @@ import cn.snowt.diary.R;
 import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.DiaryListActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
-import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.vo.DiaryVo;
 
 /**

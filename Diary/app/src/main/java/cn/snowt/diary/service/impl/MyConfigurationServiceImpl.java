@@ -14,7 +14,6 @@ import java.util.UUID;
 import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
-import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
 

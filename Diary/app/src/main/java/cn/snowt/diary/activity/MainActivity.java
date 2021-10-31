@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(MainActivity.this).load(bgImg).into(mainImageBg);
         }
         mainImageBg.setOnClickListener(v->{
-            BaseUtils.shortTipInSnack(mainImageBg,"长按修改背景图");
+            BaseUtils.shortTipInSnack(mainImageBg,"长按修改背景图 QaQ");
         });
         mainImageBg.setOnLongClickListener(v->{
             //判断有没有外部存储的写入权限
@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadMoreDiary() {
         List<DiaryVo> diaryVoList = diaryService.getDiaryVoList(nowIndex, 5);
         if(diaryVoList.size()==0){
-            BaseUtils.shortTipInSnack(recyclerView,"没有更多日记了。");
+            BaseUtils.shortTipInSnack(recyclerView,"没有更多日记了。OvO");
             //refreshLayout.setNoMoreData(true);
         }else{
             voList.addAll(diaryVoList);
@@ -454,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
             }
             case R.id.toolbar_goto_top:{
                 recyclerView.scrollToPosition(0);
-                BaseUtils.shortTipInSnack(this.recyclerView,"已返回顶部");
+                BaseUtils.shortTipInSnack(this.recyclerView,"已返回顶部 OvO");
                 break;
             }
             case R.id.toolbar_write:{

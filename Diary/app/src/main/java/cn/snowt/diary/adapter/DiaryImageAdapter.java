@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +22,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.BigImgActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
-import cn.snowt.diary.activity.MainActivity;
-import cn.snowt.diary.activity.ZoomImageActivity;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.UriUtils;
 
@@ -109,7 +105,7 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                         UriUtils.copyStream(new FileInputStream(viewHolder.imageSrc),new FileOutputStream(finalName));
                         BaseUtils.shortTipInSnack(viewHolder.itemView,"应该保存成功了😂");
                     } catch (Exception e) {
-                        BaseUtils.shortTipInSnack(viewHolder.itemView,"保存失败!");
+                        BaseUtils.shortTipInSnack(viewHolder.itemView,"保存失败! ORz");
                     }
                 });
                 builder.show();

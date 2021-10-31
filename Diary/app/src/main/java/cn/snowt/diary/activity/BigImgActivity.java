@@ -10,11 +10,9 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.BigImgAdapter;
-import cn.snowt.diary.view.ZoomImageView;
 
 /**
  * @Author: HibaraAi

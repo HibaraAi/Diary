@@ -3,11 +3,8 @@ package cn.snowt.diary.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,11 +12,9 @@ import android.os.Environment;
 import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -37,10 +32,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import cn.snowt.diary.R;
-import cn.snowt.diary.entity.FunnyInfo;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
-import cn.snowt.diary.service.impl.FunnyInfoServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
@@ -107,6 +100,7 @@ public class SettingsActivity extends AppCompatActivity {
             //测试区功能
             boolean openTestFun = BaseUtils.getSharedPreference().getBoolean("openTestFun", false);
             findPreference("customDate").setEnabled(openTestFun);
+            findPreference("allowDelSpDay").setEnabled(openTestFun);
             //读取当前字体大小
             float fontSize = MyConfiguration.getInstance().getFontSize();
             if(fontSize!=-1){
@@ -258,13 +252,18 @@ public class SettingsActivity extends AppCompatActivity {
                             edit.putBoolean("openTestFun",true);
                             edit.apply();
                             findPreference("customDate").setEnabled(true);
+                            findPreference("allowDelSpDay").setEnabled(true);
                         }else{
                             BaseUtils.shortTipInCoast(context,"测试码不正确 UoU");
                         }
                     });
                     builder.setNegativeButton("直接关闭测试功能",(dialog, which) -> {
                         findPreference("customDate").setEnabled(false);
-                        BaseUtils.getDefaultSharedPreferences().edit().putBoolean("customDate",false).apply();
+                        findPreference("allowDelSpDay").setEnabled(false);
+                        SharedPreferences.Editor edit1 = BaseUtils.getDefaultSharedPreferences().edit();
+                        edit1.putBoolean("customDate",false);
+                        edit1.putBoolean("allowDelSpDay",false);
+                        edit1.apply();
                         SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
                         edit.putBoolean("openTestFun",false);
                         edit.apply();
@@ -279,7 +278,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case "txtOutput":{
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("验证你的身份");
-                    builder.setMessage("将所有日记以纯文本、不加密的方式导出到一个txt文件中。\n提示：导出需要解密数据，此过程非常久，有卡住现象属正常，请耐心等待，完成后自有提示。\n\n输入登录密码验证你的身份以继续");
+                    builder.setMessage("将所有日记(出图片以外的任何信息)以纯文本、不加密的方式导出到一个txt文件中。\n提示：导出需要解密数据，此过程非常久，有卡住现象属正常，请耐心等待，完成后自有提示。\n\n输入登录密码验证你的身份以继续");
                     EditText pinView = new EditText(context);
                     pinView.setHint("输入登陆密码");
                     pinView.setBackgroundResource(R.drawable.background_input);
@@ -365,7 +364,7 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 }
                 case "firstLoginNotice":{
-                    BaseUtils.alertDialogToShow(context,"提示","开启后，每日首次登录后会检查今天是否有往年今日的消息，是否有逢百天/整年的纪念日，如果有则会通知栏通知，没有则不打扰。");
+                    BaseUtils.alertDialogToShow(context,"提示","开启后，每日首次登录后会检查今天是否有往年今日的消息，是否有逢百天/整年的纪念日，如果有则会通知栏通知，没有则不打扰。\n\n如果你的设备收不到通知，请手动去系统设置开启消消乐的通知权限，根据自己的需要开启声音、震动或横幅通知。");
                     break;
                 }
                 default:return false;

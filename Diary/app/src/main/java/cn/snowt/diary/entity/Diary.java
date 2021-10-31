@@ -21,7 +21,6 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Diary extends LitePalSupport implements Serializable {
     /**
      * 主键

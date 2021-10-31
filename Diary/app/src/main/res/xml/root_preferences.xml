@@ -120,5 +120,13 @@
             app:title="日记自定义日期"
             app:summary="写日记时可以自行输入日期时间" />
 
+        <SwitchPreferenceCompat
+            app:key="allowDelSpDay"
+            app:defaultValue="false"
+            app:enabled="false"
+            app:title="允许删除纪念日"
+            app:summary="开启后,在纪念日详情页可以点击删除按钮" />
+
+
     </PreferenceCategory>
 </PreferenceScreen>

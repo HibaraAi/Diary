@@ -1,7 +1,5 @@
 package cn.snowt.diary.service;
 
-import org.litepal.LitePal;
-
 import java.util.List;
 
 import cn.snowt.diary.entity.Drawing;

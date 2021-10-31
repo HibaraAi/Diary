@@ -4,32 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.service.SpecialDayService;
@@ -148,6 +136,21 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
                 finish();
                 break;
             }
+            case R.id.toolbar_day_sel:{
+                if(dayVo!=null){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("提示");
+                    builder.setMessage("是否删除这个纪念日?");
+                    builder.setNegativeButton("刚刚手滑了",null);
+                    builder.setPositiveButton("确认删除", (dialog, which) -> {
+                        specialDayService.delById(dayVo.getId());
+                        this.finish();
+                    });
+                    builder.setCancelable(false);
+                    builder.show();
+                }
+                break;
+            }
             default:break;
         }
         return true;
@@ -193,5 +196,13 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
             }
             default:break;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(BaseUtils.getDefaultSharedPreferences().getBoolean("allowDelSpDay",false)){
+            getMenuInflater().inflate(R.menu.toolbar_day_detail,menu);
+        }
+        return true;
     }
 }

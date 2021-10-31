@@ -1,17 +1,11 @@
 package cn.snowt.diary.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-
-import java.io.File;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.util.BaseUtils;
@@ -35,7 +29,7 @@ public class ZoomImageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String imgSrc = intent.getStringExtra(EXTRA_IMAGE_SRC);
         if(imgSrc==null || "".equals(imgSrc)){
-            BaseUtils.shortTipInSnack(imageView,"图片有误");
+            BaseUtils.shortTipInSnack(imageView,"图片有误 ORz");
         }else{
             Glide.with(this).load(imgSrc).into(imageView);
         }

@@ -152,4 +152,18 @@ public interface DiaryService {
      * @return 如果没有，则返回一个空的list
      */
     List<DiaryVo> getFormerYear(Date date);
+
+    /**
+     * 解密搜索
+     * @param searchValue
+     * @return diaryVo仅包含id，经过处理后的时间Str，截取正文内容Str，和一张图片src(如果有)
+     */
+    SimpleResult decodeSearch(String searchValue);
+
+    /**
+     * 根据日记id获取该日记的记录时间
+     * @param id 日记id
+     * @return 如果没有该日记，返回null
+     */
+    Date getDateById(Integer id);
 }

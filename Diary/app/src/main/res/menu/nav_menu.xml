@@ -14,6 +14,10 @@
             android:icon="@drawable/ic_date"
             android:title="时间升序浏览" />
         <item
+            android:id="@+id/nav_pic"
+            android:icon="@drawable/ic_image"
+            android:title="图库" />
+        <item
             android:id="@+id/nav_time"
             android:icon="@drawable/nav_time"
             android:title="时间轴" />

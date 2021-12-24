@@ -35,11 +35,13 @@ import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.Drawing;
 import cn.snowt.diary.entity.Location;
+import cn.snowt.diary.entity.SpecialDay;
 import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.DrawingService;
 import cn.snowt.diary.service.LabelService;
+import cn.snowt.diary.service.SpecialDayService;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
@@ -253,6 +255,7 @@ public class DiaryServiceImpl implements DiaryService {
             String subDiary = (diary.getContent().length()>30)
                     ? (diary.getContent().substring(0,30)+"...")
                     : diary.getContent();
+            subDiary = subDiary.replaceAll("\n","");
             vo.setContent(subDiary);
             List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").limit(1).find(Drawing.class);
             List<String> picSrcList = new ArrayList<>();
@@ -345,6 +348,7 @@ public class DiaryServiceImpl implements DiaryService {
             String subDiary = (diary.getContent().length()>30)
                     ? (diary.getContent().substring(0,30)+"...")
                     : diary.getContent();
+            subDiary = subDiary.replaceAll("\n","");
             vo.setContent(subDiary);
             List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").limit(1).find(Drawing.class);
             List<String> picSrcList = new ArrayList<>();
@@ -382,6 +386,9 @@ public class DiaryServiceImpl implements DiaryService {
                 vo.setDrawingList(LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class));
                 vos.add(vo);
             });
+            //读取纪念日
+            SpecialDayService specialDayService = new SpecialDayServiceImpl();
+            List<SpecialDay> specialDays = specialDayService.getAll();
             //2.封装数据
             Map<String,Object> map = new HashMap<>(11);
             String uuid = UUID.randomUUID().toString();
@@ -391,6 +398,7 @@ public class DiaryServiceImpl implements DiaryService {
             map.put(Constant.BACKUP_ARGS_NAME_PIN_KEY, MD5Utils.encrypt(Constant.PASSWORD_PREFIX+pinKey));
             map.put(Constant.BACKUP_ARGS_NAME_VERSION,Constant.INTERNAL_VERSION);
             map.put(Constant.BACKUP_ARGS_NAME_ENCODE_UUID,MD5Utils.encrypt(Constant.PASSWORD_PREFIX+uuid));
+            map.put("SpecialDay",specialDays);
             String mapJson = JSON.toJSONString(map);
             //3.输出文件
             String fileName = "XiaoXiaoLe_Backup_"+BaseUtils.dateToString(new Date())+".dll";
@@ -441,9 +449,19 @@ public class DiaryServiceImpl implements DiaryService {
                         successNum.getAndIncrement();
                     }
                 });
+                List<JSONObject> specialDay = (List<JSONObject>) map.get("SpecialDay");
+                AtomicInteger successNum2 = new AtomicInteger();
+                if(specialDay!=null && !specialDay.isEmpty()){
+                    specialDay.forEach(jsonObject -> {
+                        SpecialDay day = JSON.toJavaObject(jsonObject, SpecialDay.class);
+                        day.setId(null);
+                        day.save();
+                        successNum2.getAndIncrement();
+                    });
+                }
                 if(flag.get()){
                     result.setSuccess(true);
-                    result.setMsg("从备份文件恢复成功，共写入"+successNum+"条日记");
+                    result.setMsg("从备份文件恢复成功，共写入"+successNum+"条日记和"+successNum2+"个纪念日");
                     Log.i(TAG,"从备份文件恢复成功，共写入"+successNum+"条日记");
                 }else{
                     result.setSuccess(false);
@@ -493,6 +511,7 @@ public class DiaryServiceImpl implements DiaryService {
             String subDiary = (diary.getContent().length()>30)
                     ? (diary.getContent().substring(0,30)+"...")
                     : diary.getContent();
+            subDiary = subDiary.replaceAll("\n","");
             vo.setContent(subDiary);
             List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").limit(1).find(Drawing.class);
             List<String> picSrcList = new ArrayList<>();
@@ -812,7 +831,11 @@ public class DiaryServiceImpl implements DiaryService {
         }
         Calendar calendar = Calendar.getInstance();
         //获取第一条日记的时间
-        Date firstDate = BaseUtils.stringToDate(getDiaryVoListAsc(0, 1).get(0).getModifiedDate());
+        List<DiaryVo> diaryVoListAsc = getDiaryVoListAsc(0, 1);
+        if (diaryVoListAsc.isEmpty()){
+            return voList;
+        }
+        Date firstDate = BaseUtils.stringToDate(diaryVoListAsc.get(0).getModifiedDate());
         calendar.setTime(firstDate);
         calendar.add(Calendar.DAY_OF_MONTH,-1);
         firstDate = calendar.getTime();
@@ -823,6 +846,39 @@ public class DiaryServiceImpl implements DiaryService {
             date = calendar.getTime();
         }
         return voList;
+    }
+
+    @Override
+    public SimpleResult decodeSearch(String searchValue) {
+        List<DiaryVo> resultVos = new ArrayList<>();
+        List<DiaryVo> diaryVoList = getDiaryVoList(0, Integer.MAX_VALUE);
+        diaryVoList.forEach(diaryVo -> {
+            if (diaryVo.getContent().contains(searchValue)){
+                resultVos.add(diaryVo);
+            }
+            String subDateStr = diaryVo.getModifiedDate().substring(0, 10);
+            diaryVo.setModifiedDate(subDateStr);
+            String subDiary = (diaryVo.getContent().length()>30)
+                    ? (diaryVo.getContent().substring(0,30)+"...")
+                    : diaryVo.getContent();
+            subDiary = subDiary.replaceAll("\n","");
+            diaryVo.setContent(subDiary);
+        });
+        if (resultVos.isEmpty()){
+            return SimpleResult.error().msg("没有包含关键字为["+searchValue+"]的日记");
+        }else{
+            return SimpleResult.ok().data(resultVos);
+        }
+    }
+
+    @Override
+    public Date getDateById(Integer id) {
+        Diary diary = LitePal.select("modifiedDate").where("id = " + id).findFirst(Diary.class);
+        if(diary==null){
+            return null;
+        }else{
+            return diary.getModifiedDate();
+        }
     }
 
     /**

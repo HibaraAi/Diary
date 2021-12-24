@@ -121,7 +121,7 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
                 if(null!=specialDay){
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("提示");
-                    builder.setMessage("纪念日一旦提交，今后再也不能修改任何内容，也不能删除，你要再检查一下这条纪念日的设置吗？");
+                    builder.setMessage("你要再检查一下这条纪念日的设置吗？以后不能再次编辑，只能删除。");
                     builder.setNegativeButton("我再检查一下",null);
                     builder.setPositiveButton("现在就提交", (dialog, which) -> {
                         if(!"".equals(imgSrc)){
@@ -280,6 +280,7 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
                 if(RESULT_OK==resultCode){
                     Uri uri = data.getData();
                     if(null!=uri){
+                        //注意，这里会生成一个图片缓存，保存了纪念日之后并没有删除缓存
                         imgSrc = UriUtils.getFileAbsolutePath(this,uri);
                         new RequestOptions()
                                 .placeholder(R.drawable.load_image)

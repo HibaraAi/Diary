@@ -190,7 +190,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                     case "置顶日记":{
                         new AlertDialog.Builder(context)
                                 .setTitle("说明")
-                                .setMessage("将此条日记置顶。\n特殊地，如果对置顶日记本身执行此操作则视为取消置顶\n另外，置顶只是提前展示，你仍会在浏览时看到该日记真身。如果删除置顶日记，则视为真正删除该日记。")
+                                .setMessage("将此条日记置顶。(已有则覆盖)\n特殊地，如果对置顶日记本身执行此操作则视为取消置顶\n另外，置顶只是提前展示，你仍会在浏览时看到该日记真身。如果删除置顶日记，则视为真正删除该日记。")
                                 .setPositiveButton("继续", (dialog1, which1) -> {
                                     int topDiaryId = BaseUtils.getSharedPreference().getInt("topDiary", -1);
                                     SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();

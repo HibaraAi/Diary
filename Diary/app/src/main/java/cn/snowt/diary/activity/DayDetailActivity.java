@@ -200,9 +200,7 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(BaseUtils.getDefaultSharedPreferences().getBoolean("allowDelSpDay",false)){
-            getMenuInflater().inflate(R.menu.toolbar_day_detail,menu);
-        }
+        getMenuInflater().inflate(R.menu.toolbar_day_detail,menu);
         return true;
     }
 }

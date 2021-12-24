@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/toolbar_pictures_help"
+        android:icon="@drawable/nav_help"
+        android:title="帮助"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/toolbar_pictures_top"
+        android:icon="@drawable/bar_to_top2"
+        android:title="回到顶部"
+        app:showAsAction="always"/>
+</menu>

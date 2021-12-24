@@ -147,6 +147,7 @@ public class RecoveryDiaryActivity extends AppCompatActivity {
                     if("".equals((String)map.get(Constant.BACKUP_ARGS_NAME_PRIVATE_KEY))){
                         tipStr += "\n这个文件没有包含加密日记，不需要使用密钥";
                         loadKeyBtn.setEnabled(false);
+                        pinKeyView.setVisibility(View.VISIBLE);
                         saveBtn.setEnabled(true);
                     }else{
                         tipStr += "\n这个文件包含加密日记，请选择密钥文件";

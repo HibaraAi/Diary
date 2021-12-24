@@ -25,6 +25,7 @@ import cn.snowt.diary.service.FunnyInfoService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.service.impl.FunnyInfoServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.vo.DiaryVo;
 
 /**
  * @Author: HibaraAi
@@ -133,12 +134,17 @@ public class FunnyInfoActivity extends AppCompatActivity {
                 break;
             }
             case R.id.toolbar_funny_info_refresh:{
-                new Thread(() -> {
-                    funnyInfoService.refreshFunnyInfo();
-                    BaseUtils.simpleSysNotice(this,"数据分析已经完成了");
-                }).start();
-                BaseUtils.alertDialogToShow(this,"提示","后台已经开始分析了，在分析完成之前不要再次发起分析请求，也不要关闭本程序(可以浏览其他界面或是最小化到后台)，分析应该会在几分钟内完成，快的话几秒钟。");
-                break;
+                List<DiaryVo> diaryVoList = diaryService.getDiaryVoList(0, 1);
+                if(diaryVoList.isEmpty()){
+                    BaseUtils.alertDialogToShow(this,"提示","你都没有记录过日记，分析啥呢???");
+                }else{
+                    new Thread(() -> {
+                        funnyInfoService.refreshFunnyInfo();
+                        BaseUtils.simpleSysNotice(this,"数据分析已经完成了");
+                    }).start();
+                    BaseUtils.alertDialogToShow(this,"提示","后台已经开始分析了，在分析完成之前不要再次发起分析请求，也不要关闭本程序(可以浏览其他界面或是最小化到后台)，分析应该会在几分钟内完成，快的话几秒钟。");
+                }
+               break;
             }
             default:break;
         }

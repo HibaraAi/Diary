@@ -26,6 +26,12 @@
             app:key="autoNightTime"
             app:title="暗色模式时间段"
             app:dependency="autoNight"/>
+
+        <Preference
+            app:key="themes"
+            app:title="主色调"
+            app:summary="菜鸡做不出完善的主题😥" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="安全相关">
@@ -71,6 +77,10 @@
             app:key="funnyInfo"
             app:title="数据分析"
             app:summary="“消消乐”为你分析了一些有趣的数据"/>
+        <Preference
+            app:key="fullSearch"
+            app:title="慢速搜索"
+            app:summary="根据关键字搜索日记正文，列出匹配对象"/>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="导出/导入">
@@ -100,33 +110,33 @@
             app:title="清除外部存储数据"/>
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="测试区">
-        <Preference
-            app:key="testFun"
-            app:title="开启/关闭测试功能" />
+<!--    <PreferenceCategory app:title="测试区">-->
+<!--        <Preference-->
+<!--            app:key="testFun"-->
+<!--            app:title="开启/关闭测试功能" />-->
 
-        <SwitchPreferenceCompat
-            app:key="saveImageInExRom"
-            app:defaultValue="true"
-            app:enabled="false"
-            app:summaryOff="当前:使用图片原始地址，节约ROM使用。如果选中图片被删除/移动/修改名字则日记展示失效。\n此修改仅对今后新增日记生效。"
-            app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"
-            app:title="日记图片额外存储"/>
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="saveImageInExRom"-->
+<!--            app:defaultValue="true"-->
+<!--            app:enabled="false"-->
+<!--            app:summaryOff="当前:使用图片原始地址，节约ROM使用。如果选中图片被删除/移动/修改名字则日记展示失效。\n此修改仅对今后新增日记生效。"-->
+<!--            app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"-->
+<!--            app:title="日记图片额外存储"/>-->
 
-        <SwitchPreferenceCompat
-            app:key="customDate"
-            app:defaultValue="false"
-            app:enabled="false"
-            app:title="日记自定义日期"
-            app:summary="写日记时可以自行输入日期时间" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="customDate"-->
+<!--            app:defaultValue="false"-->
+<!--            app:enabled="false"-->
+<!--            app:title="日记自定义日期"-->
+<!--            app:summary="写日记时可以自行输入日期时间" />-->
 
-        <SwitchPreferenceCompat
-            app:key="allowDelSpDay"
-            app:defaultValue="false"
-            app:enabled="false"
-            app:title="允许删除纪念日"
-            app:summary="开启后,在纪念日详情页可以点击删除按钮" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="allowDelSpDay"-->
+<!--            app:defaultValue="false"-->
+<!--            app:enabled="false"-->
+<!--            app:title="允许删除纪念日"-->
+<!--            app:summary="开启后,在纪念日详情页可以点击删除按钮" />-->
 
 
-    </PreferenceCategory>
+<!--    </PreferenceCategory>-->
 </PreferenceScreen>

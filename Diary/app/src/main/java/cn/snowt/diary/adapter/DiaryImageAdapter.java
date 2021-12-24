@@ -26,7 +26,10 @@ import java.util.UUID;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.BigImgActivity;
+import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
+import cn.snowt.diary.service.DrawingService;
+import cn.snowt.diary.service.impl.DrawIngServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.UriUtils;
 
@@ -109,6 +112,14 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                     }
                 });
                 builder.show();
+            }else if(recyclerView.getId()==R.id.pic_day_item_ry){
+                DrawingService drawIngService = new DrawIngServiceImpl();
+                Integer diaryId = drawIngService.getDiaryIdByPicSre(viewHolder.imageSrc);
+                Intent intent = new Intent(context, DiaryDetailActivity.class);
+                intent.putExtra("id",diaryId);
+                context.startActivity(intent);
+            }else{
+                System.out.println();
             }
             return true;
         });

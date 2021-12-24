@@ -37,8 +37,8 @@ public class Constant {
      */
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
             "QQ：3192233122(注明添加缘由)\n" +
-            "版本: 1.2.2\n" +
-            "更新日期: 2021-10-20\n" +
+            "版本: 1.2.4\n" +
+            "更新日期: 2021-12-24\n" +
             "开源代码(长按复制): https://github.com/HibaraAi/Diary";
 
     /**
@@ -124,7 +124,7 @@ public class Constant {
             "A：目前整个软件都没有接入网络服务，你只能在开源代码的网址中检查这个项目有没有发布新的release，" +
             "每个release都有对应的版本号，也就是下面“关于”中的“版本”。\n" +
             "Q9：为什么开源代码的地址打不开？\n" +
-            "A：国外网站，多刷新几次。\n" +
+            "A：国外网站，多刷新几次。或者访问镜像版本[https://gitee.com/HibaraAi/Diary]\n" +
             "Q10：跨设备迁移记录具体如何操作？\n" +
             "A：1.旧设备中导出一个备份文件。" +
             "2.在新设备中恢复备份文件的记录。" +
@@ -138,7 +138,7 @@ public class Constant {
             "\n八、本次更新内容\n" +
             "自动暗色模式、日记详情页自动展开评论、支持保存日记配图、新增纪念日功能、" +
             "新增同名标签设置、新增往年今日、修改设置界面的布局、新增数据分析、" +
-            "简易日记列表可以跳转成信息流展示、更换查看大图的逻辑和组件。\n";
+            "简易日记列表可以跳转成信息流展示、更换查看大图的逻辑和组件、支持更换主色调、新增图库。\n";
     public static final String STRING_HELP = STRING_HELP_1+STRING_HELP_2+STRING_HELP_3+STRING_HELP_4+STRING_HELP_5+STRING_HELP_6+STRING_HELP_7;
 
     public static final String SHARE_PREFERENCES_HEAD_SRC = "headSrc";

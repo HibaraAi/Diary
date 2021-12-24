@@ -184,15 +184,6 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         weatherView.setOnClickListener(this);
         labelView.setOnClickListener(this);
         dateView.setOnClickListener(this);
-        //是否允许自定义时间
-        boolean customDate = BaseUtils.getDefaultSharedPreferences().getBoolean("customDate", false);
-        if(customDate){
-            dateView.setVisibility(View.VISIBLE);
-            addDateBtn.setVisibility(View.VISIBLE);
-        }else{
-            dateView.setVisibility(View.GONE);
-            addDateBtn.setVisibility(View.GONE);
-        }
         //输入字数监听
         diaryInputView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -217,7 +208,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
 
     private void initToolbar(){
         Toolbar toolbar = findViewById(R.id.keep_diary_toolbar);
-        toolbar.setTitleTextColor(Color.parseColor("#D84214"));
+        //toolbar.setTitleTextColor(Color.parseColor("#D84214"));
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if(null!=actionBar){

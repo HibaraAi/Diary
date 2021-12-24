@@ -118,6 +118,11 @@ public class SpecialDayServiceImpl implements SpecialDayService {
         }
     }
 
+    @Override
+    public List<SpecialDay> getAll() {
+        return LitePal.findAll(SpecialDay.class);
+    }
+
     /**
      * 计算两个日期的相距天数
      * @param date1

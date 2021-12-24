@@ -61,4 +61,10 @@ public interface SpecialDayService {
      * @param id
      */
     void delById(Integer id);
+
+    /**
+     * 获取纪念日的原始数据，供备份使用
+     * @return
+     */
+    List<SpecialDay> getAll();
 }

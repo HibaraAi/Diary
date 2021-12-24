@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.litepal.LitePal;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class DiaryListActivity extends AppCompatActivity {
     public static final int OPEN_FROM_SEARCH_DIARY = 3;
     public static final int OPEN_FROM_SEARCH_LABEL = 4;
     public static final int OPEN_FROM_LABEL_LIST = 5;
+    public static final int OPEN_FROM_FULL_SEARCH = 6;
 
     private final DiaryService diaryService = new DiaryServiceImpl();
 
@@ -103,9 +105,30 @@ public class DiaryListActivity extends AppCompatActivity {
                 showAllLabel();
                 break;
             }
+            case OPEN_FROM_FULL_SEARCH:{
+                List<DiaryVo> diaryVos = (List<DiaryVo>) intent.getSerializableExtra("diaryVos");
+                diaryList = diaryVos;
+                showFullSearchResult();
+                break;
+            }
             default:break;
         }
 
+    }
+
+    /**
+     * 展示慢搜索的结果
+     */
+    private void showFullSearchResult() {
+        if(diaryList==null || diaryList.isEmpty()){
+            tipView.setText("搜索出错");
+            return;
+        }
+        tipView.setText("搜索到的日记共有"+diaryList.size()+"条");
+        adapter = new DiaryAxisAdapter(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
     private void bindViewAndSetListener(){
@@ -149,6 +172,7 @@ public class DiaryListActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         //根据打开类型判断是否需要展示信息流按钮
         switch (openType) {
+            case OPEN_FROM_FULL_SEARCH:
             case OPEN_FROM_TIME_AXIS:
             case OPEN_FROM_SEARCH_DIARY:
             case OPEN_FROM_SEARCH_LABEL:{

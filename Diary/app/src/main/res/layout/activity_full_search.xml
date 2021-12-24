@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.FullSearchActivity">
+    <include android:id="@+id/asdadasd" layout="@layout/defalut_toolbar" />
+
+    <TextView
+        android:id="@+id/full_search_tip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="这里的搜索仅支持对日记正文的搜索，由于是将所有加密后的日记解密后再检查是否匹配，所以搜索速度取决于你加密日记的数量"
+        app:layout_constraintTop_toBottomOf="@+id/asdadasd"
+        android:padding="10dp"/>
+
+    <EditText
+        android:id="@+id/full_search_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/full_search_tip"
+        android:background="@drawable/background_input"
+        android:hint="请输入关键字检索"
+        android:padding="10dp"/>
+
+    <Button
+        android:id="@+id/full_search_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="搜索"
+        app:layout_constraintTop_toBottomOf="@+id/full_search_input"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

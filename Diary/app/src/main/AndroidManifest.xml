@@ -9,7 +9,7 @@
         tools:ignore="ScopedStorage" />
 
     <application
-        android:name="org.litepal.LitePalApplication"
+        android:name="MyApplication"
         android:allowBackup="false"
         android:debuggable="false"
         android:icon="@mipmap/ic_launcher"
@@ -19,6 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
+        <activity
+            android:name=".activity.PictruesActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.FullSearchActivity"
+            android:exported="true" />
         <activity
             android:name=".activity.BigImgActivity"
             android:exported="true" />

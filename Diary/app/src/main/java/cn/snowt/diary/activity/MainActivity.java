@@ -21,9 +21,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -100,8 +102,24 @@ public class MainActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
         setContentView(R.layout.activity_main);
+        //导航栏透明
+        //设置状态栏和导航栏颜色为透明
+        View decorView = getWindow().getDecorView();
+        int option = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        decorView.setSystemUiVisibility(option);
+        //设置导航栏颜色为透明
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        //设置通知栏颜色为透明
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
         //读取往年今日等提醒
         new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             LoginService loginService = new LoginServiceImpl();
             if (MyConfiguration.getInstance().isNeedFirstLoginNotice() && loginService.isFirstLoginInTheDay()) {
                 loginService.doFirstLoginOfTheDay();
@@ -237,6 +255,10 @@ public class MainActivity extends AppCompatActivity {
                     BaseUtils.gotoActivity(this,SpecialDayActivity.class);
                     break;
                 }
+                case R.id.nav_pic:{
+                    BaseUtils.gotoActivity(this,PictruesActivity.class);
+                    break;
+                }
                 default:{
                     Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
@@ -300,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.setTitle("设置用户名");
             dialog.setMessage("请输入新的用户名");
             EditText editText = new EditText(MainActivity.this);
+            editText.setHint("用户名不建议太长");
             editText.setBackgroundResource(R.drawable.background_input);
             dialog.setView(editText);
             dialog.setCancelable(false);
@@ -323,6 +346,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.setTitle("设置个性签名");
             dialog.setMessage("请输入新的个性签名");
             EditText editText = new EditText(MainActivity.this);
+            editText.setHint("在这里输入...");
             editText.setBackgroundResource(R.drawable.background_input);
             dialog.setView(editText);
             dialog.setCancelable(false);
@@ -369,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
                 if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
                     BaseUtils.shortTipInCoast(MainActivity.this,"已获取权限，请重新操作一次");
                 }else{
-                    BaseUtils.shortTipInCoast(MainActivity.this,"你没有授权外部存储的都且权限");
+                    BaseUtils.shortTipInCoast(MainActivity.this,"你没有授权外部存储的读取权限");
                 }
                 break;
             }

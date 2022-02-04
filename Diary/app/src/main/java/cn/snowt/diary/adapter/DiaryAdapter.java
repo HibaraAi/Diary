@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,13 +61,18 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         TextView label;
         TextView content;
         RecyclerView imageView;
+        RecyclerView videoView;
         RecyclerView commentView;
         Button comment;
         Button submitCommentBtn;
         EditText commentInput;
         Boolean visible;
+        TextView quoteDiaryStr;
+        CardView quoteDiaryArea;
 
         Integer diaryId;
+        String quoteDiaryUuid;
+        String myUuid;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -79,10 +86,13 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             content = itemView.findViewById(R.id.item_content);
             comment = itemView.findViewById(R.id.item_btn_comment);
             imageView = itemView.findViewById(R.id.item_pic_area);
+            videoView = itemView.findViewById(R.id.item_video_area);
             commentView = itemView.findViewById(R.id.item_comment_area);
             diaryView = itemView;
             submitCommentBtn = itemView.findViewById(R.id.item_comment_input_btn);
             commentInput = itemView.findViewById(R.id.item_comment_input);
+            quoteDiaryArea = itemView.findViewById(R.id.item_quote_diary_area);
+            quoteDiaryStr = itemView.findViewById(R.id.item_quote_diary_content);
             //评论区可见标记
             visible = false;
         }
@@ -145,7 +155,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         //长按日记文字
         viewHolder.content.setOnLongClickListener(v->{
             AtomicReference<String> select = new AtomicReference<>();
-            final String[] items = {"复制日记","置顶日记","查看详情","编辑日记","删除"};
+            final String[] items = {"复制日记","置顶日记","引用追更","查看详情","编辑日记","删除"};
             select.set(items[0]);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("日记菜单");
@@ -154,14 +164,25 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             });
             builder.setPositiveButton("确定", (dialog, which) -> {
                 switch (select.get()) {
+                    case "引用追更":{
+                        Intent intent = new Intent(context,KeepDiaryActivity.class);
+                        intent.putExtra(KeepDiaryActivity.OPEN_FROM_TYPE,KeepDiaryActivity.OPEN_FROM_QUOTE_ADD);
+                        intent.putExtra("uuid",viewHolder.myUuid);
+                        intent.putExtra("str",viewHolder.content.getText());
+                        context.startActivity(intent);
+                        break;
+                    }
                     case "复制日记":{
                         BaseUtils.copyInClipboard(context,viewHolder.content.getText().toString());
                         BaseUtils.shortTipInSnack(viewHolder.content,"日记已复制 OvO");
                         break;
                     }
                     case "删除":{
+                        String s = viewHolder.content.getText().toString().replaceAll("\n","");
+                        String tip = s.length()>20 ? s.substring(0,20)+"..." : s;
                         new AlertDialog.Builder(context)
                                 .setTitle("确定要删除这条日记吗?")
+                                .setMessage("\""+tip+"\"")
                                 .setPositiveButton("确认删除", (dialog1, which1) -> {
                                     SimpleResult result = diaryService.deleteById(viewHolder.diaryId);
                                     if(result.getSuccess()){
@@ -245,6 +266,13 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             builder.setCancelable(false);
             builder.show();
         });
+        //长按引用日记
+        viewHolder.quoteDiaryArea.setOnLongClickListener(v -> {
+            Intent intent = new Intent(context,DiaryDetailActivity.class);
+            intent.putExtra("uuid",viewHolder.quoteDiaryUuid);
+            context.startActivity(intent);
+            return true;
+        });
         return viewHolder;
     }
 
@@ -254,6 +282,8 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         ViewHolder newHolder = (ViewHolder)holder;
         DiaryVo diaryVo = diaryVoList.get(position);
         newHolder.diaryId = diaryVo.getId();
+        newHolder.quoteDiaryUuid = diaryVo.getQuoteDiaryUuid();
+        newHolder.myUuid = diaryVo.getMyUuid();
 //        if(null== MyConfiguration.getInstance().getHeadImg()){
 //            newHolder.headImg.setImageResource(R.drawable.nav_icon);
 //        }else{
@@ -276,6 +306,12 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
         imgRecyclerView.setAdapter(imgAdapter);
         imgRecyclerView.setLayoutManager(layoutManager);
+        //处理视频展示
+        RecyclerView videoRV = newHolder.videoView;
+        DiaryVideoAdapter videoAdapter = new DiaryVideoAdapter(diaryVo.getVideoSrcList());
+        GridLayoutManager videoLayoutManager = new GridLayoutManager(context, 2);
+        videoRV.setAdapter(videoAdapter);
+        videoRV.setLayoutManager(videoLayoutManager);
         //处理评论区
         RecyclerView commentRecyclerView = newHolder.commentView;
         DiaryCommentAdapter commentAdapter = new DiaryCommentAdapter(diaryVo.getCommentList());
@@ -294,6 +330,22 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             //改为不可见
             newHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.GONE);
             newHolder.visible = false;
+        }
+        //处理引用日记
+        if(null!=newHolder.quoteDiaryUuid && !"".equals(newHolder.quoteDiaryUuid)){
+            if("del".equals(newHolder.quoteDiaryUuid)){
+                newHolder.quoteDiaryStr.setText("[提示:引用的日记已被删除]");
+            }else{
+                newHolder.quoteDiaryStr.setText(diaryVo.getQuoteDiaryStr());
+            }
+            if (context.getResources().getConfiguration().uiMode == 0x11) {
+                newHolder.quoteDiaryArea.setCardBackgroundColor(Color.parseColor("#EFEAEB"));
+            }else{
+                newHolder.quoteDiaryArea.setCardBackgroundColor(Color.parseColor("#525050"));
+            }
+            newHolder.quoteDiaryArea.setVisibility(View.VISIBLE);
+        }else{
+            newHolder.quoteDiaryArea.setVisibility(View.GONE);
         }
         holder = newHolder;
     }

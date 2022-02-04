@@ -2,12 +2,14 @@ package cn.snowt.mine;
 
 
 import cn.snowt.diary.R;
+import lombok.Data;
 
 /**
  * @Author: HibaraAi
  * @Date: 2021-08-19 17:24
  * @Description: 方块
  */
+@Data
 public class Block {
     /**
      * 已被打开
@@ -23,6 +25,15 @@ public class Block {
      * 初始的默认状态
      */
     public final static int STATE_DEFAULT = 3;
+
+    public Block(Integer x, Integer y, Boolean isMine) {
+        this.x = x;
+        this.y = y;
+        this.isMine = isMine;
+        this.state = STATE_DEFAULT;
+        this.imgId = R.drawable.mine_blackground;
+        this.numOfMineNearby = -1;
+    }
 
     /**
      * x坐标
@@ -53,63 +64,4 @@ public class Block {
      * 当前图片的Id
      */
     private Integer imgId;
-
-    public Block(Integer x, Integer y, Boolean isMine) {
-        this.x = x;
-        this.y = y;
-        this.isMine = isMine;
-        this.state = STATE_DEFAULT;
-        this.imgId = R.drawable.mine_blackground;
-        this.numOfMineNearby = -1;
-    }
-
-    public Integer getX() {
-        return x;
-    }
-
-    public void setX(Integer x) {
-        this.x = x;
-    }
-
-    public Integer getY() {
-        return y;
-    }
-
-    public void setY(Integer y) {
-        this.y = y;
-    }
-
-    public Boolean getIsMine() {
-        return isMine;
-    }
-
-    public void setIsMine(Boolean isMine) {
-        this.isMine = isMine;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
-    }
-
-    public Integer getNumOfMineNearby() {
-        return numOfMineNearby;
-    }
-
-    public void setNumOfMineNearby(Integer numOfMineNearby) {
-        this.numOfMineNearby = numOfMineNearby;
-    }
-
-    public Integer getImgId() {
-        return imgId;
-    }
-
-    public void setImgId(Integer imgId) {
-        this.imgId = imgId;
-    }
-
-
 }

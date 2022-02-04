@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -236,7 +235,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case R.id.nav_asc:{
-                    BaseUtils.gotoActivity(MainActivity.this,TimeAscActivity.class);
+                    Intent intent = new Intent(this, PicturesActivity.class);
+                    intent.putExtra(PicturesActivity.OPEN_FROM_TYPE,PicturesActivity.OPEN_FROM_VIDEO);
+                    startActivity(intent);
                     break;
                 }
                 case R.id.nav_label:{
@@ -256,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case R.id.nav_pic:{
-                    BaseUtils.gotoActivity(this,PictruesActivity.class);
+                    BaseUtils.gotoActivity(this, PicturesActivity.class);
                     break;
                 }
                 default:{

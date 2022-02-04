@@ -286,7 +286,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("验证你的身份");
-                    builder.setMessage("将所有日记(出图片以外的任何信息)以纯文本、不加密的方式导出到一个txt文件中。\n提示：导出需要解密数据，此过程非常久，有卡住现象属正常，请耐心等待，完成后自有提示。\n\n输入登录密码验证你的身份以继续");
+                    builder.setMessage("将所有日记(除图片/视频以外的任何信息)以纯文本、不加密的方式导出到一个txt文件中。\n提示：导出需要解密数据，此过程非常久，有卡住现象属正常，请耐心等待，完成后自有提示。\n\n输入登录密码验证你的身份以继续");
                     EditText pinView = new EditText(context);
                     pinView.setHint("输入登陆密码");
                     pinView.setBackgroundResource(R.drawable.background_input);
@@ -422,6 +422,10 @@ public class SettingsActivity extends AppCompatActivity {
                     });
                     dialog.setNegativeButton("取消", null);
                     dialog.show();
+                    break;
+                }
+                case "ascRead":{
+                    BaseUtils.gotoActivity((Activity) context,TimeAscActivity.class);
                     break;
                 }
                 default:return false;

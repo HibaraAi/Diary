@@ -6,6 +6,7 @@ import android.os.Environment;
 import org.litepal.LitePal;
 import org.litepal.LitePalApplication;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -95,6 +96,8 @@ public class LoginServiceImpl implements LoginService {
         if(!"".equals(tip)){
             BaseUtils.longTextSysNotice(LitePalApplication.getContext(),tip);
         }
+        File externalCacheDir = LitePalApplication.getContext().getExternalCacheDir();
+        FileUtils.deleteFolder(externalCacheDir.getAbsolutePath());
     }
 
     @Override

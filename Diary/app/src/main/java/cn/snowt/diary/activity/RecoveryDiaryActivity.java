@@ -96,7 +96,7 @@ public class RecoveryDiaryActivity extends AppCompatActivity {
                     new Thread(() -> {
                         DiaryService diaryService = new DiaryServiceImpl();
                         SimpleResult result = diaryService.recoveryDiary(pinKey, privateKey, map);
-                        BaseUtils.simpleSysNotice(RecoveryDiaryActivity.this,result.getMsg());
+                        BaseUtils.longTextSysNotice(RecoveryDiaryActivity.this,result.getMsg());
                     }).start();
                     this.finish();
                 }
@@ -144,7 +144,7 @@ public class RecoveryDiaryActivity extends AppCompatActivity {
                     loadKeyBtn.setEnabled(false);
                 }else{
                     tipStr = "成功读取文件["+UriUtils.getFileName(uri)+"],共有"+dataInJson.size()+"条日记。";
-                    if("".equals((String)map.get(Constant.BACKUP_ARGS_NAME_PRIVATE_KEY))){
+                    if("".equals((String)map.get(Constant.BACKUP_ARGS_NAME_PUBLIC_KEY))){
                         tipStr += "\n这个文件没有包含加密日记，不需要使用密钥";
                         loadKeyBtn.setEnabled(false);
                         pinKeyView.setVisibility(View.VISIBLE);

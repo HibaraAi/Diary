@@ -124,6 +124,9 @@ public class DiaryListActivity extends AppCompatActivity {
             tipView.setText("搜索出错");
             return;
         }
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle("慢速搜索结果");
         tipView.setText("搜索到的日记共有"+diaryList.size()+"条");
         adapter = new DiaryAxisAdapter(diaryList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

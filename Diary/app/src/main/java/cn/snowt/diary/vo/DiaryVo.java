@@ -1,6 +1,7 @@
 package cn.snowt.diary.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.snowt.diary.entity.Comment;
@@ -24,5 +25,9 @@ public class DiaryVo implements Serializable {
     private String locationStr;
     private String labelStr;
     private List<String> picSrcList; //这个目前只能是ArrayList 2021-10-20留
+    private ArrayList<String> videoSrcList;
     private List<Comment> commentList;
+    private String quoteDiaryStr;
+    private String quoteDiaryUuid;
+    private String myUuid;
 }

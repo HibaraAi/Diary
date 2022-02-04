@@ -42,6 +42,7 @@
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_help.xml" value="0.1609375" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_keep_diary.xml" value="0.24954710144927536" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_login.xml" value="0.1" />
+        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_login_h.xml" value="0.2" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_mine_game.xml" value="0.22010869565217392" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/activity_pictrues.xml" value="0.16530797101449277" />
@@ -60,10 +61,11 @@
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/defalut_toolbar.xml" value="0.2441123188405797" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/diary_axis_item.xml" value="0.2441123188405797" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/diary_image_item.xml" value="0.2318840579710145" />
-        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/diary_item.xml" value="0.1" />
+        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/diary_item.xml" value="0.4" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/nav_header.xml" value="0.18840579710144928" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/pic_day_item.xml" value="0.25" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/settings_activity.xml" value="0.18206521739130435" />
+        <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/layout/video_day_item.xml" value="0.153125" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/menu/nav_menu.xml" value="0.25364583333333335" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/menu/toolbar.xml" value="0.25364583333333335" />
         <entry key="..\:/PC/Favorites/SourceCode/Diary/Diary/app/src/main/res/menu/toolbar_day_detail.xml" value="0.25364583333333335" />

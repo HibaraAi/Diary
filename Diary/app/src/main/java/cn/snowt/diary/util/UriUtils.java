@@ -27,7 +27,12 @@ import java.io.OutputStream;
 /**
  * @Author: HibaraAi
  * @Date: 2021-08-28 10:26
- * @Description:
+ * @Description: 这个util也太辣鸡了吧，尤其是
+ * getFileAbsolutePath中调用的uriToFileApiQ方法，居然为了一个
+ * 文件的绝对路径将整个文件复制到cache(沙盒)目录下，杀鸡用牛刀？？
+ * 大文件复制耗时不说，不考虑ROM的读写寿命？？？
+ * 这里算一个重大bug，调用了getFileAbsolutePath方法的都应该修改，应该
+ * 直接根据uri将文件复制到要用的地方，偷懒复制别人的代码果然不好。。。。2021-01-17 20点57分留
  */
 public class UriUtils {
     public static byte[] getBytesByUri(Context context, Uri uri) throws IOException {

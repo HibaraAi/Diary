@@ -37,7 +37,7 @@ public class Constant {
      */
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
             "QQ：3192233122(注明添加缘由)\n" +
-            "版本: 1.2.4\n" +
+            "版本: 1.2.5\n" +
             "更新日期: 2021-12-24\n" +
             "开源代码(长按复制): https://github.com/HibaraAi/Diary";
 

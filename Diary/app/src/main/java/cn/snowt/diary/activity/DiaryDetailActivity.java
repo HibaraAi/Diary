@@ -39,6 +39,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
     private final DiaryService diaryService = new DiaryServiceImpl();
 
     private int diaryId = -1;
+    private String uuid = "";
     private DiaryAdapter adapter;
     private FloatingActionButton fab;
 
@@ -54,6 +55,10 @@ public class DiaryDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(null!=intent){
             diaryId = intent.getIntExtra("id",-1);
+            if(-1==diaryId){
+                uuid = intent.getStringExtra("uuid");
+                diaryId = diaryService.diaryUuidToId(uuid);
+            }
         }
         bingViewAndSetListener();
         showDiaryDetail();
@@ -73,6 +78,9 @@ public class DiaryDetailActivity extends AppCompatActivity {
             }else{
                 toolbar.setTitle(result.getMsg());
             }
+        }else{
+            BaseUtils.shortTipInCoast(this,"日记貌似找不到呢...");
+            finish();
         }
     }
 

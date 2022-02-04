@@ -7,7 +7,6 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -41,9 +40,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryImageAdapter;
+import cn.snowt.diary.adapter.DiaryVideoAdapter;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.entity.Weather;
@@ -51,6 +52,7 @@ import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
+import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
 import cn.snowt.diary.vo.DiaryVo;
@@ -64,10 +66,12 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
 
     public static final String TAG = "KeepDiaryActivity";
     public static final String OPEN_FROM_TYPE = "openFrom";
-    public static final int OPEN_FROM_TEMP_DIARY = 1;
-    public static final int OPEN_FROM_UPDATE_DIARY = 2;
+    public static final int OPEN_FROM_TEMP_DIARY = 1; //草稿箱来
+    public static final int OPEN_FROM_UPDATE_DIARY = 2; //更新日记
+    public static final int OPEN_FROM_QUOTE_ADD = 3; //引用了某条日记的新增
 
     public static final int CHOOSE_PICTURE = 1;
+    public static final int CHOOSE_VIDEO = 2;
 
     private EditText diaryInputView;
     private ImageView addPicBtn;
@@ -75,21 +79,32 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     private ImageView loadWeatherBtn;
     private ImageView addLabelBtn;
     private ImageView addDateBtn;
+    private ImageView addVideoBtn;
     private TextView locationView;
     private TextView weatherView;
     private TextView labelView;
     private TextView dateView;
-    private RecyclerView recyclerView = null;
+    private RecyclerView picRecyclerView = null;
+    private RecyclerView videoRecyclerView = null;
 
     /**
      * 存储选中图片的cache路径
      */
     private static List<String> imageTempSrcList;
     /**
+     * 存储选中视频的cache路径
+     */
+    private static ArrayList<String> videoTempSrcList;
+    /**
      * 图片区使用RecyclerView，它的适配器
      */
     @SuppressLint("StaticFieldLeak")
     private static DiaryImageAdapter imageAdapter;
+    /**
+     * 视频区使用RecyclerView，它的适配器
+     */
+    @SuppressLint("StaticFieldLeak")
+    private static DiaryVideoAdapter videoAdapter;
 
     /**
      * 草稿的id
@@ -100,6 +115,11 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
      * 需要更新的日记ID
      */
     private int updateDiaryId = -1;
+
+    /**
+     * 引用日记的id
+     */
+    private String quoteDiaryId = "";
 
     private DiaryService diaryService = new DiaryServiceImpl();
 
@@ -144,9 +164,37 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     weatherView.setEnabled(false);
                     labelView.setEnabled(false);
                     dateView.setEnabled(false);
+                    addVideoBtn.setEnabled(false);
+                    findViewById(R.id.keep_diary_video_tip).setEnabled(false);
                     ActionBar actionBar = getSupportActionBar();
                     actionBar.setTitle("修改日记错别字");
                     BaseUtils.alertDialogToShow(KeepDiaryActivity.this,"提示","此功能仅用于修改日记正文中的错别字，其他的均不能改。后续可能会删除此功能。");
+                    break;
+                }
+                case OPEN_FROM_QUOTE_ADD:{
+                    quoteDiaryId = intent.getStringExtra("uuid");
+                    if(null==quoteDiaryId || "".equals(quoteDiaryId)){
+                        BaseUtils.shortTipInCoast(this,"貌似出现了未知错误呢...");
+                        finish();
+                    }else{
+                        if("noUuid".equals(quoteDiaryId)){
+                            BaseUtils.longTipInCoast(this,"由于设计原因，旧日记缺少一个属性。现尝试修复，稍后再试...");
+                            //为没有uuid的日记添加uuid
+                            new Thread(() -> {
+                                List<Diary> diaryList = LitePal.findAll(Diary.class);
+                                diaryList.forEach(diary -> {
+                                    if (null==diary.getMyUuid() || "".equals(diary.getMyUuid())){
+                                        diary.setMyUuid(UUID.randomUUID().toString());
+                                        diary.update(diary.getId());
+                                    }
+                                });
+                            }).start();
+                            finish();
+                        }else{
+                            String quoteDiaryStr = intent.getStringExtra("str");
+                            BaseUtils.alertDialogToShow(this,"引用追更的提示","原文为:\n"+quoteDiaryStr);
+                        }
+                    }
                     break;
                 }
                 default:break;
@@ -162,6 +210,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         loadLocationBtn = findViewById(R.id.keep_diary_btn_location);
         loadWeatherBtn = findViewById(R.id.keep_diary_btn_weather);
         addDateBtn = findViewById(R.id.keep_diary_btn_date);
+        addVideoBtn = findViewById(R.id.keep_diary_btn_video);
         locationView = findViewById(R.id.keep_diary_location);
         weatherView = findViewById(R.id.keep_diary_weather);
         labelView = findViewById(R.id.keep_diary_label);
@@ -169,17 +218,25 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         //处理图片展示区
         imageTempSrcList = new ArrayList<>();
         imageAdapter = new DiaryImageAdapter((ArrayList<String>) imageTempSrcList);
-        recyclerView = findViewById(R.id.keep_diary_pic_area);
+        picRecyclerView = findViewById(R.id.keep_diary_pic_area);
         GridLayoutManager layoutManager = new GridLayoutManager(KeepDiaryActivity.this, 4);
-        recyclerView.setAdapter(imageAdapter);
-        recyclerView.setLayoutManager(layoutManager);
-
+        picRecyclerView.setAdapter(imageAdapter);
+        picRecyclerView.setLayoutManager(layoutManager);
+        //处理视频展示区
+        videoTempSrcList = new ArrayList<>();
+        videoAdapter = new DiaryVideoAdapter((ArrayList<String>) videoTempSrcList);
+        videoRecyclerView = findViewById(R.id.keep_diary_video_area);
+        GridLayoutManager videoLayoutManager = new GridLayoutManager(KeepDiaryActivity.this, 2);
+        videoRecyclerView.setAdapter(videoAdapter);
+        videoRecyclerView.setLayoutManager(videoLayoutManager);
         addPicBtn.setOnClickListener(this);
         addLabelBtn.setOnClickListener(this);
         loadLocationBtn.setOnClickListener(this);
         loadWeatherBtn.setOnClickListener(this);
         addDateBtn.setOnClickListener(this);
+        addVideoBtn.setOnClickListener(this);
         findViewById(R.id.keep_diary_btn_image_tip).setOnClickListener(this);
+        findViewById(R.id.keep_diary_video_tip).setOnClickListener(this);
         locationView.setOnClickListener(this);
         weatherView.setOnClickListener(this);
         labelView.setOnClickListener(this);
@@ -258,7 +315,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                                 labelView.getText().toString(),
                                 locationView.getText().toString(),
                                 weatherView.getText().toString(),
-                                imageTempSrcList,date);
+                                imageTempSrcList,date,videoTempSrcList,quoteDiaryId);
                     }
                     if(result.getSuccess()){
                         clearTempPinInEdit();
@@ -281,6 +338,19 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             default:break;
         }
         return true;
+    }
+
+    /**
+     * 如果视频和图片的文件过大，提示文件过大，多等待
+     */
+    private void romSizeTip() {
+        long size  = videoTempSrcList.stream().mapToLong(FileUtils::getFileSize).sum();
+        size += imageTempSrcList.stream().mapToLong(FileUtils::getFileSize).sum();
+        if(size>200*1024*1024){
+            //超过500M，给予提示
+            BaseUtils.longTipInCoast(this,"视频和图片超过了200M，需要保存较久" +
+                    "\n(卡住属于正常现象，请耐心等待)");
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -424,6 +494,25 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 datePickerDialog.show();
                 break;
             }
+            case R.id.keep_diary_btn_video:
+            case R.id.keep_diary_video_tip:{
+                //判断权限
+                if(ContextCompat.checkSelfPermission(KeepDiaryActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED){
+                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
+                }else{
+                    if(imageTempSrcList.size()>=8){
+                        BaseUtils.shortTipInSnack(v,"你最多选择8个视频。长按视频可将其移除。QaQ");
+                    }else{
+                        BaseUtils.longTipInCoast(this,"请选择需要的视频...\n视频过大会卡住，请耐心等待");
+                        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+                        intent.setType("video/*");
+                        this.startActivityForResult(intent,CHOOSE_VIDEO);
+                    }
+                }
+                break;
+            }
             default:break;
         }
     }
@@ -439,9 +528,22 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     if(null!=uri){
                         imageTempSrcList.add(UriUtils.getFileAbsolutePath(KeepDiaryActivity.this,uri));
                         imageAdapter.notifyDataSetChanged();
+                        //判断视频/图片有多大，给予等待提示
+                        romSizeTip();
                     }
                 }
                 break;
+            }
+            case CHOOSE_VIDEO:{
+                if(RESULT_OK==resultCode){
+                    Uri uri = data.getData();
+                    if(null!=uri){
+                        videoTempSrcList.add(UriUtils.getFileAbsolutePath(KeepDiaryActivity.this,uri));
+                        videoAdapter.notifyDataSetChanged();
+                        //判断视频/图片有多大，给予等待提示
+                        romSizeTip();
+                    }
+                }
             }
             default:break;
         }
@@ -500,7 +602,12 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             });
             builder.show();
         }else{
-            finish();
+            new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("你即将退出日记更新，确定更新请使用发送按钮，不更新请继续退出")
+                    .setPositiveButton("继续退出", (dialog, which) -> finish())
+                    .setNegativeButton("继续编辑",null)
+                    .show();
         }
     }
 
@@ -520,7 +627,22 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     }
 
     /**
-     * 删除选择图片时的所有临时缓存
+     * 删除编辑区中的视频
+     * @param src
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    public static void deleteTempVideoInEdit(String src){
+        videoTempSrcList.remove(src);
+        File file = new File(src);
+        if(file.exists()){
+            file.delete();
+            Log.i(TAG,"------删除一个临时视频");
+        }
+        videoAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 删除选择图片/视频时的所有临时缓存
      */
     private void clearTempPinInEdit(){
         Iterator<String> iterator = imageTempSrcList.iterator();
@@ -530,6 +652,15 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             if(file.exists()){
                 file.delete();
                 Log.i(TAG,"------删除一张临时图片");
+            }
+        }
+        Iterator<String> iterator2 = videoTempSrcList.iterator();
+        while (iterator2.hasNext()) {
+            String tempSrc = iterator2.next();
+            File file = new File(tempSrc);
+            if(file.exists()){
+                file.delete();
+                Log.i(TAG,"------删除一个临时视频");
             }
         }
     }

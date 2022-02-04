@@ -19,6 +19,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
+
 import cn.snowt.diary.R;
 import cn.snowt.diary.service.SpecialDayService;
 import cn.snowt.diary.service.impl.SpecialDayServiceImpl;
@@ -126,6 +128,7 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
             specialDayService.changeNoticeState(dayVo.getId(),isChecked);
             dayVo.setNeedNotice(isChecked);
         });
+        img.setOnClickListener(this);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -193,6 +196,19 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
                     builder.show();
                 }
                 break;
+            }
+            case R.id.day_detail_img :{
+                if(null!=dayVo){
+//                    Intent intent = new Intent(DayDetailActivity.this, BigImgActivity.class);
+//                    intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,dayVo.getImageSrc());
+//                    ArrayList<String> list = new ArrayList<>(1);
+//                    list.add(dayVo.getImageSrc());
+//                    intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,list);
+//                    DayDetailActivity.this.startActivity(intent);
+                    Intent intent = new Intent(DayDetailActivity.this, ZoomImageActivity.class);
+                    intent.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,dayVo.getImageSrc());
+                    DayDetailActivity.this.startActivity(intent);
+                }
             }
             default:break;
         }

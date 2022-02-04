@@ -36,6 +36,7 @@ import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.Drawing;
 import cn.snowt.diary.entity.Location;
 import cn.snowt.diary.entity.SpecialDay;
+import cn.snowt.diary.entity.Video;
 import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.DiaryService;
@@ -99,6 +100,11 @@ public class DiaryServiceImpl implements DiaryService {
             List<String> picSrcList = new ArrayList<>();
             drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
             vo.setPicSrcList(picSrcList);
+            //视频
+            List<Video> videos = LitePal.where("diaryId = ?", diary.getId() + "").find(Video.class);
+            ArrayList<String> videoSrcList = new ArrayList<>();
+            videos.forEach(video -> videoSrcList.add(video.getVideoSrc()));
+            vo.setVideoSrcList(videoSrcList);
             //评论
             List<Comment> commentList = LitePal.where("diaryId = ?",diary.getId()+"").order("modifiedDate desc").find(Comment.class);
             commentList.forEach(comment ->{
@@ -108,13 +114,42 @@ public class DiaryServiceImpl implements DiaryService {
                 }
             });
             vo.setCommentList(commentList);
+            if(null==diary.getMyUuid() || "".equals(diary.getMyUuid())){
+                vo.setMyUuid("noUuid");
+            }else{
+                vo.setMyUuid(diary.getMyUuid());
+            }
+            //引用日记
+            if(null!=diary.getQuoteDiaryUuid() && !"".equals(diary.getQuoteDiaryUuid())){
+                Diary quoteDiary = LitePal
+                        .select("myUuid,content,encryption")
+                        .where("myUuid = ?", diary.getQuoteDiaryUuid())
+                        .findFirst(Diary.class);
+                if(null!=quoteDiary){
+                    vo.setQuoteDiaryUuid(quoteDiary.getMyUuid());
+                    String showStr;
+                    if(quoteDiary.getEncryption()){
+                        showStr = RSAUtils.decode(quoteDiary.getContent(),MyConfiguration.getInstance().getPrivateKey());
+                    }else{
+                        showStr = quoteDiary.getContent();
+                    }
+                    if(showStr.length()>200){
+                        showStr = showStr.substring(0,200);
+                        showStr += "\n...\n..\n.";
+                    }
+                    vo.setQuoteDiaryStr(showStr);
+                }else{
+                    //引用日记不存在(已删除)，赋予特定值"del"
+                    vo.setQuoteDiaryUuid("del");
+                }
+            }
             voList.add(vo);
         });
         return voList;
     }
 
     @Override
-    public SimpleResult addOneByArgs(String diaryContent, String labelStr, String locationStr, String weatherStr, List<String> tempImgSrcList,Date date) {
+    public SimpleResult addOneByArgs(String diaryContent, String labelStr, String locationStr, String weatherStr, List<String> tempImgSrcList,Date date,ArrayList<String> tempVideoSrcList,String quoteDiaryUuid) {
         SimpleResult result = new SimpleResult();
         result.setSuccess(true);
         if(date==null){
@@ -138,7 +173,7 @@ public class DiaryServiceImpl implements DiaryService {
                     RSAUtils.encode(diaryContent,MyConfiguration.getInstance().getPublicKey()),
                     date,
                     weather.getId(),
-                    location.getId(),true);
+                    location.getId(),true,quoteDiaryUuid,UUID.randomUUID().toString());
         }else{
             //不需要加密
             diary = new Diary(null,
@@ -146,7 +181,7 @@ public class DiaryServiceImpl implements DiaryService {
                     diaryContent,
                     date,
                     weather.getId(),
-                    location.getId(),false);
+                    location.getId(),false,quoteDiaryUuid,UUID.randomUUID().toString());
         }
         if (diary.save()) {
             //存储图片关系
@@ -188,6 +223,32 @@ public class DiaryServiceImpl implements DiaryService {
                 Drawing drawing = new Drawing(null, finalSavePath.getAbsolutePath(), diary.getId());
                 drawing.save();
             });
+            File path2 = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION+"video/"+nowMonth+"/");
+            if(!path2.exists()){
+                Log.i(TAG,"------创建目录"+path.getAbsolutePath());
+                path2.mkdirs();
+            }
+            String absolutePath2 = path2.getAbsolutePath();
+            tempVideoSrcList.forEach(videoSrc->{
+                File finalSavePath = new File((absolutePath2 + "/" + UUID.randomUUID().toString() + ".hibara"));
+                try {
+                    finalSavePath.createNewFile();
+                    UriUtils.copyStream(new FileInputStream(new File(videoSrc)),new FileOutputStream(finalSavePath));
+                    Log.i(TAG,"------复制视频成功，新视频为:"+finalSavePath.getAbsolutePath());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(TAG,"------保存日记失败,复制视频失败");
+                    result.setSuccess(false);
+                    result.setMsg("复制视频失败");
+                    diary.delete();
+                    weather.delete();
+                    location.delete();
+                    //这里还得加个删视频
+                    return;
+                }
+                Video video = new Video(null, finalSavePath.getAbsolutePath(), diary.getId());
+                video.save();
+            });
             Log.i(TAG,"------保存日记成功");
         }else{
             Log.e(TAG,"------保存日记失败,Diary数据库存入失败");
@@ -224,6 +285,14 @@ public class DiaryServiceImpl implements DiaryService {
             drawings.forEach(drawing -> {
                 new File(drawing.getImgSrc()).delete();
                 drawing.delete();
+            });
+        }
+        //删除视频
+        List<Video> videos = LitePal.where("diaryId = ?", diaryId + "").find(Video.class);
+        if(null!=videos && videos.size()>0){
+            videos.forEach(video -> {
+                new File(video.getVideoSrc()).delete();
+                video.delete();
             });
         }
         diary.delete();
@@ -297,6 +366,11 @@ public class DiaryServiceImpl implements DiaryService {
         List<String> picSrcList = new ArrayList<>();
         drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
         vo.setPicSrcList(picSrcList);
+        //视频
+        List<Video> videos = LitePal.where("diaryId = ?", diary.getId() + "").find(Video.class);
+        ArrayList<String> videoSrcList = new ArrayList<>();
+        videos.forEach(video -> videoSrcList.add(video.getVideoSrc()));
+        vo.setVideoSrcList(videoSrcList);
         //评论
         List<Comment> commentList = LitePal.where("diaryId = ?",diary.getId()+"").order("modifiedDate desc").find(Comment.class);
         commentList.forEach(comment ->{
@@ -305,6 +379,30 @@ public class DiaryServiceImpl implements DiaryService {
             }
         });
         vo.setCommentList(commentList);
+        //引用日记
+        if(null!=diary.getQuoteDiaryUuid() && !"".equals(diary.getQuoteDiaryUuid())){
+            Diary quoteDiary = LitePal
+                    .select("myUuid,content,encryption")
+                    .where("myUuid = ?", diary.getQuoteDiaryUuid())
+                    .findFirst(Diary.class);
+            if(null!=quoteDiary){
+                vo.setQuoteDiaryUuid(quoteDiary.getMyUuid());
+                String showStr;
+                if(quoteDiary.getEncryption()){
+                    showStr = RSAUtils.decode(quoteDiary.getContent(),MyConfiguration.getInstance().getPrivateKey());
+                }else{
+                    showStr = quoteDiary.getContent();
+                }
+                if(showStr.length()>200){
+                    showStr = showStr.substring(0,200);
+                    showStr += "\n...\n..\n.";
+                }
+                vo.setQuoteDiaryStr(showStr);
+            }else{
+                //引用日记不存在(已删除)，赋予特定值"del"
+                vo.setQuoteDiaryUuid("del");
+            }
+        }
         return SimpleResult.ok().data(vo);
     }
 
@@ -363,7 +461,9 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public SimpleResult backupDiary(String publicKey,String pinKey) {
         SimpleResult result = new SimpleResult();
-        List<Diary> diaryList = LitePal.findAll(Diary.class);
+        //List<Diary> diaryList = LitePal.findAll(Diary.class);
+        //按时间排序是希望恢复日记时能按照日记顺序恢复，方便操作日记引用
+        List<Diary> diaryList = LitePal.order("modifiedDate asc").find(Diary.class);
         if(diaryList.isEmpty()){
             result.setSuccess(false);
             result.setMsg("没有查询到有日记，备份啥呢?");
@@ -384,6 +484,9 @@ public class DiaryServiceImpl implements DiaryService {
                 }
                 vo.setCommentList(LitePal.where("diaryId = ?",diary.getId()+"").find(Comment.class));
                 vo.setDrawingList(LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class));
+                vo.setVideoList(LitePal.where("diaryId = ?",diary.getId()+"").find(Video.class));
+                vo.setQuoteDiaryUuid(diary.getQuoteDiaryUuid());
+                vo.setMyUuid(diary.getMyUuid());
                 vos.add(vo);
             });
             //读取纪念日
@@ -444,9 +547,12 @@ public class DiaryServiceImpl implements DiaryService {
                 AtomicInteger successNum = new AtomicInteger();
                 data.forEach(jsonObject -> {
                     DiaryVoForBackup diaryVoForBackup = JSON.toJavaObject(jsonObject, DiaryVoForBackup.class);
-                    if(addOneByBackupVo(diaryVoForBackup,privateKeyInput)){
-                        flag.set(true);
-                        successNum.getAndIncrement();
+                    //uuid已存在数据库了，视为该日记已被存储，不需要恢复
+                    if(!diaryUuidAlreadyInDb(diaryVoForBackup.getMyUuid())){
+                        if(addOneByBackupVo(diaryVoForBackup,privateKeyInput)){
+                            flag.set(true);
+                            successNum.getAndIncrement();
+                        }
                     }
                 });
                 List<JSONObject> specialDay = (List<JSONObject>) map.get("SpecialDay");
@@ -461,7 +567,7 @@ public class DiaryServiceImpl implements DiaryService {
                 }
                 if(flag.get()){
                     result.setSuccess(true);
-                    result.setMsg("从备份文件恢复成功，共写入"+successNum+"条日记和"+successNum2+"个纪念日");
+                    result.setMsg("从备份文件恢复成功(图片/视频资源你得自己复制，详见帮助)，共写入\n"+successNum+"条日记和\n"+successNum2+"个纪念日");
                     Log.i(TAG,"从备份文件恢复成功，共写入"+successNum+"条日记");
                 }else{
                     result.setSuccess(false);
@@ -560,21 +666,21 @@ public class DiaryServiceImpl implements DiaryService {
         weather9.save();
         Location location9 = new Location(null,null,null,"广东省河源市");
         location9.save();
-        Diary diary1 = new Diary(null,"#初次使用软件指引#",Constant.STRING_ABOUT,new Date(), weather1.getId(),location1.getId(),false);
+        Diary diary1 = new Diary(null,"#初次使用软件指引#",Constant.STRING_ABOUT,new Date(), weather1.getId(),location1.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
-        Diary diary2 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_7,new Date(),weather2.getId(),location2.getId(),false);
+        Diary diary2 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_7,new Date(),weather2.getId(),location2.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
-        Diary diary3 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_6,new Date(),weather3.getId(),location3.getId(),false);
+        Diary diary3 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_6,new Date(),weather3.getId(),location3.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
-        Diary diary4 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_5,new Date(),weather4.getId(),location4.getId(),false);
+        Diary diary4 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_5,new Date(),weather4.getId(),location4.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
-        Diary diary5 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_4,new Date(),weather5.getId(),location5.getId(),false);
+        Diary diary5 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_4,new Date(),weather5.getId(),location5.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
-        Diary diary6 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_3,new Date(),weather6.getId(),location6.getId(),false);
+        Diary diary6 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_3,new Date(),weather6.getId(),location6.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
-        Diary diary7 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_2,new Date(),weather7.getId(),location7.getId(),false);
+        Diary diary7 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_2,new Date(),weather7.getId(),location7.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
-        Diary diary8 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_1,new Date(),weather8.getId(),location8.getId(),false);
+        Diary diary8 = new Diary(null,"#初次使用软件指引#",Constant.STRING_HELP_1,new Date(),weather8.getId(),location8.getId(),false,null,UUID.randomUUID().toString());
         Thread.sleep(1000);
         String s = "前言\n" +
 //                "    作者很早就想自己做一个日记类的软件了，“正经人谁写日记啊”说是这么说，" +
@@ -607,7 +713,7 @@ public class DiaryServiceImpl implements DiaryService {
 //                "对你绝对忠诚。你可以把它当树洞，也可以当成一个守口如瓶的、你专属的聆听者，你所有的所有" +
 //                "都可以和它分享。\n\n" +
                 "    接下来还有8条软件指引。是直接从“帮助&关于”搬过来的。可以看也可以不看。删除完软件指引就开始使用“消消乐吧”";
-        Diary diary9 = new Diary(null, "#初次使用软件指引#", s, new Date(), weather9.getId(), location9.getId(), false);
+        Diary diary9 = new Diary(null, "#初次使用软件指引#", s, new Date(), weather9.getId(), location9.getId(), false,null,UUID.randomUUID().toString());
         diary1.save();
         diary2.save();
         diary3.save();
@@ -699,6 +805,11 @@ public class DiaryServiceImpl implements DiaryService {
             List<String> picSrcList = new ArrayList<>();
             drawingList.forEach(drawing -> picSrcList.add(drawing.getImgSrc()));
             vo.setPicSrcList(picSrcList);
+            //视频
+            List<Video> videos = LitePal.where("diaryId = ?", diary.getId() + "").find(Video.class);
+            ArrayList<String> videoSrcList = new ArrayList<>();
+            videos.forEach(video -> videoSrcList.add(video.getVideoSrc()));
+            vo.setVideoSrcList(videoSrcList);
             //评论
             List<Comment> commentList = LitePal.where("diaryId = ?",diary.getId()+"").order("modifiedDate desc").find(Comment.class);
             commentList.forEach(comment ->{
@@ -881,6 +992,36 @@ public class DiaryServiceImpl implements DiaryService {
         }
     }
 
+    @Override
+    public Boolean diaryUuidAlreadyInDb(String uuid) {
+        //如果uuid为null或""，视为不存在
+        if(null==uuid || "".equals(uuid)){
+            return false;
+        }
+        Diary diary = LitePal
+                .select("myUuid")
+                .where("myUuid = ?", uuid)
+                .findFirst(Diary.class);
+        //没有找到该日记，视为不存在,找到了表示已存在
+        return null != diary;
+    }
+
+    @Override
+    public Integer diaryUuidToId(String uuid) {
+        if(null==uuid || "".equals(uuid)){
+            return -1;
+        }
+        Diary diary = LitePal
+                .select("id")
+                .where("myUuid = ?", uuid)
+                .findFirst(Diary.class);
+        if (null==diary){
+            return -1;
+        }else{
+            return diary.getId();
+        }
+    }
+
     /**
      * 从DiaryVoForBackup写入一条日记记录
      * @param privateKey 解密时的密钥
@@ -898,6 +1039,7 @@ public class DiaryServiceImpl implements DiaryService {
         String labelStr = backupVo.getLabelStr();
         Boolean encryption = backupVo.getEncryption();
         List<Drawing> drawingList = backupVo.getDrawingList();
+        List<Video> videoList = backupVo.getVideoList();
         //先保存天气和位置，因为需要他们的主键要当外键
         if(null!=weather && !"".equals(weather.getWeather())){
             weather.save();
@@ -928,6 +1070,12 @@ public class DiaryServiceImpl implements DiaryService {
                 newContentStr = content;
             }
         }
+        if(null==backupVo.getMyUuid() || "".equals(backupVo.getMyUuid())){
+            diary.setMyUuid(UUID.randomUUID().toString());
+        }else{
+            diary.setMyUuid(backupVo.getMyUuid());
+        }
+        diary.setQuoteDiaryUuid(backupVo.getQuoteDiaryUuid());
         diary.setEncryption(MyConfiguration.getInstance().isRequiredAndAbleToEncode());
         diary.setModifiedDate(modifiedDate);
         diary.setContent(newContentStr);
@@ -940,6 +1088,15 @@ public class DiaryServiceImpl implements DiaryService {
                 drawingList.forEach(picSrc->{
                     Drawing drawing = new Drawing(null, picSrc.getImgSrc(), diary.getId());
                     if (!drawing.save()) {
+                        flag.set(false);
+                    }
+                });
+            }
+            //存储视频
+            if(null!=videoList && videoList.size()!=0){
+                videoList.forEach(videoSrc->{
+                    Video video = new Video(null, videoSrc.getVideoSrc(), diary.getId());
+                    if (!video.save()) {
                         flag.set(false);
                     }
                 });

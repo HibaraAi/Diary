@@ -56,4 +56,15 @@ public class Diary extends LitePalSupport implements Serializable {
      * 加密标志
      */
     private Boolean encryption;
+
+    /**
+     * 引用了哪个日记，无引用为null或""
+     */
+    private String quoteDiaryUuid;
+
+    /**
+     * 恢复备份时回有重复日记，而且没有uuid时，恢复日记中的引用日记会恢复不到
+     * 其实一开始就应该用uuid作为主键，目前使用在备份/恢复中
+     */
+    private String myUuid;
 }

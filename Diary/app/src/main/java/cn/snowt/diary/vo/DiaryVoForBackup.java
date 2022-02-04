@@ -7,6 +7,7 @@ import java.util.List;
 import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.entity.Drawing;
 import cn.snowt.diary.entity.Location;
+import cn.snowt.diary.entity.Video;
 import cn.snowt.diary.entity.Weather;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,5 +31,8 @@ public class DiaryVoForBackup implements Serializable {
     private String labelStr;
     private List<Comment> commentList;
     private List<Drawing> drawingList;
+    private List<Video> videoList;
     private Boolean encryption;
+    private String quoteDiaryUuid;
+    private String myUuid;
 }

@@ -10,13 +10,17 @@
             android:icon="@drawable/nav_temp"
             android:title="草稿箱" />
         <item
-            android:id="@+id/nav_asc"
-            android:icon="@drawable/ic_date"
-            android:title="时间升序浏览" />
+            android:id="@+id/nav_label"
+            android:icon="@drawable/ic_label"
+            android:title="标签集" />
         <item
             android:id="@+id/nav_pic"
             android:icon="@drawable/ic_image"
             android:title="图库" />
+        <item
+            android:id="@+id/nav_asc"
+            android:icon="@drawable/ic_video"
+            android:title="视频库" />
         <item
             android:id="@+id/nav_time"
             android:icon="@drawable/nav_time"
@@ -25,10 +29,7 @@
             android:id="@+id/nav_former_years"
             android:icon="@drawable/nav_former_years"
             android:title="往年今日" />
-        <item
-            android:id="@+id/nav_label"
-            android:icon="@drawable/ic_label"
-            android:title="标签集" />
+
         <item
             android:id="@+id/nav_special_day"
             android:icon="@drawable/nav_special_day"

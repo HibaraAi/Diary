@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,9 @@ import cn.snowt.diary.activity.BigImgActivity;
 import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.service.DrawingService;
+import cn.snowt.diary.service.VideoService;
 import cn.snowt.diary.service.impl.DrawIngServiceImpl;
+import cn.snowt.diary.service.impl.VideoServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.UriUtils;
 
@@ -69,10 +72,22 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 .inflate(R.layout.diary_image_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.diaryImage.setOnClickListener(v->{
-            Intent intent = new Intent(context, BigImgActivity.class);
-            intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,viewHolder.mPosition);
-            intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,imageSrcList);
-            context.startActivity(intent);
+            ViewParent parent1 = viewHolder.diaryImage.getParent();
+            ViewParent parent2 = parent1.getParent();
+            RecyclerView recyclerView = (RecyclerView) parent2;
+            if(recyclerView.getId()==R.id.video_day_item_ry){
+                //视频库中的单击
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri uri = Uri.parse(viewHolder.imageSrc);
+                intent.setDataAndType(uri, "video/*");
+                context.startActivity(intent);
+            }else{
+                //其他的为之前的默认情况——图片单击
+                Intent intent = new Intent(context, BigImgActivity.class);
+                intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,viewHolder.mPosition);
+                intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,imageSrcList);
+                context.startActivity(intent);
+            }
         });
         viewHolder.diaryImage.setOnLongClickListener(v->{
             ViewParent parent1 = viewHolder.diaryImage.getParent();
@@ -113,8 +128,16 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 });
                 builder.show();
             }else if(recyclerView.getId()==R.id.pic_day_item_ry){
+                //图库区域
                 DrawingService drawIngService = new DrawIngServiceImpl();
                 Integer diaryId = drawIngService.getDiaryIdByPicSre(viewHolder.imageSrc);
+                Intent intent = new Intent(context, DiaryDetailActivity.class);
+                intent.putExtra("id",diaryId);
+                context.startActivity(intent);
+            }else if (recyclerView.getId()==R.id.video_day_item_ry){
+                //视频库区域
+                VideoService videoService = new VideoServiceImpl();
+                Integer diaryId = videoService.getDiaryIdByVideoSrc(viewHolder.imageSrc);
                 Intent intent = new Intent(context, DiaryDetailActivity.class);
                 intent.putExtra("id",diaryId);
                 context.startActivity(intent);

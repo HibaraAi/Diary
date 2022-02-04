@@ -204,4 +204,21 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 获取文件大小
+     * @param src 文件路径
+     * @return 如果文件不存在，或者src为文件夹，返回0
+     */
+    public static long getFileSize(String src) {
+        File file = new File(src);
+        if(!file.exists()){
+            return 0;
+        }else{
+            if(file.isDirectory()){
+                return 0;
+            }else{
+                return file.length();
+            }
+        }
+    }
 }

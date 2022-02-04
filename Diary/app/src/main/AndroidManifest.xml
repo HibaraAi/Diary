@@ -19,88 +19,112 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
+        <!--图库/视频库复用这个-->
         <activity
-            android:name=".activity.PictruesActivity"
-            android:exported="true" />
+            android:name=".activity.PicturesActivity"
+            android:exported="true"
+            android:launchMode="singleTop"/>
+        <!--慢速搜索-->
         <activity
             android:name=".activity.FullSearchActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop"/>
+        <!--图片浏览（左右切换）-->
         <activity
             android:name=".activity.BigImgActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop"/>
+        <!--数据分析-->
         <activity
             android:name=".activity.FunnyInfoActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--新增纪念日-->
         <activity
             android:name=".activity.AddSpecialDayActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--纪念日详情-->
         <activity
             android:name=".activity.DayDetailActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--纪念日主界面-->
         <activity
             android:name=".activity.SpecialDayActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--同名标签设置-->
         <activity
             android:name=".activity.SetSameLabelActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--时间升序浏览-->
         <activity
             android:name=".activity.TimeAscActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--设置字体大小-->
         <activity
             android:name=".activity.SetDiarySizeActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--恢复日记-->
         <activity
             android:name=".activity.RecoveryDiaryActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--设置加密密钥-->
         <activity
             android:name=".activity.SetRSAActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--日记详情-->
         <activity
             android:name=".activity.DiaryDetailActivity"
-            android:exported="true"
-            android:launchMode="singleTop" />
+            android:exported="true" />
+        <!--简易的日记列表/便签集复用这个-->
         <activity
             android:name=".activity.DiaryListActivity"
             android:exported="true" />
+        <!--日记编写-->
         <activity
             android:name=".activity.KeepDiaryActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--设置-->
         <activity
             android:name=".activity.SettingsActivity"
             android:exported="true"
             android:label="@string/title_activity_settings"
             android:launchMode="singleTop" />
+        <!--查看大图-->
         <activity
             android:name=".activity.ZoomImageActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--扫雷-->
         <activity
             android:name="cn.snowt.mine.MineGameActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--帮助-->
         <activity
             android:name=".activity.HelpActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--设置密码-->
         <activity
             android:name=".activity.SetPasswordActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+        <!--登陆后的主界面-->
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/TopTransparent" />
+        <!--登录界面-->
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true">

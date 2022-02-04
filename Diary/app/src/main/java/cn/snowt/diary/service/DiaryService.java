@@ -33,9 +33,19 @@ public interface DiaryService {
      * @param weatherStr 天气Str
      * @param tempImgSrcList 读取到的图片缓存Src
      * @param date 日记时间,如果为null，则自动填写时间
+     * @param tempVideoSrcList  读取到的视频缓存Src
+     * @param quoteDiaryId 被引用日记的uuid
      * @return
      */
-    SimpleResult addOneByArgs(String diaryContent, String labelStr, String locationStr, String weatherStr, List<String> tempImgSrcList,Date date);
+    SimpleResult addOneByArgs(
+            String diaryContent,
+            String labelStr,
+            String locationStr,
+            String weatherStr,
+            List<String> tempImgSrcList,
+            Date date,
+            ArrayList<String> tempVideoSrcList
+            ,String quoteDiaryId);
 
     /**
      * 通过id删除一条日记，级联删除其他相关内容
@@ -166,4 +176,19 @@ public interface DiaryService {
      * @return 如果没有该日记，返回null
      */
     Date getDateById(Integer id);
+
+    /**
+     * 检查日记的uuid是否已存在
+     * 如果uuid为null或""，视为不存在
+     * @param uuid uuid
+     * @return true已存在
+     */
+    Boolean diaryUuidAlreadyInDb(String uuid);
+
+    /**
+     * 根据uuid获取主键id
+     * @param uuid uuid
+     * @return 如果找不到则返回-1
+     */
+    Integer diaryUuidToId(String uuid);
 }

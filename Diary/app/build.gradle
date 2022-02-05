@@ -11,13 +11,18 @@ android {
         targetSdk 30
         versionCode 1
         versionName "1.2.5"
-
+        resConfigs "zh", "zh-rCN"
+        ndk {
+            abiFilters 'x86_64','x86'/*, 'armeabi-v7a'*/
+            // 还可以添加 'x86', 'x86_64', 'mips', 'mips64'
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

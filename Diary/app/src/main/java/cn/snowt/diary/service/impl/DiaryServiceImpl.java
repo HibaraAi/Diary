@@ -1054,7 +1054,7 @@ public class DiaryServiceImpl implements DiaryService {
         //再存Diary，它的主键要当图片的外键
         Diary diary = new Diary();
         String newContentStr;
-        if(encryption){
+        if(null!=encryption && encryption){
             //此条记录被加密过，需要解密后再次加密
             String decode = RSAUtils.decode(content, privateKey);
             if(MyConfiguration.getInstance().isRequiredAndAbleToEncode()){

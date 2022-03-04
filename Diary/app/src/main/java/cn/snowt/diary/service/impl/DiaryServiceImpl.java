@@ -1,6 +1,7 @@
 package cn.snowt.diary.service.impl;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Environment;
 import android.util.Log;
@@ -492,8 +493,10 @@ public class DiaryServiceImpl implements DiaryService {
             //读取纪念日
             SpecialDayService specialDayService = new SpecialDayServiceImpl();
             List<SpecialDay> specialDays = specialDayService.getAll();
+            //读取同名标签设置
+            String sameLabel = BaseUtils.getSharedPreference().getString("sameLabel", "");
             //2.封装数据
-            Map<String,Object> map = new HashMap<>(11);
+            Map<String,Object> map = new HashMap<>();
             String uuid = UUID.randomUUID().toString();
             map.put(Constant.BACKUP_ARGS_NAME_UUID,uuid);
             map.put(Constant.BACKUP_ARGS_NAME_DATA_NAME,vos);
@@ -502,6 +505,7 @@ public class DiaryServiceImpl implements DiaryService {
             map.put(Constant.BACKUP_ARGS_NAME_VERSION,Constant.INTERNAL_VERSION);
             map.put(Constant.BACKUP_ARGS_NAME_ENCODE_UUID,MD5Utils.encrypt(Constant.PASSWORD_PREFIX+uuid));
             map.put("SpecialDay",specialDays);
+            map.put("sameLabel",sameLabel);
             String mapJson = JSON.toJSONString(map);
             //3.输出文件
             String fileName = "XiaoXiaoLe_Backup_"+BaseUtils.dateToString(new Date())+".dll";
@@ -542,6 +546,7 @@ public class DiaryServiceImpl implements DiaryService {
                 //破坏UUID的加密值、破坏正确密钥的值、拉黑UUID等
             }else{
                 //所有校验通过，开始读取Diary
+                //1.处理日记相关
                 List<JSONObject> data = (List<JSONObject>) map.get(Constant.BACKUP_ARGS_NAME_DATA_NAME);
                 AtomicBoolean flag = new AtomicBoolean(false);
                 AtomicInteger successNum = new AtomicInteger();
@@ -555,6 +560,7 @@ public class DiaryServiceImpl implements DiaryService {
                         }
                     }
                 });
+                //2.处理纪念日相关
                 List<JSONObject> specialDay = (List<JSONObject>) map.get("SpecialDay");
                 AtomicInteger successNum2 = new AtomicInteger();
                 if(specialDay!=null && !specialDay.isEmpty()){
@@ -564,6 +570,12 @@ public class DiaryServiceImpl implements DiaryService {
                         day.save();
                         successNum2.getAndIncrement();
                     });
+                }
+                //3. 处理同名标签设置(以新增的方式恢复)
+                String sameLabelStr = (String) map.get("sameLabel");
+                Map labelMap = (Map) JSON.parse(sameLabelStr);
+                if(null!=labelMap && labelMap.size()!=0){
+                    labelMap.forEach((i, s) -> labelService.addSameLabel((String)s));
                 }
                 if(flag.get()){
                     result.setSuccess(true);
@@ -630,6 +642,25 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public void addHelpDiary() throws InterruptedException {
+        Weather weather1 = new Weather(null, Weather.WEATHER_SUNNY, null, null);
+        weather1.save();
+        Location location1 = new Location(null,null,null,"广东省河源市");
+        location1.save();
+        String tip = "初次使用软件，建议先看看右侧菜单栏的“帮助”部分的内容，" +
+                "特别是关于本软件的登录、加密、备份相关的说明";
+        Diary diary1 = new Diary(null,
+                "#初次使用软件#",
+                tip,
+                new Date(),
+                weather1.getId(),
+                location1.getId(),
+                false,
+                null,
+                UUID.randomUUID().toString());
+        diary1.save();
+    }
+
+    public void addHelpDiary2() throws InterruptedException {
         Weather weather1 = new Weather(null, Weather.WEATHER_SUNNY, null, null);
         weather1.save();
         Location location1 = new Location(null,null,null,"广东省河源市");
@@ -739,16 +770,21 @@ public class DiaryServiceImpl implements DiaryService {
                 SimpleResult diaryVo = getDiaryVoById(ids.get(i).getId());
                 DiaryVo data = (DiaryVo) diaryVo.getData();
                 sb.append("第(").append(i+1).append("/").append(diaryCount).append(")条日记\n");
-                sb.append("日记头:").append(data.getModifiedDate()).append("   ")
-                        .append(data.getWeatherStr()).append("   ")
-                        .append(data.getLocationStr()).append("\n");
+                sb.append("日记头:").append(data.getModifiedDate()).append("   ");
+                if(null!=data.getWeatherStr()){
+                    sb.append(data.getWeatherStr()).append("   ");
+                }
+                if(null!=data.getLocationStr()){
+                    sb.append(data.getLocationStr()).append("   ");
+                }
+                sb.append("\n");
                 sb.append("标签:").append(data.getLabelStr()).append("\n");
                 sb.append("正文:").append(data.getContent()).append("\n");
                 if (!data.getCommentList().isEmpty()) {
                     sb.append("评论:\n");
                     data.getCommentList().forEach(comment -> {
                         sb.append("\t")
-                                .append(BaseUtils.dateToString(comment.getModifiedDate())).append("  ")
+                                .append(BaseUtils.dateToString(comment.getModifiedDate())).append("  --:")
                                 .append(comment.getContent()).append("\n");
                     });
                 }

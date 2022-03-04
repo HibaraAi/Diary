@@ -29,6 +29,7 @@ import cn.snowt.diary.R;
 import cn.snowt.diary.activity.BigImgActivity;
 import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
+import cn.snowt.diary.activity.ZoomImageActivity;
 import cn.snowt.diary.service.DrawingService;
 import cn.snowt.diary.service.VideoService;
 import cn.snowt.diary.service.impl.DrawIngServiceImpl;
@@ -83,10 +84,16 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 context.startActivity(intent);
             }else{
                 //其他的为之前的默认情况——图片单击
-                Intent intent = new Intent(context, BigImgActivity.class);
-                intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,viewHolder.mPosition);
-                intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,imageSrcList);
-                context.startActivity(intent);
+                if(imageSrcList.size()==1){
+                    Intent intent1 = new Intent(context, ZoomImageActivity.class);
+                    intent1.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,imageSrcList.get(0));
+                    context.startActivity(intent1);
+                }else{
+                    Intent intent = new Intent(context, BigImgActivity.class);
+                    intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,viewHolder.mPosition);
+                    intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,imageSrcList);
+                    context.startActivity(intent);
+                }
             }
         });
         viewHolder.diaryImage.setOnLongClickListener(v->{
@@ -142,7 +149,7 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 intent.putExtra("id",diaryId);
                 context.startActivity(intent);
             }else{
-                System.out.println();
+                BaseUtils.shortTipInCoast(context,"未定义的操作...DiaryImageAdapter");
             }
             return true;
         });

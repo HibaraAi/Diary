@@ -198,11 +198,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void applyPermission() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder.setTitle("存储权限申请");
-        builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，本软件不会偷盗你的数据，放心使用。" +
-                "\n读权限用在了读取相册中的图片、读取本软件生成的备份文件。" +
-                "\n写权限用在了日记配图、头像、背景图、加密密钥和备份文件的存储。" +
-                "\n你可以在后续使用过程中再来许可权限，但不敢保证会不会出现闪退现象，因此本软件强烈建议你在此时授予权限" +
-                "\n你可在帮助和关于中找到权限使用的详细说明");
+//        builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，本软件不会偷盗你的数据，放心使用。" +
+//                "\n读权限用在了读取相册中的图片、读取本软件生成的备份文件。" +
+//                "\n写权限用在了日记配图、头像、背景图、加密密钥和备份文件的存储。" +
+//                "\n你可以在后续使用过程中再来许可权限，但不敢保证会不会出现闪退现象，因此本软件强烈建议你在此时授予权限" +
+//                "\n你可在帮助和关于中找到权限使用的详细说明");
+        builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，" +
+                "你之后可以在“帮助”中看到申请的权限用在何处。本软件不会偷盗你的任何数据，放心使用。" +
+                "\n\n你可以拒绝授权，但涉及存储的功能，你都用不了。（你可以在后续使用中重新授予权限）");
         builder.setPositiveButton("了解", (dialog, which) -> {
             ActivityCompat.requestPermissions(LoginActivity.this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);

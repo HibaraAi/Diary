@@ -27,11 +27,14 @@ public class VideoServiceImpl implements VideoService {
             String videoSrc = video.getVideoSrc();
             File file = new File(videoSrc);
             if(file.exists()){
+                //文件存在，则判断是否存在对应的日记
                 Integer diaryId = video.getDiaryId();
                 Set<Integer> keySet = result.keySet();
                 if(keySet.contains(diaryId)){
                     List<Video> videos = result.get((Integer) diaryId);
+                    assert videos != null;
                     videos.add(video);
+                    result.put(diaryId,videos);
                 }else{
                     List<Video> list = new ArrayList<>();
                     list.add(video);

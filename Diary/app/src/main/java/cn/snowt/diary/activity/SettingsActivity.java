@@ -202,7 +202,10 @@ public class SettingsActivity extends AppCompatActivity {
                     }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("设置读取密钥");
-                        builder.setMessage("为备份文件设置读取口令\n（提示：从备份文件读取日记时，如果存在被加密过的日记，还需要提供解密密钥(生成的长密钥)，如果你没有长密钥，则整个备份文件会读取失败。\n");
+                        builder.setMessage("为备份文件设置读取口令\n（提示：从备份文件读取日记时，如果存在被加密过的日记，还需要提供解密密钥(生成的长密钥)，如果你没有长密钥，则整个备份文件会读取失败。)\n" +
+                                "\n备份以下数据：\n1.日记正文、评论、对应图片视频路径" +
+                                "\n2.纪念日数据" +
+                                "\n3.同名标签设置");
                         EditText pinView = new EditText(context);
                         pinView.setHint("设置一个读取口令");
                         pinView.setBackgroundResource(R.drawable.background_input);
@@ -286,7 +289,8 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("验证你的身份");
-                    builder.setMessage("将所有日记(除图片/视频以外的任何信息)以纯文本、不加密的方式导出到一个txt文件中。\n提示：导出需要解密数据，此过程非常久，有卡住现象属正常，请耐心等待，完成后自有提示。\n\n输入登录密码验证你的身份以继续");
+                    builder.setMessage("将所有日记以纯文本、不加密的方式导出到一个txt文件中。\n提示：导出需要解密数据，此过程非常久，有卡住现象属正常，请耐心等待，完成后自有提示。\n\n" +
+                            "导出以下数据：1.日记正文  2.日记时间、地点、天气情况  3.日记评论内容及评论时间");
                     EditText pinView = new EditText(context);
                     pinView.setHint("输入登陆密码");
                     pinView.setBackgroundResource(R.drawable.background_input);

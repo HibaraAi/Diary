@@ -27,6 +27,8 @@
 
 ## 二、软件截图
 
+视频演示：https://www.bilibili.com/video/BV1Bb4y1v7qm
+
 ![软件截图](img/01.png)
 
 ## 三、待解决

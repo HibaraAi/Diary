@@ -429,6 +429,10 @@ public class SettingsActivity extends AppCompatActivity {
                     BaseUtils.gotoActivity((Activity) context,TimeAscActivity.class);
                     break;
                 }
+                case "thanks":{
+                    BaseUtils.gotoActivity((Activity)context,ThanksActivity.class);
+                    break;
+                }
                 default:return false;
             }
             return true;

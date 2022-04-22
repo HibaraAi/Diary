@@ -85,6 +85,10 @@
             app:key="ascRead"
             app:title="时间升序浏览"
             app:summary="和主界面的浏览顺序反过来查看日记"/>
+        <Preference
+            app:key="thanks"
+            app:title="感谢名单"
+            app:summary="感谢为本软件做出过贡献的人"/>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="导出/导入">

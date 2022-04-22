@@ -25,6 +25,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
+        <!--鸣谢界面-->
+        <activity
+            android:name=".activity.ThanksActivity"
+            android:exported="true"
+            android:launchMode="singleTop"/>
         <!--图库/视频库复用这个-->
         <activity
             android:name=".activity.PicturesActivity"

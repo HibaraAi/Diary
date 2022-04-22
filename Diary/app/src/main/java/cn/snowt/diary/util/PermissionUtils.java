@@ -48,6 +48,7 @@ public class PermissionUtils {
                        Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                        activity.startActivityForResult(intent,requestCode);
                    })
+                   .setTitle("Android11授权提示")
                    .show();
         }else{
             //为Android 10

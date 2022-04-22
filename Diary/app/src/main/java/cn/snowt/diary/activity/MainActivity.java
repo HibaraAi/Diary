@@ -16,12 +16,15 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +58,7 @@ import cn.snowt.diary.service.impl.MyConfigurationServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 import cn.snowt.mine.MineGameActivity;
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     public static final int CHOOSE_HEAD_IMAGE = 1;
     public static final int CHOOSE_MAIN_BG = 2;
+    public static final int REQUEST_CODE_PERMISSION = 3;
 
     private long firstTime = 0;
 
@@ -304,15 +309,12 @@ public class MainActivity extends AppCompatActivity {
         });
         this.headImg.setOnLongClickListener(v -> {
             //判断有没有外部存储的写入权限
-            if(ContextCompat.checkSelfPermission(MainActivity.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED){
-                //如果没有立马申请
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-            }else{
+            if(PermissionUtils.haveExternalStoragePermission(MainActivity.this)){
                 //如果有，打开相册
                 BaseUtils.openAlbum(MainActivity.this,Constant.OPEN_ALBUM_TYPE_HEAD,CHOOSE_HEAD_IMAGE);
+            }else{
+                //如果没有立马申请
+                PermissionUtils.applyExternalStoragePermission(MainActivity.this,REQUEST_CODE_PERMISSION);
             }
             return true;
         });
@@ -373,15 +375,12 @@ public class MainActivity extends AppCompatActivity {
         });
         mainImageBg.setOnLongClickListener(v->{
             //判断有没有外部存储的写入权限
-            if(ContextCompat.checkSelfPermission(MainActivity.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED){
-                //如果没有立马申请
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-            }else{
+            if(PermissionUtils.haveExternalStoragePermission(MainActivity.this)){
                 //如果有，打开相册
                 BaseUtils.openAlbum(MainActivity.this,Constant.OPEN_ALBUM_TYPE_MAIN_BG,CHOOSE_MAIN_BG);
+            }else{
+                //如果没有立马申请
+                PermissionUtils.applyExternalStoragePermission(MainActivity.this,REQUEST_CODE_PERMISSION);
             }
             return true;
         });
@@ -437,6 +436,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+                break;
+            }
+            case REQUEST_CODE_PERMISSION:{
+                if (PermissionUtils.haveExternalStoragePermission(MainActivity.this)) {
+                    BaseUtils.longTipInCoast(MainActivity.this,"已获取外部存储的读写权限,请再次操作");
+                }else{
+                    BaseUtils.alertDialogToShow(MainActivity.this,"授权失败","你没有授予外部存储的读写权限，你将不能使用大部分功能");
+                }
+                break;
             }
             default:break;
         }

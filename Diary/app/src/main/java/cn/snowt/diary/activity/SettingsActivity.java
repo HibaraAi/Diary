@@ -42,6 +42,7 @@ import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.MD5Utils;
 import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 
 /**
@@ -195,9 +196,7 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 }
                 case "backupDiary":{
-                    if(ContextCompat.checkSelfPermission(context,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED){
+                    if(!PermissionUtils.haveExternalStoragePermission(context)){
                         BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用备份功能，但你可以使用导出功能。你可以去修改头像的地方进行授权外部存储的读写权限");
                     }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -232,9 +231,7 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 }
                 case "recoveryDiary":{
-                    if(ContextCompat.checkSelfPermission(context,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED){
+                    if(!PermissionUtils.haveExternalStoragePermission(context)){
                         BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用恢复功能。你可以去修改头像的地方进行授权外部存储的读写权限");
                     }else{
                         BaseUtils.gotoActivity((Activity) context,RecoveryDiaryActivity.class);

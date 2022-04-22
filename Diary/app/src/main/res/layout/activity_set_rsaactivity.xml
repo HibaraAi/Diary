@@ -1,77 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.SetRSAActivity">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       >
+        <include android:id="@+id/d4566545465" layout="@layout/defalut_toolbar" />
 
-    <include android:id="@+id/d4566545465" layout="@layout/defalut_toolbar" />
+        <TextView
+            android:id="@+id/q7898435132465"
+            app:layout_constraintTop_toBottomOf="@+id/d4566545465"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="长密钥:" />
+        <TextView
+            android:id="@+id/rsa_private"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/background_input"
+            android:maxLines="18"
+            android:minLines="18"
+            android:scrollbars="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/q7898435132465"/>
+        <TextView
+            android:id="@+id/d786413456"
+            app:layout_constraintTop_toBottomOf="@+id/rsa_private"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="短密钥:" />
+        <TextView
+            android:id="@+id/rsa_public"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/background_input"
+            android:maxLines="9"
+            android:minLines="9"
+            android:scrollbars="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/d786413456"/>
 
-    <TextView
-        android:id="@+id/q7898435132465"
-        app:layout_constraintTop_toBottomOf="@+id/d4566545465"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="长密钥:" />
-    <TextView
-        android:id="@+id/rsa_private"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/background_input"
-        android:maxLines="18"
-        android:minLines="18"
-        android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/q7898435132465"/>
-    <TextView
-        android:id="@+id/d786413456"
-        app:layout_constraintTop_toBottomOf="@+id/rsa_private"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="短密钥:" />
-    <TextView
-        android:id="@+id/rsa_public"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/background_input"
-        android:maxLines="9"
-        android:minLines="9"
-        android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/d786413456"/>
+        <TextView
+            android:id="@+id/rsa_tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_input"
+            app:layout_constraintTop_toBottomOf="@+id/rsa_public"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:gravity="center_vertical"
+            android:text="提示区"/>
 
-    <TextView
-        android:id="@+id/rsa_tip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/background_input"
-        app:layout_constraintTop_toBottomOf="@+id/rsa_public"
-        android:layout_margin="10dp"
-        android:padding="10dp"
-        android:gravity="center_vertical"
-        android:text="提示区"/>
-
-    <Button
-        android:id="@+id/rsa_create_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/rsa_tip"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:text="生成密钥"
-        android:layout_margin="5dp"/>
-    <Button
-        android:id="@+id/rsa_test_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/rsa_tip"
-        app:layout_constraintLeft_toRightOf="@+id/rsa_create_key"
-        android:layout_margin="5dp"
-        android:text="测试密钥"/>
-    <Button
-        android:id="@+id/rsa_save_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/rsa_tip"
-        app:layout_constraintLeft_toRightOf="@+id/rsa_test_key"
-        android:layout_margin="5dp"
-        android:text="使用并保存此密钥"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/rsa_create_key"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/rsa_tip"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text="生成密钥"
+            android:layout_margin="5dp"/>
+        <Button
+            android:id="@+id/rsa_test_key"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/rsa_tip"
+            app:layout_constraintLeft_toRightOf="@+id/rsa_create_key"
+            android:layout_margin="5dp"
+            android:text="测试密钥"/>
+        <Button
+            android:id="@+id/rsa_save_key"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/rsa_tip"
+            app:layout_constraintLeft_toRightOf="@+id/rsa_test_key"
+            android:layout_margin="5dp"
+            android:text="使用并保存此密钥"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

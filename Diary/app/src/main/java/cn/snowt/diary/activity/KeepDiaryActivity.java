@@ -53,6 +53,7 @@ import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
+import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
 import cn.snowt.diary.vo.DiaryVo;
@@ -360,9 +361,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_btn_image_tip:
             case R.id.keep_diary_btn_image:{
                 //判断权限
-                if(ContextCompat.checkSelfPermission(KeepDiaryActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED){
+                if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
                 }else{
                     if(imageTempSrcList.size()>=8){
@@ -497,9 +496,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_btn_video:
             case R.id.keep_diary_video_tip:{
                 //判断权限
-                if(ContextCompat.checkSelfPermission(KeepDiaryActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED){
+                if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
                 }else{
                     if(imageTempSrcList.size()>=8){

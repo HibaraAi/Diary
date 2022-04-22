@@ -24,6 +24,7 @@ import cn.snowt.diary.R;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
+import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.RSAUtils;
 
 /**
@@ -104,9 +105,7 @@ public class SetRSAActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rsa_create_key:{
-                if(ContextCompat.checkSelfPermission(SetRSAActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED){
+                if(!PermissionUtils.haveExternalStoragePermission(SetRSAActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能启用加密功能，因为加密密钥必须存储在外部存储中。你可以去修改头像的地方进行授权外部存储的读写权限");
                 }else{
                     List<String> randomKey = RSAUtils.getRandomKey();

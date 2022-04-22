@@ -3,18 +3,23 @@ package cn.snowt.diary.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
+
+import com.bumptech.glide.Glide;
 
 import org.litepal.LitePal;
 
@@ -28,7 +33,9 @@ import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.mine.MineGameActivity;
 
@@ -204,21 +211,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void applyPermission() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder.setTitle("存储权限申请");
-//        builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，本软件不会偷盗你的数据，放心使用。" +
-//                "\n读权限用在了读取相册中的图片、读取本软件生成的备份文件。" +
-//                "\n写权限用在了日记配图、头像、背景图、加密密钥和备份文件的存储。" +
-//                "\n你可以在后续使用过程中再来许可权限，但不敢保证会不会出现闪退现象，因此本软件强烈建议你在此时授予权限" +
-//                "\n你可在帮助和关于中找到权限使用的详细说明");
         builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，" +
                 "你之后可以在“帮助”中看到申请的权限用在何处。本软件不会偷盗你的任何数据，放心使用。" +
                 "\n\n你可以拒绝授权，但涉及存储的功能，你都用不了。（你可以在后续使用中重新授予权限）");
-        builder.setPositiveButton("了解", (dialog, which) -> {
-            ActivityCompat.requestPermissions(LoginActivity.this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-        });
+        builder.setPositiveButton("了解", (dialog, which) -> PermissionUtils.applyExternalStoragePermission(LoginActivity.this,1));
         builder.show();
     }
 
+    /**
+     * 权限授予情况
+     * 安卓10
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
@@ -227,6 +233,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     BaseUtils.shortTipInCoast(LoginActivity.this,"已获取外部存储的读写权限");
                 }else{
                     BaseUtils.shortTipInCoast(LoginActivity.this,"你没有授权外部存储的读写权限");
+                }
+                //跳转设置登录密码界面
+                BaseUtils.gotoActivity(this, SetPasswordActivity.class);
+                break;
+            }
+            default:break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            /**
+             * Android11
+             * 权限授予情况
+             */
+            case 1:{
+                if (PermissionUtils.haveExternalStoragePermission(LoginActivity.this)) {
+                    BaseUtils.longTipInCoast(LoginActivity.this,"已获取外部存储的读写权限");
+                }else{
+                    BaseUtils.alertDialogToShow(LoginActivity.this,"授权失败","你没有授予外部存储的读写权限，你将不能使用大部分功能");
                 }
                 //跳转设置登录密码界面
                 BaseUtils.gotoActivity(this, SetPasswordActivity.class);

@@ -124,6 +124,15 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
 
     private DiaryService diaryService = new DiaryServiceImpl();
 
+    /**
+     * 日记图片的最大数量
+     */
+    private static int IMG_MAX_NUM = 50;
+
+    /**
+     * 日记视频的最大数量
+     */
+    private static int VIDEO_MAX_NUM = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -364,8 +373,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
                 }else{
-                    if(imageTempSrcList.size()>=8){
-                        BaseUtils.shortTipInSnack(v,"你最多选择8张图片。长按图片可将其移除。QaQ");
+                    if(imageTempSrcList.size()>=IMG_MAX_NUM){
+                        BaseUtils.shortTipInSnack(v,"你最多选择"+IMG_MAX_NUM+"张图片。长按图片可将其移除。QaQ");
                     }else{
                         BaseUtils.openAlbum(KeepDiaryActivity.this, Constant.OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC,CHOOSE_PICTURE);
                     }
@@ -499,8 +508,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
                 }else{
-                    if(imageTempSrcList.size()>=8){
-                        BaseUtils.shortTipInSnack(v,"你最多选择8个视频。长按视频可将其移除。QaQ");
+                    if(imageTempSrcList.size()>=VIDEO_MAX_NUM){
+                        BaseUtils.shortTipInSnack(v,"你最多选择"+VIDEO_MAX_NUM+"个视频。长按视频可将其移除。QaQ");
                     }else{
                         BaseUtils.longTipInCoast(this,"请选择需要的视频...\n视频过大会卡住，请耐心等待");
                         Intent intent = new Intent("android.intent.action.GET_CONTENT");

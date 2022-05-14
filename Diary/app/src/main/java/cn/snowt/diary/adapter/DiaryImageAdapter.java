@@ -128,7 +128,8 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                     String finalName = absolutePath + UUID.randomUUID().toString() + ".jpg";
                     try {
                         UriUtils.copyStream(new FileInputStream(viewHolder.imageSrc),new FileOutputStream(finalName));
-                        BaseUtils.shortTipInSnack(viewHolder.itemView,"应该保存成功了😂");
+                        //BaseUtils.shortTipInSnack(viewHolder.itemView,"应该保存成功了😂");
+                        BaseUtils.alertDialogToShow(context,"提示","图片应该保存成功了，存储路径为：\n"+finalName);
                     } catch (Exception e) {
                         BaseUtils.shortTipInSnack(viewHolder.itemView,"保存失败! ORz");
                     }

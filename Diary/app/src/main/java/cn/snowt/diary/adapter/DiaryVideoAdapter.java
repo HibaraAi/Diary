@@ -102,7 +102,8 @@ public class DiaryVideoAdapter extends RecyclerView.Adapter{
                     String finalName = absolutePath + UUID.randomUUID().toString() + ".mp4";
                     try {
                         UriUtils.copyStream(new FileInputStream(viewHolder.videoSrc),new FileOutputStream(finalName));
-                        BaseUtils.shortTipInSnack(viewHolder.itemView,"应该保存成功了😂");
+                        //BaseUtils.shortTipInSnack(viewHolder.itemView,"应该保存成功了😂");
+                        BaseUtils.alertDialogToShow(context,"提示","视频应该保存成功了，存储路径为：\n"+finalName);
                     } catch (Exception e) {
                         BaseUtils.shortTipInSnack(viewHolder.itemView,"保存失败! ORz");
                     }

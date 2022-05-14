@@ -10,7 +10,7 @@ public class Constant {
     /**
      * 软件内部版本
      */
-    public static final Integer INTERNAL_VERSION = 5;
+    public static final Integer INTERNAL_VERSION = 6;
     /**
      * MD5加密的前缀
      */
@@ -37,8 +37,8 @@ public class Constant {
      */
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
             "QQ：3192233122(注明添加缘由)\n" +
-            "版本: 1.3.0\n" +
-            "更新日期: 2022-04-22\n" +
+            "版本: 1.3.1\n" +
+            "更新日期: 2022-05-14\n" +
             "开源代码(长按复制): https://github.com/HibaraAi/Diary";
 
     /**
@@ -137,7 +137,9 @@ public class Constant {
             "4.不要去系统中手动“删除数据”，“删除数据”相当于重装，这会删除软件所有的已存储数据。“清空缓存”可以，但是本应用提供了缓存清除功能。其实缓存归安卓系统自动管理，你大可不必自己去清空\n" +
             "\n八、本次更新内容\n" +
             "1. 修复Android11的兼容性\n" +
-            "2. 新增感谢名单\n";
+            "2. 新增感谢名单\n" +
+            "3. 更换保存图片/视频的提示，长按标签进行复制\n" +
+            "4. 单个日记的图片上限改为50张，视频改为8个\n";
     public static final String STRING_HELP = STRING_HELP_1+STRING_HELP_2+STRING_HELP_3+STRING_HELP_4+STRING_HELP_5+STRING_HELP_6+STRING_HELP_7;
 
     public static final String SHARE_PREFERENCES_HEAD_SRC = "headSrc";

@@ -266,6 +266,12 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             builder.setCancelable(false);
             builder.show();
         });
+        viewHolder.label.setOnLongClickListener(v -> {
+            String allLabel = viewHolder.label.getText().toString();
+            BaseUtils.copyInClipboard(context,allLabel);
+            BaseUtils.shortTipInCoast(context,"已复制: "+allLabel);
+            return true;
+        });
         //长按引用日记
         viewHolder.quoteDiaryArea.setOnLongClickListener(v -> {
             Intent intent = new Intent(context,DiaryDetailActivity.class);

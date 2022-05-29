@@ -1,5 +1,6 @@
 package cn.snowt.diary.service;
 
+import java.util.Date;
 import java.util.List;
 
 import cn.snowt.diary.entity.SpecialDay;
@@ -67,4 +68,11 @@ public interface SpecialDayService {
      * @return
      */
     List<SpecialDay> getAll();
+
+    /**
+     * 更换纪念日的结束日期
+     * @param id
+     * @param date
+     */
+    void changeEndDate(Integer id, Date date);
 }

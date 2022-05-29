@@ -3,6 +3,7 @@ package cn.snowt.diary.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -202,8 +203,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }
             }).start();
-            //申请存储权限
-            applyPermission();
+            //免责声明
+            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+            builder.setTitle("免责声明")
+                    .setMessage("本软件不会盗取你任何数据，有开源代码可查，开源网址https://github.com/HibaraAi/Diary或https://gitee.com/HibaraAi/Diary。因此，如果你在使用本软件的过程中，产生无论何种形式的损失，都与本作者无关。")
+                    .setPositiveButton("了解并接受", (dialog, which) -> {
+                        //申请存储权限
+                        applyPermission();
+                    })
+                    .setNegativeButton("不接受并退出",((dialog, which) -> finish()))
+                    .show();
         }
     }
 

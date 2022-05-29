@@ -144,6 +144,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         }
         setContentView(R.layout.activity_keep_diary);
         bindViewAndSetListener();
+        openTip();
         Intent intent = getIntent();
         if(null!=intent){
             switch (intent.getIntExtra(OPEN_FROM_TYPE,-1)) {
@@ -209,6 +210,16 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 }
                 default:break;
             }
+        }
+    }
+
+    /**
+     * 打开这个界面时的提示
+     */
+    private void openTip() {
+        boolean needTip = BaseUtils.getDefaultSharedPreferences().getBoolean("inputTip", false);
+        if(needTip){
+            BaseUtils.longTipInCoast(KeepDiaryActivity.this,"记得切换单机输入法哦(⊙o⊙)");
         }
     }
 

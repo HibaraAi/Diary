@@ -7,11 +7,13 @@ import androidx.appcompat.widget.SwitchCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +22,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.service.SpecialDayService;
@@ -55,6 +59,11 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //禁止截屏设置
+        boolean notAllowScreenshot = BaseUtils.getDefaultSharedPreferences().getBoolean("notAllowScreenshot", true);
+        if(notAllowScreenshot){
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }
         setContentView(R.layout.activity_day_detail);
         bindViewAndSetListener();
         Intent intent = getIntent();
@@ -122,6 +131,13 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
         notice = findViewById(R.id.day_detail_notice);
         startDate.setOnClickListener(this);
         endDate.setOnClickListener(this);
+        endDate.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                changeEndDate();
+                return true;
+            }
+        });
         startDateHelp.setOnClickListener(this);
         endDateHelp.setOnClickListener(this);
         notice.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -129,6 +145,28 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
             dayVo.setNeedNotice(isChecked);
         });
         img.setOnClickListener(this);
+    }
+
+    private void changeEndDate() {
+        Calendar calendar = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                DayDetailActivity.this,
+                (view, year, month, dayOfMonth) -> {
+                    Date date = BaseUtils.stringToDate(year+"-"+(month+1)+"-"+dayOfMonth+" 08:00:00");
+                    Date nowDate = specialDayService.getOneById(dayVo.getId()).getStartDate();
+                    if (date.before(nowDate)){
+                        BaseUtils.longTipInCoast(DayDetailActivity.this,"结束日期好像不能早于开始日期吧");
+                    }else{
+                        specialDayService.changeEndDate(dayVo.getId(),date);
+                        BaseUtils.longTipInCoast(DayDetailActivity.this,"应该更换成功了\uD83D\uDE35");
+                        DayDetailActivity.this.finish();
+                    }
+                }, calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.setCancelable(false);
+        datePickerDialog.setTitle("更换结束日期");
+        datePickerDialog.show();
     }
 
     @SuppressLint("NonConstantResourceId")

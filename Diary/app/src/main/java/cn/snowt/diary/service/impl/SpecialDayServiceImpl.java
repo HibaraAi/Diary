@@ -123,6 +123,13 @@ public class SpecialDayServiceImpl implements SpecialDayService {
         return LitePal.findAll(SpecialDay.class);
     }
 
+    @Override
+    public void changeEndDate(Integer id, Date date) {
+        SpecialDay specialDay = LitePal.find(SpecialDay.class, id);
+        specialDay.setStopDate(date);
+        specialDay.update(id);
+    }
+
     /**
      * 计算两个日期的相距天数
      * @param date1

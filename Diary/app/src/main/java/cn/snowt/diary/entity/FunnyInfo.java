@@ -44,6 +44,16 @@ public class FunnyInfo implements Serializable {
     private Integer shortestDiaryContentLength;
 
     /**
+     * 最多的字数段是哪段？0：100以内、1：100到200
+     */
+    private Integer maximumNumOfWords;
+
+    /**
+     * 最长的那个字数段具体有多少日记数量
+     */
+    private Integer wordSegmentNum;
+
+    /**
      * 没有携带标签的日记数量
      */
     private Integer noLabelDiaryNum;
@@ -118,6 +128,11 @@ public class FunnyInfo implements Serializable {
      * 已经存了多少张图
      */
     private Integer imageSum;
+
+    /**
+     * 已经存了多少个视频
+     */
+    private Integer videoSum;
 
     /**
      * 最常在什么天气记录日记

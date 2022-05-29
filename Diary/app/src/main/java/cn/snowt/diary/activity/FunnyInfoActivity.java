@@ -63,6 +63,15 @@ public class FunnyInfoActivity extends AppCompatActivity {
         list.add("在["+BaseUtils.dateToString(diary.getModifiedDate())+"]你在消消乐记下了第一个日记");
         list.add(info.getLongestDiaryContentLength()+"是目前为止你记下最长篇日记的字数。ID为"+info.getLongestDiaryId()+"(将来再支持日记展示和跳转)");
         list.add(info.getShortestDiaryContentLength()+"是目前为止你记下最短篇日记的字数。ID为"+info.getShortestDiaryId());
+        String s;
+        if(null!=info.getMaximumNumOfWords()){
+            if(info.getMaximumNumOfWords()==0){
+                s = "100以内";
+            }else{
+                s = info.getMaximumNumOfWords()+"00-"+info.getMaximumNumOfWords()+"99";
+            }
+            list.add("你的单篇日记字数大多都在"+s+"，目前为止共有"+info.getWordSegmentNum()+"篇");
+        }
         list.add("你已经在系统中记下了"+info.getTotalLabelNum()+"个标签，其中最常用的标签是"+info.getMostAppearLabel()+"。但还有"+info.getNoLabelDiaryNum()+"条日记是没有标签的。");
         list.add("目前为止,你已经记录了"+info.getTotalDiaryNum()+"条日记。");
         list.add("在"+info.getMonthWithTheMostDiary()+"这个月，你记录了最多日记，高达"+ info.getMonthWithTheMostDiaryCount()+"条");
@@ -77,6 +86,7 @@ public class FunnyInfoActivity extends AppCompatActivity {
         list.add("有"+info.getHaveCommentDiarySum()+"条日记是被追更过的");
         list.add("追更过次数最多的日记是:ID="+info.getMostCommentedDiaryId()+",有"+info.getMostCommentedDiaryCount()+"条评论，看来那天是满满的回忆吧");
         list.add("目前为止，你一共存储了"+info.getImageSum()+"张日记配图");
+        list.add("目前为止，你一共存储了"+info.getVideoSum()+"个视频");
         list.add("你所有日记里，记录了最多的天气是"+info.getMostWeatherInDiary());
         list.add("消消乐一共陪你度过"+info.getRainSumInDiary()+"个下雨天");
         list.add("你一共记录过"+info.getSpecialDaySum()+"个特殊日期");

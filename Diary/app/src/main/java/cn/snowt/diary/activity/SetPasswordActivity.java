@@ -93,10 +93,16 @@ public class SetPasswordActivity extends AppCompatActivity {
         boolean firstUse = sharedPreferences.getBoolean("firstUse", true);
         String tip;
         if(firstUse){
-            tip = "\t提示:\n\t第一次使用本软件，请为本软件设置启动密码。\n\t请牢记密码，本软件不支持密码找回!";
-            oldPassword.setVisibility(View.GONE);
+            tip = "\t提示:\n\t第一次使用本软件，请为本软件设置启动密码。\n\t请牢记密码，本软件不支持密码找回!\n\n" +
+                    "不要试图以猜密码的方式来找回密码，猜错5次会受到一次制裁，第一次制裁时间为1分钟，" +
+                    "第n次制裁时间为n^3分钟，(制裁等级的n最大为10。当内部记录的n达到15时，" +
+                    "软件会自动清空本软件存储的所有数据。每当输入正确密码，n重置为1。)";
+            oldPassword.setVisibility(View.INVISIBLE);
         }else{
-            tip = new String("\t提示:\n\t凭旧密码修改启动密码。\n\t请牢记密码，本软件不支持密码找回!");
+            tip = new String("\t提示:\n\t凭旧密码修改启动密码。\n\t请牢记密码，本软件不支持密码找回!\n\n" +
+                    "不要试图以猜密码的方式来找回密码，猜错5次会受到一次制裁，第一次制裁时间为1分钟，" +
+                    "第n次制裁时间为n^3分钟，(制裁等级的n最大为10。当内部记录的n达到15时，" +
+                    "软件会自动清空本软件存储的所有数据。每当输入正确密码，n重置为1。)");
         }
         textTip.setText(tip);
         return firstUse;

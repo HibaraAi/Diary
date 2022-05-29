@@ -37,10 +37,10 @@
     <PreferenceCategory app:title="安全相关">
         <SwitchPreferenceCompat
             app:key="notAllowScreenshot"
-            app:title="日记界面不允许截屏"
+            app:title="敏感界面不允许截屏"
             app:defaultValue="true"
-            app:summaryOff="当前：允许截屏/录屏\n软件重启后生效"
-            app:summaryOn="当前：不允许截屏/录屏\n软件重启后生效"/>
+            app:summaryOff="当前：允许截屏/录屏。\n软件重启后生效"
+            app:summaryOn="当前：不允许截屏/录屏。\n软件重启后生效"/>
 
         <Preference
             app:key="setPassword"
@@ -71,7 +71,7 @@
         <Preference
             app:key="sameLabel"
             app:title="同名标签设置"
-            app:summary="我的提示很长,你进来再看🤭" />
+            app:summary="我的提示很长,你点进来我再说🤭" />
 
         <Preference
             app:key="funnyInfo"
@@ -89,6 +89,12 @@
             app:key="thanks"
             app:title="感谢名单"
             app:summary="感谢为本软件做出过贡献的人"/>
+        <SwitchPreferenceCompat
+            app:key="inputTip"
+            app:defaultValue="false"
+            app:title="提示切换输入法"
+            app:summaryOn="当前: 开启提示。建议安装多一个单机输入法来编辑日记。作者已安装，但总是忘了切换，因此加一个日记编辑界面的提示😁"
+            app:summaryOff="当前: 关闭提示。建议安装多一个单机输入法来编辑日记。作者已安装，但总是忘了切换，因此加一个日记编辑界面的提示😁"/>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="导出/导入">

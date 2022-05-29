@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 
 import com.alibaba.fastjson.JSON;
 
+import org.litepal.LitePal;
 import org.litepal.LitePalApplication;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.snowt.diary.entity.FunnyInfo;
+import cn.snowt.diary.entity.Video;
 import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.FunnyInfoService;
@@ -72,6 +74,7 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
         final int[] imageSum = {0}; //已经存了多少张图
         Map<String,Integer> weatherMap = new HashMap<>(); //用于统计哪个天气下存了多少日记（天气作为key）
         final long[] numOfTotalWords = {0}; //已经写过多少字了
+        Map<Integer,Integer> diaryWordSegment = new HashMap<>(); //用于统计字数段
         voList.forEach(vo->{
             int contentLength = vo.getContent().length();
             Integer id = vo.getId();
@@ -87,6 +90,14 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
             }
             //----------------更新已经写了多少字(日记正文)------
             numOfTotalWords[0] += contentLength;
+            //----------------字数段统计------
+            int wordSegment = contentLength/100;
+            Integer wordSegmentNum = diaryWordSegment.get((Integer) wordSegment);
+            if(null==wordSegmentNum){
+                wordSegmentNum = 0;
+            }
+            wordSegmentNum++;
+            diaryWordSegment.put(wordSegment,wordSegmentNum);
             //----------------------评论相关-------------------------
             List<String> commentList = vo.getCommentList();
             if(!commentList.isEmpty()){
@@ -122,6 +133,9 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
             //---------------------天气相关--------------------
             String weatherStr = vo.getWeatherStr();
             if(null!=weatherStr){
+                if(weatherStr.contains("雨")){
+                    weatherStr = Weather.WEATHER_RAIN;
+                }
                 Integer integer = weatherMap.get(weatherStr);
                 if(null==integer){
                     integer = 0;
@@ -222,6 +236,8 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
         info.setMostCommentedDiaryId(mostCommentedDiaryId.get((Integer)maxCommentCount[0]));
         info.setMostCommentedDiaryCount(maxCommentCount[0]);
         info.setImageSum(imageSum[0]);
+        //日记视频的数量
+        info.setVideoSum(LitePal.count(Video.class));
         final int[] maxWeatherCount = {0};
         final String[] mostWeatherStr = new String[1];
         weatherMap.forEach((weather,count)->{
@@ -233,6 +249,17 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
         info.setMostWeatherInDiary(mostWeatherStr[0]);
         info.setRainSumInDiary(weatherMap.get(Weather.WEATHER_RAIN));
         info.setNumOfTotalWords(numOfTotalWords[0]);
+        //处理字数段相关
+        final int[] maxNum = {0};
+        final int[] maxSegment = {0};
+        diaryWordSegment.forEach((segment, num) -> {
+            if(num > maxNum[0]){
+                maxNum[0] = num;
+                maxSegment[0] = segment;
+            }
+        });
+        info.setMaximumNumOfWords(maxSegment[0]);
+        info.setWordSegmentNum(maxNum[0]);
         //-------------------------info写入完成，将info存入sharePerformances-------//
         SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
         edit.putString(FUNNY_INFO_IN_SP_NAME,JSON.toJSONString(info));

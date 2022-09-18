@@ -1,11 +1,16 @@
 package cn.snowt.diary.adapter;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.os.FileUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +20,8 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -70,6 +77,12 @@ public class DiaryVideoAdapter extends RecyclerView.Adapter{
                 .inflate(R.layout.diary_image_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.diaryVideo.setOnClickListener(v->{
+            boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !removeTip){
+                //高于或等于Android11
+                BaseUtils.longTipInCoast(context,"如果播放异常，可长按保存");
+            }
+            //为Android 10
             Intent intent = new Intent(Intent.ACTION_VIEW);
             Uri uri = Uri.parse(viewHolder.videoSrc);
             intent.setDataAndType(uri, "video/*");

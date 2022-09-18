@@ -140,7 +140,8 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             if(!"".equals(commentInputStr)){
                 SimpleResult result = commentService.addOneByArgs(commentInputStr, viewHolder.diaryId);
                 if(result.getSuccess()){
-                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"评论成功，请手动刷新 OvO");
+                    BaseUtils.shortTipInCoast(context,"评论成功，请手动刷新 OvO");
+//                    BaseUtils.shortTipInSnack(viewHolder.diaryView,"评论成功，请手动刷新 OvO");
                     viewHolder.commentInput.setText("");
                 }else{
                     BaseUtils.longTipInSnack(viewHolder.diaryView,result.getMsg());
@@ -278,6 +279,13 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             intent.putExtra("uuid",viewHolder.quoteDiaryUuid);
             context.startActivity(intent);
             return true;
+        });
+        //短按引用日记的提示
+        viewHolder.quoteDiaryArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BaseUtils.shortTipInSnack(viewHolder.quoteDiaryArea,"长按跳转到引用日记");
+            }
         });
         return viewHolder;
     }

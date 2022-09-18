@@ -85,8 +85,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
-//        SharedPreferences sharedPreferences = BaseUtils.getDefaultSharedPreferences();
-//        boolean testFun = sharedPreferences.getBoolean("testFun", false);
+        SharedPreferences sharedPreferences = BaseUtils.getDefaultSharedPreferences();
+        boolean testFun = sharedPreferences.getBoolean("testFun", false);
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -101,10 +101,10 @@ public class SettingsActivity extends AppCompatActivity {
             clearROMPreference.setSummary(FileUtils.getStringForDirSize(
                     Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath()
             ));
-//            //测试区功能
-//            boolean openTestFun = BaseUtils.getSharedPreference().getBoolean("openTestFun", false);
-//            findPreference("customDate").setEnabled(openTestFun);
-//            findPreference("allowDelSpDay").setEnabled(openTestFun);
+            //测试区功能
+            boolean openTestFun = BaseUtils.getSharedPreference().getBoolean("openTestFun", false);
+            findPreference("autoBackup").setEnabled(openTestFun);
+            findPreference("removeTip").setEnabled(openTestFun);
             //读取当前字体大小
             float fontSize = MyConfiguration.getInstance().getFontSize();
             if(fontSize!=-1){
@@ -254,18 +254,18 @@ public class SettingsActivity extends AppCompatActivity {
                             SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
                             edit.putBoolean("openTestFun",true);
                             edit.apply();
-                            findPreference("customDate").setEnabled(true);
-                            findPreference("allowDelSpDay").setEnabled(true);
+                            findPreference("autoBackup").setEnabled(true);
+                            findPreference("removeTip").setEnabled(true);
                         }else{
                             BaseUtils.shortTipInCoast(context,"测试码不正确 UoU");
                         }
                     });
                     builder.setNegativeButton("直接关闭测试功能",(dialog, which) -> {
-                        findPreference("customDate").setEnabled(false);
-                        findPreference("allowDelSpDay").setEnabled(false);
+                        findPreference("autoBackup").setEnabled(false);
+                        findPreference("removeTip").setEnabled(false);
                         SharedPreferences.Editor edit1 = BaseUtils.getDefaultSharedPreferences().edit();
-                        edit1.putBoolean("customDate",false);
-                        edit1.putBoolean("allowDelSpDay",false);
+                        edit1.putBoolean("autoBackup",false);
+                        edit1.putBoolean("removeTip",false);
                         edit1.apply();
                         SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
                         edit.putBoolean("openTestFun",false);
@@ -431,6 +431,41 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 case "thanks":{
                     BaseUtils.gotoActivity((Activity)context,ThanksActivity.class);
+                    break;
+                }
+                case "autoBackup":{
+                    if (PermissionUtils.haveExternalStoragePermission(context)) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle("自动备份的提示：");
+                        builder.setMessage("每三天自动输出一个备份文件，文件名为“"+Constant.AUTO_BACKUP_FILE_NAME+"”，" +
+                                "存储在“根目录/Hibara”下。\n如果已经有一个自动备份的文件，则会覆盖。\n登录后才会检查是否需要备份。\n\n" +
+                                "现在请为自动备份文件设置读取口令");
+                        EditText pinView = new EditText(context);
+                        pinView.setHint("设置一个读取口令");
+                        pinView.setBackgroundResource(R.drawable.background_input);
+                        pinView.setMinLines(2);
+                        pinView.setMaxLines(2);
+                        builder.setView(pinView);
+                        builder.setCancelable(false);
+                        builder.setPositiveButton("设置口令", (dialog, which) -> {
+                            String pinStr = pinView.getText().toString();
+                            pinStr = pinStr.trim();
+                            if("".equals(pinStr)){
+                                BaseUtils.longTipInCoast(context,"我真的是服了，口令能空的吗？此次设置失效");
+                            }else{
+                                SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+                                edit.putString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_PIN,pinStr);
+                                edit.apply();
+                            }
+                        });
+                        builder.show();
+                    }else{
+                        BaseUtils.alertDialogToShow(context,"自动备份的提示","你没有授予外部读写权限，此开关无效。");
+                    }
+                    break;
+                }
+                case "pay":{
+                    BaseUtils.gotoActivity((Activity)context,PayActivity.class);
                     break;
                 }
                 default:return false;

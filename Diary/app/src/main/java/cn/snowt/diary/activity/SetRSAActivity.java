@@ -56,7 +56,8 @@ public class SetRSAActivity extends AppCompatActivity implements View.OnClickLis
         String publicKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PUBLIC_KEY, "");
         if(null!=publicKey && !"".equals(publicKey)){
             //已经修改过了
-            String tip = "你已经修改过加密密钥了，不准再次修改，也不准再次保存密钥";
+            String path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION+"output/").getAbsolutePath();
+            String tip = "你已经修改过加密密钥了，不准再次修改，也不准再次保存密钥。初次导出的密钥存储在："+path;
             privateKeyView.setText(tip);
             tipView.setText(tip);
             publicKeyView.setText(tip);

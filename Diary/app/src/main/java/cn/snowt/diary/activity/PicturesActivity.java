@@ -15,18 +15,23 @@ import android.view.WindowManager;
 
 import org.litepal.LitePal;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
 import cn.snowt.diary.adapter.PicDayAdapter;
 import cn.snowt.diary.adapter.VideoDayAdapter;
+import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.Drawing;
 import cn.snowt.diary.entity.Video;
+import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.DrawingService;
 import cn.snowt.diary.service.VideoService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
@@ -70,6 +75,14 @@ public class PicturesActivity extends AppCompatActivity {
             if(allPic.isEmpty()){
                 BaseUtils.longTipInCoast(this,"日记暂时没有存图片");
             }else{
+                //去除标签为“图库”的日记
+                Set<Integer> integers = allPic.keySet();
+                for (Integer diaryId : integers) {
+                    Diary label = LitePal.select("label").where("id = " + diaryId).findFirst(Diary.class);
+                    if(null!=label && null!=label.getLabel() && label.getLabel().contains("#图库#")){
+                        allPic.remove((Integer)diaryId);
+                    }
+                }
                 recyclerView = findViewById(R.id.at_pic_rv);
                 PicDayAdapter adapter = new PicDayAdapter(allPic);
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -86,6 +99,16 @@ public class PicturesActivity extends AppCompatActivity {
             if (allVideos.isEmpty()) {
                 BaseUtils.longTipInCoast(this,"日记暂时没有存视频");
             }else{
+                //去除标签为“视频库”的日记
+                Set<Integer> integers = allVideos.keySet();
+                List<Integer> ids = new ArrayList<>(integers.size());
+                ids.addAll(integers);
+                for (Integer diaryId : ids) {
+                    Diary label = LitePal.select("label").where("id = " + diaryId).findFirst(Diary.class);
+                    if(null!=label && null!=label.getLabel() && label.getLabel().contains("#视频库#")){
+                        allVideos.remove((Integer)diaryId);
+                    }
+                }
                 recyclerView = findViewById(R.id.at_pic_rv);
                 VideoDayAdapter adapter = new VideoDayAdapter(allVideos);
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);

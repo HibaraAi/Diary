@@ -191,4 +191,10 @@ public interface DiaryService {
      * @return 如果找不到则返回-1
      */
     Integer diaryUuidToId(String uuid);
+
+    /**
+     * 自动备份日记
+     */
+    void autoBackupDiary();
+
 }

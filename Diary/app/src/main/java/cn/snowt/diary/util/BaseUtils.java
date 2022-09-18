@@ -115,6 +115,16 @@ public class BaseUtils {
     }
 
     /**
+     * java.util.Date转String
+     * @param date Date
+     * @return 指定格式的String日期 不带周几
+     */
+    public static String dateToStringWithout(Date date){
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat(Constant.DATE_FORMAT);
+        return sdf.format(date);
+    }
+
+    /**
      * String转java.util.Date
      * @param dateStr 指定格式的String日期
      * @return Date 转换失败返回null
@@ -231,7 +241,7 @@ public class BaseUtils {
      * @param notice
      */
     public static void simpleSysNotice(Context context, String notice){
-        String channelId = "ChannelId"; // 通知渠道
+        String channelId = "small"; // 通知渠道
         Notification notification = new Notification.Builder(context,channelId)
                 .setChannelId(channelId)
                 .setAutoCancel(true)
@@ -247,18 +257,18 @@ public class BaseUtils {
                 NotificationManager.IMPORTANCE_LOW);
         notificationManager.createNotificationChannel(channel);
         // 3. 发送通知(Notification与NotificationManager的channelId必须对应)
-        notificationManager.notify(1, notification);
+        notificationManager.notify(2, notification);
     }
 
 
     public static void longTextSysNotice(Context context,String notice){
         NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         NotificationChannel channel = new NotificationChannel(
-                "channelId",
+                "big",
                 "消消乐提示",
                 NotificationManager.IMPORTANCE_LOW);
         manager.createNotificationChannel(channel);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelId")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "big")
                 .setContentText("回到通知栏上也是一样，每个开发者都只想着尽可能地去宣传自己的App，最后用户的手机就乱得跟鸡窝一样了。但")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setAutoCancel(true);

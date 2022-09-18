@@ -134,6 +134,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
      */
     private static int VIDEO_MAX_NUM = 10;
 
+    boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,7 +181,9 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     findViewById(R.id.keep_diary_video_tip).setEnabled(false);
                     ActionBar actionBar = getSupportActionBar();
                     actionBar.setTitle("修改日记错别字");
-                    BaseUtils.alertDialogToShow(KeepDiaryActivity.this,"提示","此功能仅用于修改日记正文中的错别字，其他的均不能改。后续可能会删除此功能。");
+                    if(!removeTip){
+                        BaseUtils.alertDialogToShow(KeepDiaryActivity.this,"提示","此功能仅用于修改日记正文中的错别字，其他的均不能改。后续可能会删除此功能。");
+                    }
                     break;
                 }
                 case OPEN_FROM_QUOTE_ADD:{
@@ -396,7 +400,9 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_btn_location:{
                 android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
                 dialog.setTitle("所处位置");
-                dialog.setMessage("暂时不支持读取地理位置，请手动输入");
+                if(!removeTip){
+                    dialog.setMessage("暂时不支持读取地理位置，请手动输入");
+                }
                 EditText editText = new EditText(KeepDiaryActivity.this);
                 editText.setBackgroundResource(R.drawable.background_input);
                 editText.setMinLines(4);
@@ -417,7 +423,9 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_btn_weather:{
 
                 android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
-                dialog.setTitle("暂时不支持读取当地天气信息，请手动选择");
+                if(!removeTip){
+                    dialog.setTitle("暂时不支持读取当地天气信息，请手动选择");
+                }
                 String[] items = {Weather.WEATHER_CLOUDY,Weather.WEATHER_RAIN,
                         Weather.WEATHER_SUNNY,Weather.WEATHER_HOT,Weather.WEATHER_OVERCAST,
                         Weather.WEATHER_SNOW,Weather.WEATHER_HAIL,"自定义"};
@@ -462,7 +470,9 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_btn_label:{
                 android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
                 dialog.setTitle("请输入标签");
-                dialog.setMessage("可输入多个标签，但请用英文#隔开。\ne.g:#美食##周末#");
+                if(!removeTip){
+                    dialog.setMessage("可输入多个标签，但请用英文#隔开。\ne.g:#美食##周末#");
+                }
                 EditText editText = new EditText(KeepDiaryActivity.this);
                 editText.setBackgroundResource(R.drawable.background_input);
                 editText.setMinLines(4);

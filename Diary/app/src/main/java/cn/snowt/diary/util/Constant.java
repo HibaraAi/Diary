@@ -37,8 +37,8 @@ public class Constant {
      */
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
             "QQ：3192233122(注明添加缘由)\n" +
-            "版本: 1.3.2\n" +
-            "更新日期: 2022-05-29\n" +
+            "版本: 1.3.3\n" +
+            "更新日期: 2022-09-18\n" +
             "开源代码(长按复制): https://github.com/HibaraAi/Diary";
 
     /**
@@ -128,18 +128,30 @@ public class Constant {
             "Q10：跨设备迁移记录具体如何操作？\n" +
             "A：1.旧设备中导出一个备份文件。" +
             "2.在新设备中恢复备份文件的记录。" +
-            "3.将旧设备的图片（视频）资源(外部存储根目录/Hibara/Diary/image  和  外部存储根目录/Hibara/Diary/video)复制到新设备的对应目录下。\n";
+            "3.将旧设备的图片（视频）资源(外部存储根目录/Hibara/Diary/image  和  外部存储根目录/Hibara/Diary/video)复制到新设备的对应目录下。\n" +
+            "Q11：为什么我的设备升级Android11（或更高）后，我的图片看不见了？" +
+            "A：Android10和Android11的存储权限设计不一样，所以软件所要的权限也不一样，" +
+            "请在“修改头像”的地方重新申请权限。" +
+            "（或者在系统设置的权限管理中，将消消乐的“媒体和文件”权限设置为“所有文件”）。" +
+            "未来会重现设计软件的存储策略，以后将不用申请存储权限。当然就得看我什么时候有兴趣更新了hhhhhhhh";
     public static final String STRING_HELP_7 = "\n七、写在最后\n" +
             "1.本软件不会盗取你任何数据，下面有开源代码可查。同样的，" +
             "如果你在使用本软件的过程中，产生无论何种形式的损失，都与本作者无关。\n" +
             "2.更多软件功能并没有在这里写明，你可以自行发现，例如可以长按日记文本进行复制等操作。\n" +
-            "3.软件兼容性，1080p、2k、2.5k屏幕使用应该不会有什么问题，其他分辨率设备没试。Android 10以下的设备不能安装。\n" +
+            "3.软件兼容性，Android 10以下的设备不能安装。Android11及以上版本可能存在适配问题，鸿蒙适配。目前正抓紧适配中。1080p、2k、2.5k屏幕使用应该不会有什么问题，其他分辨率设备没试。\n" +
             "4.不要去系统中手动“删除数据”，“删除数据”相当于重装，这会删除软件所有的已存储数据。“清空缓存”可以，但是本应用提供了缓存清除功能。其实缓存归安卓系统自动管理，你大可不必自己去清空\n" +
             "\n八、本次更新内容\n" +
-            "1. 新增字数段统计，修复雨天统计错误的bug\n" +
-            "2. 纪念日的结束时间可更改\n" +
-            "3. 图库、视频库、查看大图和纪念日界面加入敏感界面范畴，可禁止截屏\n" +
-            "4. 提示更换输入法\n";
+            "1. 离线点赞的设计\n" +
+            "2. 可设置去除多余的提示(试用)\n" +
+            "3. 自动备份功能(试用)\n" +
+            "4. 压缩软件安装大小\n" +
+            "5. 修复会被其他软件绕过登录的bug\n" +
+            "6. 其他小优化\n" +
+            "\n九、待更新内容\n" +
+            "1. 解决Android11及以上的版本可能遇到的视频播放问题\n" +
+            "2. 更换存储策略，去除外部存储的读写权限申请\n" +
+            "3. 输入框弹出时，输入法一并弹出\n" +
+            "4. 数据分析的优化\n";
     public static final String STRING_HELP = STRING_HELP_1+STRING_HELP_2+STRING_HELP_3+STRING_HELP_4+STRING_HELP_5+STRING_HELP_6+STRING_HELP_7;
 
     public static final String SHARE_PREFERENCES_HEAD_SRC = "headSrc";
@@ -149,6 +161,8 @@ public class Constant {
     public static final String SHARE_PREFERENCES_PRIVATE_KEY = "private_key";
     public static final String SHARE_PREFERENCES_PUBLIC_KEY = "public_key";
     public static final String SHARE_PREFERENCES_DIARY_FONT_SIZE = "font_size";
+    public static final String SHARE_PREFERENCES_AUTO_BACKUP_PIN = "auto_backup_pin";
+    public static final String SHARE_PREFERENCES_AUTO_BACKUP_LATEST_DAIRY = "latest_backup_diary";
 
     public static final int OPEN_ALBUM_TYPE_HEAD = 1;
     public static final int OPEN_ALBUM_TYPE_MAIN_BG = 2;
@@ -167,6 +181,12 @@ public class Constant {
      * 本应用在外部存储使用的路径名称
      */
     public static final String EXTERNAL_STORAGE_LOCATION = "/Hibara/Diary/";
+
+    /**
+     * 自动备份日记的文件名
+     */
+    public static final String AUTO_BACKUP_FILE_NAME = "Diary_AutoBackup.dll";
+
 
     /**
      * 开启测试功能的测试码

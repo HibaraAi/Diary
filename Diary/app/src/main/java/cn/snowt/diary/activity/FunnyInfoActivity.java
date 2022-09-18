@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,7 +47,14 @@ public class FunnyInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_funny_info);
         bindViewAndSetListener();
-        showFunnyInfo();
+        try {
+            showFunnyInfo();
+        } catch (Exception e){
+            SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+            edit.remove(FunnyInfoServiceImpl.LAST_FUNNY_INFO_IN_SP_NAME);
+            edit.remove(FunnyInfoServiceImpl.FUNNY_INFO_IN_SP_NAME);
+            edit.apply();
+        }
     }
 
     private void showFunnyInfo() {

@@ -21,3 +21,13 @@
 #-renamesourcefileattribute SourceFile
 -keep class org.litepal.** {*;}
 -keep class * extends org.litepal.crud.LitePalSupport {*;}
+-dontwarn com.alibaba.fastjson.**
+-keep class com.alibaba.fastjson.** { *; }
+-keepattributes Signature
+-keepattributes Annotation
+-keepattributes InnerClasses
+
+-keep class cn.snowt.diary.service.DiaryService {*;}
+-keep class cn.snowt.diary.service.impl.DiaryServiceImpl {*;}
+-keep class cn.snowt.diary.util.Constant {*;}
+-keep class cn.snowt.diary.vo.DiaryVoForBackup {*;}

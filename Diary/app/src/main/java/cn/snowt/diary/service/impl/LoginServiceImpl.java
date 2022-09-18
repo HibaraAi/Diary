@@ -11,11 +11,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.MD5Utils;
+import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 
@@ -27,6 +30,7 @@ import cn.snowt.diary.vo.DiaryVo;
 public class LoginServiceImpl implements LoginService {
     public static final String TAG = "LoginService";
     private final SharedPreferences sharedPreferences = BaseUtils.getSharedPreference();
+    private final DiaryService diaryService = new DiaryServiceImpl();
 
     @Override
     public SimpleResult login(String inputPassword) {
@@ -83,21 +87,32 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public void doFirstLoginOfTheDay() {
-        String tip = "";
-        //查询往年今日
-        List<DiaryVo> voList = new DiaryServiceImpl().getFormerYear(new Date());
-        if(!voList.isEmpty()){
-            tip = "[往年今日]有"+voList.size()+"条记录。\n";
+        //1.读取是否有往年今日内容
+        //2.纪念日是否逢整百天整年
+        if (MyConfiguration.getInstance().isNeedFirstLoginNotice()) {
+            String tip = "";
+            //查询往年今日
+            List<DiaryVo> voList = new DiaryServiceImpl().getFormerYear(new Date());
+            if(!voList.isEmpty()){
+                tip = "[往年今日]有"+voList.size()+"条记录。\n";
+            }
+            //查询今天是否是纪念日整百/整年
+            String haveSpecialCount = new SpecialDayServiceImpl().haveSpecialCount();
+            tip += haveSpecialCount;
+            tip = tip.trim();
+            if(!"".equals(tip)){
+                BaseUtils.longTextSysNotice(LitePalApplication.getContext(),tip);
+            }
         }
-        //查询今天是否是纪念日整百/整年
-        String haveSpecialCount = new SpecialDayServiceImpl().haveSpecialCount();
-        tip += haveSpecialCount;
-        tip = tip.trim();
-        if(!"".equals(tip)){
-            BaseUtils.longTextSysNotice(LitePalApplication.getContext(),tip);
-        }
+        //3.清除沙盒中的cache
         File externalCacheDir = LitePalApplication.getContext().getExternalCacheDir();
         FileUtils.deleteFolder(externalCacheDir.getAbsolutePath());
+        //4.自动备份日记
+        //有存储权限且设置了要备份才继续
+        if (PermissionUtils.haveExternalStoragePermission(LitePalApplication.getContext())
+                && BaseUtils.getDefaultSharedPreferences().getBoolean("autoBackup",false)) {
+            diaryService.autoBackupDiary();
+        }
     }
 
     @Override

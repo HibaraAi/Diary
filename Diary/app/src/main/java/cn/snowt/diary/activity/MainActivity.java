@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DiaryAdapter diaryAdapter;
     private MyConfigurationService configurationService = new MyConfigurationServiceImpl();
+    boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,12 +121,12 @@ public class MainActivity extends AppCompatActivity {
         //读取往年今日等提醒
         new Thread(() -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             LoginService loginService = new LoginServiceImpl();
-            if (MyConfiguration.getInstance().isNeedFirstLoginNotice() && loginService.isFirstLoginInTheDay()) {
+            if (loginService.isFirstLoginInTheDay()) {
                 loginService.doFirstLoginOfTheDay();
             }
         }).start();
@@ -174,7 +175,11 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_time:{
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("查找指定时间段的日记");
-                    builder.setMessage("提示：如果时间段内的日记数量很多，则查找过程可能会很久，尽量缩短查找时间段。\n只选一个日期则查找当天的日记\n");
+                    if(!removeTip){
+                        builder.setMessage("提示：如果时间段内的日记数量很多，则查找过程可能会很久，尽量缩短查找时间段。\n只选一个日期则查找当天的日记\n");
+                    }else{
+                        builder.setMessage("\n");
+                    }
                     TextView timeOne = new TextView(MainActivity.this);
                     TextView timeTwo = new TextView(MainActivity.this);
                     timeOne.setOnClickListener(v->{
@@ -296,17 +301,11 @@ public class MainActivity extends AppCompatActivity {
         if(null!=headImgInSp){
             Glide.with(MainActivity.this).load(headImgInSp).into(headImg);
         }
-        this.headImg.setOnClickListener(v->{
-//            if(null!=headImgInSp){
-//                Intent intent = new Intent(MainActivity.this,ZoomImageActivity.class);
-//                intent.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,headImgInSp);
-//                startActivity(intent);
-//                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像");
-//            }else{
-//                BaseUtils.shortTipInCoast(MainActivity.this,"短按查看大图，长按更换头像\n(但你还没有更换自己的头像)");
-//            }
-            BaseUtils.shortTipInSnack(this.headImg,"长按修改头像 OvO");
-        });
+        if(!removeTip){
+            this.headImg.setOnClickListener(v->{
+                BaseUtils.shortTipInSnack(this.headImg,"长按修改头像 OvO");
+            });
+        }
         this.headImg.setOnLongClickListener(v -> {
             //判断有没有外部存储的写入权限
             if(PermissionUtils.haveExternalStoragePermission(MainActivity.this)){
@@ -370,9 +369,11 @@ public class MainActivity extends AppCompatActivity {
         if(null!=bgImg){
             Glide.with(MainActivity.this).load(bgImg).into(mainImageBg);
         }
-        mainImageBg.setOnClickListener(v->{
-            BaseUtils.shortTipInSnack(mainImageBg,"长按修改背景图 QaQ");
-        });
+        if(!removeTip){
+            mainImageBg.setOnClickListener(v->{
+                BaseUtils.shortTipInSnack(mainImageBg,"长按修改背景图 QaQ");
+            });
+        }
         mainImageBg.setOnLongClickListener(v->{
             //判断有没有外部存储的写入权限
             if(PermissionUtils.haveExternalStoragePermission(MainActivity.this)){

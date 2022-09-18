@@ -28,11 +28,6 @@ public interface LoginService {
 
     /**
      * 当天第一次登录，执行一些操作
-     * 1.读取是否有往年今日内容
-     * 2.纪念日是否逢整百天整年
-     * 3.清除沙盒中的cache
-     * 2022-01-27补充：设计实现歧义，这个方法目前只有开启每日登录提示
-     * 才会被调用所有这个方法不应该叫doFirstLoginOfTheDay
      */
     void doFirstLoginOfTheDay();
 

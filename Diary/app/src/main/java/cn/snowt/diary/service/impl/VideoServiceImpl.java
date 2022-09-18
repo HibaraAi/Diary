@@ -34,7 +34,7 @@ public class VideoServiceImpl implements VideoService {
                     List<Video> videos = result.get((Integer) diaryId);
                     assert videos != null;
                     videos.add(video);
-                    result.put(diaryId,videos);
+                    //result.put(diaryId,videos);
                 }else{
                     List<Video> list = new ArrayList<>();
                     list.add(video);

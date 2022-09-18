@@ -221,7 +221,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder.setTitle("存储权限申请");
         builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，" +
-                "你之后可以在“帮助”中看到申请的权限用在何处。本软件不会偷盗你的任何数据，放心使用。" +
+                "你之后可以在“帮助”中看到申请的权限用在何处。" +
                 "\n\n你可以拒绝授权，但涉及存储的功能，你都用不了。（你可以在后续使用中重新授予权限）");
         builder.setPositiveButton("了解", (dialog, which) -> PermissionUtils.applyExternalStoragePermission(LoginActivity.this,1));
         builder.show();

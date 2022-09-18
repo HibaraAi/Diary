@@ -15,6 +15,8 @@ import org.litepal.LitePalApplication;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,7 +190,8 @@ public class DiaryServiceImpl implements DiaryService {
             //存储图片关系
             @SuppressLint("SimpleDateFormat")
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-            String nowMonth = sdf.format(new Date());
+            //String nowMonth = sdf.format(new Date());
+            String nowMonth = sdf.format(date);
             File path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION+"image/"+nowMonth+"/");
             if(!path.exists()){
                 Log.i(TAG,"------创建目录"+path.getAbsolutePath());
@@ -1055,6 +1058,90 @@ public class DiaryServiceImpl implements DiaryService {
             return -1;
         }else{
             return diary.getId();
+        }
+    }
+
+    @Override
+    public void autoBackupDiary() {
+        String pin = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_PIN, "");
+        String publicKey = MyConfiguration.getInstance().getPublicKey();
+        String latestBackupStr = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_LATEST_DAIRY, "1998-01-01 00:00:00");
+        Date latestBackupDate = BaseUtils.stringToDate(latestBackupStr);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DAY_OF_MONTH,-3);
+        Date calendarTime = calendar.getTime();
+        if(!"".equals(pin) && null!=latestBackupDate && calendarTime.after(latestBackupDate)){
+            //按时间排序是希望恢复日记时能按照日记顺序恢复，方便操作日记引用
+            List<Diary> diaryList = LitePal.order("modifiedDate asc").find(Diary.class);
+            if(diaryList.isEmpty()){
+
+            }else{
+                //1.读取日记
+                List<DiaryVoForBackup> vos = new ArrayList<>(diaryList.size());
+                diaryList.forEach(diary -> {
+                    DiaryVoForBackup vo = new DiaryVoForBackup();
+                    vo.setEncryption(diary.getEncryption());
+                    vo.setContent(diary.getContent());
+                    vo.setLabelStr(diary.getLabel());
+                    vo.setModifiedDate(diary.getModifiedDate());
+                    if(null!=diary.getLocationId()){
+                        vo.setLocation(LitePal.find(Location.class, diary.getLocationId()));
+                    }
+                    if(null!=diary.getWeatherId()){
+                        vo.setWeather(LitePal.find(Weather.class,diary.getWeatherId()));
+                    }
+                    vo.setCommentList(LitePal.where("diaryId = ?",diary.getId()+"").find(Comment.class));
+                    vo.setDrawingList(LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class));
+                    vo.setVideoList(LitePal.where("diaryId = ?",diary.getId()+"").find(Video.class));
+                    vo.setQuoteDiaryUuid(diary.getQuoteDiaryUuid());
+                    vo.setMyUuid(diary.getMyUuid());
+                    vos.add(vo);
+                });
+                //读取纪念日
+                SpecialDayService specialDayService = new SpecialDayServiceImpl();
+                List<SpecialDay> specialDays = specialDayService.getAll();
+                //读取同名标签设置
+                String sameLabel = BaseUtils.getSharedPreference().getString("sameLabel", "");
+                //2.封装数据
+                Map<String,Object> map = new HashMap<>();
+                String uuid = UUID.randomUUID().toString();
+                map.put(Constant.BACKUP_ARGS_NAME_UUID,uuid);
+                map.put(Constant.BACKUP_ARGS_NAME_DATA_NAME,vos);
+                map.put(Constant.BACKUP_ARGS_NAME_PUBLIC_KEY,publicKey);
+                map.put(Constant.BACKUP_ARGS_NAME_PIN_KEY, MD5Utils.encrypt(Constant.PASSWORD_PREFIX+pin));
+                map.put(Constant.BACKUP_ARGS_NAME_VERSION,Constant.INTERNAL_VERSION);
+                map.put(Constant.BACKUP_ARGS_NAME_ENCODE_UUID,MD5Utils.encrypt(Constant.PASSWORD_PREFIX+uuid));
+                map.put("SpecialDay",specialDays);
+                map.put("sameLabel",sameLabel);
+                String mapJson = JSON.toJSONString(map);
+                //3.输出文件
+                FileWriter writer = null;
+                try {
+                    File externalDirectory = Environment.getExternalStoragePublicDirectory("/Hibara/");
+                    if (!externalDirectory.exists()){
+                        externalDirectory.mkdirs();
+                    }
+                    File file = new File(externalDirectory.getAbsolutePath() + "/" + Constant.AUTO_BACKUP_FILE_NAME);
+                    writer = new FileWriter(file);
+                    writer.write(mapJson);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        writer.flush();
+                        writer.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            String dateToString = BaseUtils.dateToStringWithout(new Date());
+            SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+            edit.putString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_LATEST_DAIRY,dateToString);
+            edit.apply();
+            //BaseUtils.simpleSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
+            BaseUtils.longTextSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
         }
     }
 

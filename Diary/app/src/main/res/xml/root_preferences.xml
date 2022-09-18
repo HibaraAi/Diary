@@ -85,16 +85,20 @@
             app:key="ascRead"
             app:title="时间升序浏览"
             app:summary="和主界面的浏览顺序反过来查看日记"/>
-        <Preference
-            app:key="thanks"
-            app:title="感谢名单"
-            app:summary="感谢为本软件做出过贡献的人"/>
         <SwitchPreferenceCompat
             app:key="inputTip"
             app:defaultValue="false"
             app:title="提示切换输入法"
             app:summaryOn="当前: 开启提示。建议安装多一个单机输入法来编辑日记。作者已安装，但总是忘了切换，因此加一个日记编辑界面的提示😁"
             app:summaryOff="当前: 关闭提示。建议安装多一个单机输入法来编辑日记。作者已安装，但总是忘了切换，因此加一个日记编辑界面的提示😁"/>
+        <Preference
+            app:key="thanks"
+            app:title="感谢名单"
+            app:summary="感谢为本软件做出过贡献的人"/>
+        <Preference
+            app:key="pay"
+            app:title="为本软件点赞"
+            app:summary="👍👍👍"/>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="导出/导入">
@@ -124,33 +128,32 @@
             app:title="清除外部存储数据"/>
     </PreferenceCategory>
 
-<!--    <PreferenceCategory app:title="测试区">-->
-<!--        <Preference-->
-<!--            app:key="testFun"-->
-<!--            app:title="开启/关闭测试功能" />-->
+    <PreferenceCategory app:title="测试区">
+        <Preference
+            app:key="testFun"
+            app:title="开启/关闭测试功能" />
 
-<!--        <SwitchPreferenceCompat-->
-<!--            app:key="saveImageInExRom"-->
-<!--            app:defaultValue="true"-->
-<!--            app:enabled="false"-->
-<!--            app:summaryOff="当前:使用图片原始地址，节约ROM使用。如果选中图片被删除/移动/修改名字则日记展示失效。\n此修改仅对今后新增日记生效。"-->
-<!--            app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"-->
-<!--            app:title="日记图片额外存储"/>-->
+        <SwitchPreferenceCompat
+            app:key="saveImageInExRom"
+            app:defaultValue="true"
+            app:enabled="false"
+            app:summaryOff="当前:使用图片原始地址，节约ROM使用。如果选中图片被删除/移动/修改名字则日记展示失效。\n此修改仅对今后新增日记生效。"
+            app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"
+            app:title="日记图片额外存储"/>
 
-<!--        <SwitchPreferenceCompat-->
-<!--            app:key="customDate"-->
-<!--            app:defaultValue="false"-->
-<!--            app:enabled="false"-->
-<!--            app:title="日记自定义日期"-->
-<!--            app:summary="写日记时可以自行输入日期时间" />-->
+        <SwitchPreferenceCompat
+            app:key="autoBackup"
+            app:defaultValue="false"
+            app:enabled="false"
+            app:title="自动备份"
+            app:summary="定期输出一个备份文件" />
 
-<!--        <SwitchPreferenceCompat-->
-<!--            app:key="allowDelSpDay"-->
-<!--            app:defaultValue="false"-->
-<!--            app:enabled="false"-->
-<!--            app:title="允许删除纪念日"-->
-<!--            app:summary="开启后,在纪念日详情页可以点击删除按钮" />-->
+        <SwitchPreferenceCompat
+            app:key="removeTip"
+            app:defaultValue="false"
+            app:enabled="false"
+            app:title="关闭提示"
+            app:summary="我对软件很了解了!为了美观而去除部分提示" />
 
-
-<!--    </PreferenceCategory>-->
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -62,6 +62,7 @@ import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 import cn.snowt.mine.MineGameActivity;
+import cn.snowt.note.NoteActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -162,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()){
                 case R.id.nav_mine:{
                     BaseUtils.gotoActivity(MainActivity.this, MineGameActivity.class);
+                    break;
+                }
+                case R.id.nav_note:{
+                    BaseUtils.gotoActivity(MainActivity.this, NoteActivity.class);
                     break;
                 }
                 case R.id.nav_settings:{

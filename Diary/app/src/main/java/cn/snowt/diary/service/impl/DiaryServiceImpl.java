@@ -366,12 +366,20 @@ public class DiaryServiceImpl implements DiaryService {
         //地址
         if(null!=diary.getLocationId()){
             Location location = LitePal.find(Location.class, diary.getLocationId());
-            vo.setLocationStr(location.getLocationString());
+            if(null==location){
+                vo.setLocationStr("");
+            }else{
+                vo.setLocationStr(location.getLocationString());
+            }
         }
         //天气
         if(null!=diary.getWeatherId()){
             Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
-            vo.setWeatherStr(weather.getWeather());
+            if(null==weather){
+                vo.setWeatherStr("");
+            }else{
+                vo.setWeatherStr(weather.getWeather());
+            }
         }
         //图片
         List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class);
@@ -840,12 +848,21 @@ public class DiaryServiceImpl implements DiaryService {
             //地址
             if(null!=diary.getLocationId()){
                 Location location = LitePal.find(Location.class, diary.getLocationId());
-                vo.setLocationStr(location.getLocationString());
+                if(null==location){
+                    vo.setLocationStr("");
+                }else{
+                    vo.setLocationStr(location.getLocationString());
+                }
             }
             //天气
             if(null!=diary.getWeatherId()){
                 Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
-                vo.setWeatherStr(weather.getWeather());
+                if(null==weather){
+                    vo.setWeatherStr("");
+                }else{
+                    vo.setWeatherStr(weather.getWeather());
+                }
+
             }
             //图片
             List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class);
@@ -942,12 +959,21 @@ public class DiaryServiceImpl implements DiaryService {
             //地址
             if(null!=diary.getLocationId()){
                 Location location = LitePal.find(Location.class, diary.getLocationId());
-                vo.setLocationStr(location.getLocationString());
+                if(null==location){
+                    vo.setLocationStr("");
+                }else{
+                    vo.setLocationStr(location.getLocationString());
+                }
             }
             //天气
             if(null!=diary.getWeatherId()){
                 Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
-                vo.setWeatherStr(weather.getWeather());
+                if(null==weather){
+                    vo.setWeatherStr("");
+                }else{
+                    vo.setWeatherStr(weather.getWeather());
+                }
+
             }
             vo.setPicNum(drawingService.getDrawingsByDiaryId(vo.getId()).size());
             List<Comment> commentList = commentService.getDecodeCommentByDiaryId(vo.getId());

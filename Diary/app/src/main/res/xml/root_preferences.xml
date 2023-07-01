@@ -43,6 +43,11 @@
             app:summaryOn="当前：不允许截屏/录屏。\n软件重启后生效"/>
 
         <Preference
+            app:key="loginType"
+            app:title="伪装方式"
+            app:summary="选择登录方式" />
+
+        <Preference
             app:key="setPassword"
             app:title="修改登录密码"
             app:summary="我也要有灰字提示QaQ😤"/>

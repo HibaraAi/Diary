@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/toolbar_finish"
+        android:icon="@drawable/bar_finish"
+        android:title="已完成"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/toolbar_add"
+        android:icon="@drawable/bar_add"
+        android:title="新增"
+        app:showAsAction="always"/>
+</menu>

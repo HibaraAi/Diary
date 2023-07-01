@@ -468,6 +468,39 @@ public class SettingsActivity extends AppCompatActivity {
                     BaseUtils.gotoActivity((Activity)context,PayActivity.class);
                     break;
                 }
+                case "loginType":{
+                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
+                    dialog.setTitle("伪装方式");
+                    String[] items = {"手动登录(默认)","自动登录","便签界面(新增一个“123”便签跳转登录)"};
+                    final int[] selectId = new int[1];
+                    dialog.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            switch (which) {
+                                case 1:{
+                                    selectId[0] = LoginActivity.LOGIN_TYPE_AUTO_LOGIN; break;
+                                }
+                                case 2:{
+                                    selectId[0] = LoginActivity.LOGIN_TYPE_GOTO_NOTE;break;
+                                }
+                                default:{
+                                    selectId[0] = LoginActivity.LOGIN_TYPE_DEFAULT;break;
+                                }
+                            }
+                        }
+                    });
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("确定", (dialog12, which) -> {
+                        SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+                        edit.putInt("loginType", selectId[0]);
+                        edit.apply();
+                        BaseUtils.shortTipInCoast(context,"重启后生效");
+                    });
+                    dialog.setNegativeButton("取消", null);
+                    dialog.show();
+                    break;
+                }
                 default:return false;
             }
             return true;

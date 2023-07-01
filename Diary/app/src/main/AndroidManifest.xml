@@ -118,6 +118,16 @@
             android:launchMode="singleTop"
             android:theme="@style/TopTransparent" /> <!-- 登录界面 -->
         <activity
+            android:name="cn.snowt.note.FinishActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/TopTransparent" /><!--已完成的便签-->
+        <activity
+            android:name="cn.snowt.note.NoteActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/TopTransparent" /><!--便签列表-->
+        <activity
             android:name=".activity.LoginActivity"
             android:exported="true">
             <intent-filter>

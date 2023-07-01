@@ -39,6 +39,7 @@ import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.mine.MineGameActivity;
+import cn.snowt.note.NoteActivity;
 
 /**
  * @Author: HibaraAi
@@ -46,6 +47,9 @@ import cn.snowt.mine.MineGameActivity;
  * @Description: 登录界面
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+    public static Integer LOGIN_TYPE_AUTO_LOGIN = 1;
+    public static Integer LOGIN_TYPE_DEFAULT= 2;
+    public static Integer LOGIN_TYPE_GOTO_NOTE= 3;
 
     private  Button[] buttons = new Button[12];
     private TextView password;
@@ -57,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         autoNight();
+        loadLoginType();
         //横屏、竖屏的布局处理
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.activity_login_h);
@@ -66,6 +71,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         bindViewAndSetListener();
         doWhenFirstLogin();
         initKeyboard();
+    }
+
+    private void loadLoginType() {
+        int loginType = BaseUtils.getSharedPreference().getInt("loginType", LOGIN_TYPE_DEFAULT);
+        switch (loginType){
+            //LOGIN_TYPE_GOTO_NOTE= 3;
+            case 3:{
+                if (!getIntent().getBooleanExtra("trueLogin",false)) {
+                    BaseUtils.gotoActivity(LoginActivity.this,NoteActivity.class);
+                    finish();
+                }
+                break;
+            }
+            //LOGIN_TYPE_AUTO_LOGIN = 1;
+            case 1:{
+                BaseUtils.gotoActivity(LoginActivity.this,MainActivity.class);
+                finish();
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     /**
@@ -159,6 +186,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String gameTag = "123";
                 if(gameTag.equals(pinUserInput)){
                     BaseUtils.gotoActivity(this, MineGameActivity.class);
+                    this.finish();
+                    return;
+                }
+                //便签跳转
+                String noteTag = "456";
+                if(noteTag.equals(pinUserInput)){
+                    BaseUtils.gotoActivity(this, NoteActivity.class);
                     this.finish();
                     return;
                 }

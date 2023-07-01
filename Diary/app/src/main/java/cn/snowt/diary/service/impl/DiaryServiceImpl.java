@@ -91,12 +91,20 @@ public class DiaryServiceImpl implements DiaryService {
             //地址
             if(null!=diary.getLocationId()){
                 Location location = LitePal.find(Location.class, diary.getLocationId());
-                vo.setLocationStr(location.getLocationString());
+                if(null==location){
+                    vo.setLocationStr("");
+                }else{
+                    vo.setLocationStr(location.getLocationString());
+                }
             }
             //天气
             if(null!=diary.getWeatherId()){
                 Weather weather = LitePal.find(Weather.class, diary.getWeatherId());
-                vo.setWeatherStr(weather.getWeather());
+                if(null==weather){
+                    vo.setWeatherStr("");
+                }else{
+                    vo.setWeatherStr(weather.getWeather());
+                }
             }
             //图片
             List<Drawing> drawingList = LitePal.where("diaryId = ?",diary.getId()+"").find(Drawing.class);
@@ -511,7 +519,7 @@ public class DiaryServiceImpl implements DiaryService {
             map.put("sameLabel",sameLabel);
             String mapJson = JSON.toJSONString(map);
             //3.输出文件
-            String fileName = "XiaoXiaoLe_Backup_"+BaseUtils.dateToString(new Date())+".dll";
+            String fileName = "Backup_"+BaseUtils.dateToString(new Date()).substring(0,10)+"_"+UUID.randomUUID().toString().substring(0,4)+".dll";
             boolean saveFlag = FileUtils.saveAsFileWriter(mapJson, fileName);
             if(saveFlag){
                 String absolutePath = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION + "output/").getAbsolutePath();

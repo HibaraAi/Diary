@@ -165,7 +165,12 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     SimpleResult result = diaryService.getDiaryVoById(updateDiaryId);
                     if(result!=null){
                         DiaryVo vo = (DiaryVo)result.getData();
-                        diaryInputView.setText(vo.getContent());
+                        if(null==vo){
+                            BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"你刚刚貌似在尝试编辑已删除的日记。");
+                            KeepDiaryActivity.this.finish();
+                        }else{
+                            diaryInputView.setText(vo.getContent());
+                        }
                     }
                     addPicBtn.setEnabled(false);
                     addLabelBtn.setEnabled(false);

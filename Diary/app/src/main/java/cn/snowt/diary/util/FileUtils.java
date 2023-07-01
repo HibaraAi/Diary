@@ -52,6 +52,8 @@ public class FileUtils {
     /**
      * 将String保存到文件
      * 保存在应用外存主目录下的output文件夹下
+     *
+     * 2023-07-01注：文件名不能太长，我也不知道为啥
      * @param content 要保存的String
      * @param fileName 要保存的文件名字
      * @return

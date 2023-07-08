@@ -77,6 +77,7 @@ public class NoteActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.toolbar_add:{
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setCancelable(false);
                 builder.setTitle("新增");
                 EditText editText = new EditText(this);
                 editText.setLines(10);

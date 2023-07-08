@@ -57,6 +57,7 @@ import cn.snowt.diary.util.UriUtils;
 import cn.snowt.diary.vo.DiaryVo;
 import cn.snowt.diary.vo.DiaryVoForBackup;
 import cn.snowt.diary.vo.DiaryVoForFunny;
+import cn.snowt.note.ItemDao;
 
 /**
  * @Author: HibaraAi
@@ -514,6 +515,8 @@ public class DiaryServiceImpl implements DiaryService {
             List<SpecialDay> specialDays = specialDayService.getAll();
             //读取同名标签设置
             String sameLabel = BaseUtils.getSharedPreference().getString("sameLabel", "");
+            //读取便签数据
+            String TipJson = new ItemDao().getAllDataToJSON();
             //2.封装数据
             Map<String,Object> map = new HashMap<>();
             String uuid = UUID.randomUUID().toString();
@@ -525,6 +528,7 @@ public class DiaryServiceImpl implements DiaryService {
             map.put(Constant.BACKUP_ARGS_NAME_ENCODE_UUID,MD5Utils.encrypt(Constant.PASSWORD_PREFIX+uuid));
             map.put("SpecialDay",specialDays);
             map.put("sameLabel",sameLabel);
+            map.put("TipJson",TipJson);
             String mapJson = JSON.toJSONString(map);
             //3.输出文件
             String fileName = "Backup_"+BaseUtils.dateToString(new Date()).substring(0,10)+"_"+UUID.randomUUID().toString().substring(0,4)+".dll";
@@ -596,6 +600,9 @@ public class DiaryServiceImpl implements DiaryService {
                 if(null!=labelMap && labelMap.size()!=0){
                     labelMap.forEach((i, s) -> labelService.addSameLabel((String)s));
                 }
+                //4.处理便签
+                String tipJson = (String) map.get("TipJson");
+                new ItemDao().addFromJson(tipJson);
                 if(flag.get()){
                     result.setSuccess(true);
                     result.setMsg("从备份文件恢复成功(图片/视频资源你得自己复制，详见帮助)，共写入\n"+successNum+"条日记和\n"+successNum2+"个纪念日");

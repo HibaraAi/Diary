@@ -1,12 +1,19 @@
 package cn.snowt.note;
 
+import com.alibaba.fastjson.JSON;
+
 import org.litepal.LitePal;
+import org.litepal.crud.LitePalSupport;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class ItemDao {
+    /**
+     * 所有未完成的便签
+     * @return
+     */
     List<Item> getAllUnfinished(){
         List<Item> list = new ArrayList<>();
         List<Item> items = LitePal.order("createDate desc").find(Item.class);
@@ -60,5 +67,27 @@ public class ItemDao {
             list = new ArrayList<>();
         }
         return list;
+    }
+
+    public String getAllDataToJSON(){
+        List<Item> all = LitePal.findAll(Item.class);
+        if(all.size()==0){
+            return "";
+        }else{
+            return JSON.toJSONString(all);
+        }
+    }
+
+    public void addFromJson(String tipJson) {
+        if(null==tipJson || "".equals(tipJson)){
+            return;
+        }
+        List<Item> item = JSON.parseArray(tipJson, Item.class);
+        if(null!=item){
+            item.forEach(item1 -> {
+                item1.assignBaseObjId(0);
+                item1.save();
+            });
+        }
     }
 }

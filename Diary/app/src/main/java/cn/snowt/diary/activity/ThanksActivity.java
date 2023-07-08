@@ -31,6 +31,7 @@ public class ThanksActivity extends AppCompatActivity {
     private void initThanks(){
         thanksVoList = new ArrayList<>();
         thanksVoList.add(new ThanksVo(R.drawable.thanks_01,"戟间血：","BUG反馈--Android11的存储兼容性问题"));
+        thanksVoList.add(new ThanksVo(R.drawable.thanks_02,"看哔哩世界：","BUG反馈--“备份与恢复”功能会闪退"));
     }
 
     @Override

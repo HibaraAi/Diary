@@ -19,6 +19,8 @@ public class MyApplication extends org.litepal.LitePalApplication{
     @Override
     public void onCreate() {
         super.onCreate();
+        MyCrashHandler crashHandler = MyCrashHandler.getInstance();
+        crashHandler.init(getApplicationContext());
         LitePal.initialize(this);
 
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {

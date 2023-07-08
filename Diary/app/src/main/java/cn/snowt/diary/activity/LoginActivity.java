@@ -190,12 +190,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     return;
                 }
                 //便签跳转
-                String noteTag = "456";
-                if(noteTag.equals(pinUserInput)){
-                    BaseUtils.gotoActivity(this, NoteActivity.class);
-                    this.finish();
-                    return;
-                }
+//                String noteTag = "456";
+//                if(noteTag.equals(pinUserInput)){
+//                    BaseUtils.gotoActivity(this, NoteActivity.class);
+//                    this.finish();
+//                    return;
+//                }
                 password.setText("");
                 SimpleResult result = loginService.login(pinUserInput);
                 if(result.getSuccess()){

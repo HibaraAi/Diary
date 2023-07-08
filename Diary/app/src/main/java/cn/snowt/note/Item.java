@@ -6,8 +6,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Item extends LitePalSupport  implements Serializable {
     public static Integer STATE_FINISH = 1;
     public static Integer STATE_UNFINISHED = 2;

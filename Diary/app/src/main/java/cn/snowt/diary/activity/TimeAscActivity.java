@@ -1,11 +1,25 @@
 package cn.snowt.diary.activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.text.InputType;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -19,16 +33,29 @@ import com.scwang.smart.refresh.header.BezierRadarHeader;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
+import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.Constant;
+import cn.snowt.diary.util.MD5Utils;
+import cn.snowt.diary.util.PDFUtils;
+import cn.snowt.diary.util.PermissionUtils;
+import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
+import cn.snowt.note.FinishActivity;
+import cn.snowt.note.Item;
+import cn.snowt.note.NoteActivity;
 
 /**
  * @Author: HibaraAi
@@ -39,6 +66,7 @@ public class TimeAscActivity extends AppCompatActivity {
     public static final String OPEN_FROM_TYPE = "openFrom";
     public static final int OPEN_FROM_FORMER_YEARS = 1;
     public static final int OPEN_FROM_SIMPLE_DIARY_LIST = 2;
+    public static final int OPEN_FROM_DELETE_LIST = 3;
     private List<DiaryVo> voList = new ArrayList<>();
     private DiaryService diaryService = new DiaryServiceImpl();
     private DiaryAdapter diaryAdapter;
@@ -47,6 +75,8 @@ public class TimeAscActivity extends AppCompatActivity {
     private RecyclerView recyclerView = null;
     private FloatingActionButton fab;
     private ActionBar actionBar;
+    private Integer intExtra;
+    private List<Integer> realToDelIds = new ArrayList<>();  //批量删除中，真正需要删除的Id
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -60,7 +90,7 @@ public class TimeAscActivity extends AppCompatActivity {
         setContentView(R.layout.activity_time_asc);
         bindViewAndSetListener();
         Intent intent = getIntent();
-        int intExtra = intent.getIntExtra(OPEN_FROM_TYPE, -1);
+        intExtra = intent.getIntExtra(OPEN_FROM_TYPE, -1);
         switch (intExtra){
             case OPEN_FROM_FORMER_YEARS:{
                 actionBar.setTitle("往年今日");
@@ -73,6 +103,22 @@ public class TimeAscActivity extends AppCompatActivity {
                 stopRefreshLayout();
                 showByIds(intent.getIntegerArrayListExtra("ids"),intent.getIntExtra("sortType",1));
                 break;
+            }
+            case OPEN_FROM_DELETE_LIST:{
+                ArrayList<Integer> delIds = intent.getIntegerArrayListExtra("delIds");
+                //处理ids到diaryVoList
+                delIds.forEach(id->{
+                    SimpleResult result = diaryService.getDiaryVoById(id);
+                    if(result.getSuccess()){
+                        //只有成功查到的才展示
+                        realToDelIds.add(id);
+                        voList.add((DiaryVo) result.getData());
+                    }
+                });
+                actionBar.setTitle("批量删除-条数:"+realToDelIds.size());
+                stopRefreshLayout();
+                BaseUtils.alertDialogToShow(this,"最后一次提示","这些是你选中且数据库中存在的项目，请浏览确认。\n\n下一个删除按钮将不再有任何提示！");
+               break;
             }
             default:{
                 getDiaryForFirstShow();
@@ -137,9 +183,11 @@ public class TimeAscActivity extends AppCompatActivity {
         });
         recyclerView = findViewById(R.id.asc_recyclerview);
         refreshLayout = findViewById(R.id.asc_refresh);
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);
         refreshLayout.setRefreshHeader(new BezierRadarHeader(this)
                 .setEnableHorizontalDrag(true)
-                .setPrimaryColor(Color.parseColor("#FA7298")));
+                .setPrimaryColor(typedValue.data));
         refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.FixedBehind));
         refreshLayout.setOnRefreshListener(refreshLayout -> {
             refreshDiary();
@@ -194,6 +242,7 @@ public class TimeAscActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -201,8 +250,82 @@ public class TimeAscActivity extends AppCompatActivity {
                 finish();
                 break;
             }
+            case R.id.toolbar_time_asc_flow:{
+                Context context = TimeAscActivity.this;
+                if(!PermissionUtils.haveExternalStoragePermission(context)){
+                    BaseUtils.shortTipInSnack(recyclerView,"没有外部存储权限，不允许导出！");
+                    break;
+                }
+                android.app.AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("验证你的身份");
+                builder.setMessage("\n\n将临时信息流的日记导出到一个PDF文件中，如果你在信息流删除了某个日记，请重新进入信息流，否则会导出失败。");
+                EditText pinView = new EditText(context);
+                pinView.setHint("输入登陆密码");
+                pinView.setBackgroundResource(R.drawable.background_input);
+                pinView.setMinLines(2);
+                pinView.setMaxLines(2);
+                builder.setView(pinView);
+                builder.setCancelable(false);
+                pinView.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                builder.setPositiveButton("验证密码并导出PDF", (dialog, which) -> {
+                    String pinInput = pinView.getText().toString();
+                    //空输入
+                    if("".equals(pinInput)){
+                        BaseUtils.longTipInCoast(context,"你不验证密码我就不导出。");
+                    }//密码不对
+                    else if (!BaseUtils.getSharedPreference().getString("loginPassword","")
+                            .equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX+pinInput))){
+                        BaseUtils.longTipInCoast(context,"登录密码不对!!!");
+                    }//导出PDF
+                    else{
+                        new Thread(() -> {
+                            PDFUtils.createPdf(voList,TimeAscActivity.this,(ViewGroup) fab.getParent());
+                            BaseUtils.simpleSysNotice(TimeAscActivity.this,"PDF导出成功！");
+                        }).start();
+                        final String tip = "已开始导出PDF，完成时将在通知栏通知你。(过程比较慢，在一次导出完成前，请不要再次发起导出PDF请求。)\n\n导出的文件存放路径为【Hibara\\Dairy\\putput\\PDF】\n\n";
+                        BaseUtils.alertDialogToShow(this,"提示",tip);
+                    }
+                });
+                builder.setNegativeButton("取消",null);
+                builder.show();
+                break;
+            }
+            case R.id.toolbar_day_sel:{
+                if(realToDelIds.size()>0){
+                    new Thread(() -> realToDelIds.forEach(id-> diaryService.deleteById(id))).start();
+                    BaseUtils.shortTipInCoast(this,"删除已在后台进行...");
+                }else{
+                    BaseUtils.shortTipInCoast(this,"0条数据，不需要执行删除操作.");
+                }
+                finish();
+                break;
+            }
             default:break;
         }
         return true;
     }
+
+    /**
+     * 根据当前界面类型，动态展示右上角的标题栏按钮，仅在临时信息流可以导出pdf
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        switch (intExtra) {
+            //如果是临时信息流，展示“导出为PDF”按钮
+            case OPEN_FROM_SIMPLE_DIARY_LIST:{
+                getMenuInflater().inflate(R.menu.toolbar_time_asc,menu);
+                break;
+            }
+            //如果是批量删除，展示”删除“按钮
+            case OPEN_FROM_DELETE_LIST:{
+                getMenuInflater().inflate(R.menu.toolbar_day_detail,menu);
+                break;
+            }
+            default:break;
+        }
+        return true;
+    }
+
 }

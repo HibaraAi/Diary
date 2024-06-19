@@ -99,7 +99,7 @@ public class FunnyInfoActivity extends AppCompatActivity {
         list.add("消消乐一共陪你度过"+info.getRainSumInDiary()+"个下雨天");
         list.add("你一共记录过"+info.getSpecialDaySum()+"个特殊日期");
         list.add("目前为止你所有日记加评论，字数已经达到了"+info.getNumOfTotalWords()+"个");
-        list.add("扫雷最快通关秒数是"+info.getFastestGame());
+//        list.add("扫雷最快通关秒数是"+info.getFastestGame());
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
                 list);

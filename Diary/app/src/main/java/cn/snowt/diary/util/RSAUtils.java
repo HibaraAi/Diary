@@ -34,7 +34,7 @@ public class RSAUtils {
     public static String UTF8 = "UTF-8";
 
     /**
-     * 密钥长度，DSA算法的默认密钥长度是1024
+     * 密钥长度，RSA算法的默认密钥长度是1024位
      * 密钥长度必须是64的倍数，在512到65536位之间
      * */
     private static final int KEY_SIZE=1024*2;
@@ -80,6 +80,45 @@ public class RSAUtils {
 //        }
 //        return null;
 //    }
+
+    /**
+     * 解密密文的前面部分的一些数据，需要你提供分片数needSliceNum，一个分片的长度为(KEY_SIZE / 8)-1，
+     * 此RSAUtils的分片长度为255，可以解密出汉字约85-88个（目前并不晓得为啥是这个数字）
+     *
+     * @param s 需要解密的密文
+     * @param decodeKey 解密密钥
+     * @param needSliceNum 需要解密多少个分片
+     * @return 解密好的字符串
+     */
+    public static String decodePartial(String s,String decodeKey,int needSliceNum){
+        byte[] trueDecodeKey = Base64.decode(decodeKey, Base64.DEFAULT);
+        byte[] originalBytes = Base64.decode(s, Base64.DEFAULT);
+        //分片长度
+        int sliceLength = (KEY_SIZE / 8)-1;
+        //分片个数
+        int sliceNum = originalBytes.length/(sliceLength+1);
+        //更换解密的分片数，达到解密前面的一部分数据
+        if(sliceNum>needSliceNum){
+            sliceNum = needSliceNum;
+        }
+        byte[] decodeTempBytes = new byte[sliceNum*sliceLength];
+        int trueDecodeResultLength = 0;
+        for(int i=0;i<sliceNum;i++){
+            try{
+                byte[] bytes = new byte[sliceLength+1];
+                System.arraycopy(originalBytes,(i*(sliceLength+1)),bytes,0, sliceLength+1);
+                byte[] bytes1 = decryptByPrivateKey(bytes, trueDecodeKey);
+                System.arraycopy(bytes1,0,decodeTempBytes,i*sliceLength,Math.min(sliceLength,bytes1.length));
+                trueDecodeResultLength += Math.min(sliceLength,bytes1.length);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        byte[] decodeResultBytes = new byte[trueDecodeResultLength];
+        System.arraycopy(decodeTempBytes,0,decodeResultBytes,0,trueDecodeResultLength);
+        return new String(decodeResultBytes);
+    }
 
     /**
      * 测试私钥是否正确

@@ -16,6 +16,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,10 +26,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -161,10 +164,10 @@ public class MainActivity extends AppCompatActivity {
         //侧滑菜单的按钮事件在这
         navView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()){
-                case R.id.nav_mine:{
-                    BaseUtils.gotoActivity(MainActivity.this, MineGameActivity.class);
-                    break;
-                }
+//                case R.id.nav_mine:{
+//                    BaseUtils.gotoActivity(MainActivity.this, MineGameActivity.class);
+//                    break;
+//                }
                 case R.id.nav_note:{
                     BaseUtils.gotoActivity(MainActivity.this, NoteActivity.class);
                     break;
@@ -236,7 +239,8 @@ public class MainActivity extends AppCompatActivity {
                             intent.putExtra(DiaryListActivity.DATE_TWO,timeTwoStr);
                             startActivity(intent);
                         }else{
-                            BaseUtils.longTipInCoast(MainActivity.this,"一个日期都不选？就是你这种不按照正常逻辑使用软件的人，才导致我们程序员要考虑各种各样的奇怪情况！");
+//                            BaseUtils.longTipInCoast(MainActivity.this,"一个日期都不选？就是你这种不按照正常逻辑使用软件的人，才导致我们程序员要考虑各种各样的奇怪情况！");
+                              BaseUtils.alertDialogToShow(MainActivity.this,"😡怒了😡","一个日期都不选？就是你这种不按照正常逻辑使用软件的人，才导致我们软件开发要考虑各种各样的奇怪情况！");
                         }
                     });
                     builder.setNegativeButton("取消",null);
@@ -285,9 +289,11 @@ public class MainActivity extends AppCompatActivity {
         //下拉刷新控件及RecyclerView
         recyclerView = findViewById(R.id.main_recyclerview);
         refreshLayout = findViewById(R.id.main_refresh);
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);
         refreshLayout.setRefreshHeader(new BezierRadarHeader(this)
                 .setEnableHorizontalDrag(true)
-                .setPrimaryColor(Color.parseColor("#FA7298")));
+                .setPrimaryColor(typedValue.data));
         refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.FixedBehind));
         refreshLayout.setOnRefreshListener(refreshLayout -> {
             refreshDiary();
@@ -514,6 +520,10 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("搜索", (dialog, which) -> {
                     String searchValue = editText.getText().toString();
                     searchValue = searchValue.trim();
+                    if("".equals(searchValue)){
+                        BaseUtils.shortTipInSnack(recyclerView,"不允许搜索空值！！！");
+                        return;
+                    }
                     SimpleResult result = diaryService.searchDiary(searchValue);
                     if(result.getSuccess()){
                         Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);

@@ -39,9 +39,9 @@ public class FunnyInfoServiceImpl implements FunnyInfoService {
         //2. 开始分析数据
         //2.1 扫雷
         SharedPreferences sharedPreference = BaseUtils.getSharedPreference();
-        float mineBestTime = sharedPreference.getFloat("mineBestTime", 3600);
-        BigDecimal bigDecimal = new BigDecimal(String.valueOf(mineBestTime));
-        info.setFastestGame(bigDecimal.doubleValue());
+//        float mineBestTime = sharedPreference.getFloat("mineBestTime", 3600);
+//        BigDecimal bigDecimal = new BigDecimal(String.valueOf(mineBestTime));
+//        info.setFastestGame(bigDecimal.doubleValue());
         //2.2 程序安装日期
         try {
             long firstInstallTime = LitePalApplication.getContext().getPackageManager().getPackageInfo(LitePalApplication.getContext().getPackageName(), 0).firstInstallTime;

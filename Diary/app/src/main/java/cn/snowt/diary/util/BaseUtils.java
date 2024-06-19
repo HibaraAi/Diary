@@ -269,7 +269,7 @@ public class BaseUtils {
                 NotificationManager.IMPORTANCE_LOW);
         manager.createNotificationChannel(channel);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "big")
-                .setContentText("回到通知栏上也是一样，每个开发者都只想着尽可能地去宣传自己的App，最后用户的手机就乱得跟鸡窝一样了。但")
+                .setContentText(notice)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setAutoCancel(true);
         //创建大文本样式

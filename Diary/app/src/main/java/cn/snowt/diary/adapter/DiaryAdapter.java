@@ -35,6 +35,7 @@ import cn.snowt.diary.service.impl.CommentServiceImpl;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.MyConfiguration;
+import cn.snowt.diary.util.PDFUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 
@@ -156,7 +157,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         //长按日记文字
         viewHolder.content.setOnLongClickListener(v->{
             AtomicReference<String> select = new AtomicReference<>();
-            final String[] items = {"复制日记","置顶日记","引用追更","查看详情","编辑日记","删除"};
+            final String[] items = {"复制日记","置顶日记","引用追更","查看详情","编辑日记","导出为PDF","删除"};
             select.set(items[0]);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("日记菜单");
@@ -165,6 +166,10 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             });
             builder.setPositiveButton("确定", (dialog, which) -> {
                 switch (select.get()) {
+                    case "导出为PDF":{
+                        PDFUtils.saveViewAsPdf(view);
+                        break;
+                    }
                     case "引用追更":{
                         Intent intent = new Intent(context,KeepDiaryActivity.class);
                         intent.putExtra(KeepDiaryActivity.OPEN_FROM_TYPE,KeepDiaryActivity.OPEN_FROM_QUOTE_ADD);
@@ -264,7 +269,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                 context.startActivity(intent);
             });
             builder.setNegativeButton("取消",null);
-            builder.setCancelable(false);
+            builder.setCancelable(true);
             builder.show();
         });
         viewHolder.label.setOnLongClickListener(v -> {

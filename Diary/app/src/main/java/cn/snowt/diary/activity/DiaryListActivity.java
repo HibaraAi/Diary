@@ -2,12 +2,17 @@ package cn.snowt.diary.activity;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -18,6 +23,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
 import org.litepal.LitePal;
 
 import java.io.Serializable;
@@ -26,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -57,6 +66,7 @@ public class DiaryListActivity extends AppCompatActivity {
     public static final int OPEN_FROM_SEARCH_LABEL = 4;
     public static final int OPEN_FROM_LABEL_LIST = 5;
     public static final int OPEN_FROM_FULL_SEARCH = 6;
+    public static final int OPEN_FROM_DELETE_LIST = 7;
 
     private final DiaryService diaryService = new DiaryServiceImpl();
 
@@ -71,6 +81,8 @@ public class DiaryListActivity extends AppCompatActivity {
 
     private List<String> searchHelp = new ArrayList<>();
     private List<DiaryVo> diaryListBackup;
+
+    static List<Integer> beSelectedToDelID = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,8 +123,32 @@ public class DiaryListActivity extends AppCompatActivity {
                 showFullSearchResult();
                 break;
             }
+            case OPEN_FROM_DELETE_LIST:{
+                showDeleteList();
+                break;
+            }
             default:break;
         }
+
+    }
+
+    /**
+     * 处理批量删除的界面
+     */
+    private void showDeleteList() {
+        //标题及提示
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle("批量删除");
+        tipView.setText("被选中日记的时间会被成蓝紫色，点击删除按钮预览确认被选中日记。");
+        //处理信息展示
+        SimpleResult result = diaryService.getSimpleDiaryByDate(BaseUtils.stringToDate("1024-06-16 00:00:00"),new Date());
+        diaryList = (List<DiaryVo>) result.getData();
+        DiaryAxisAdapterForDeleteList adapter = new DiaryAxisAdapterForDeleteList(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+        //响应条目点击，展示被点击条目及记录被点击日记的ID
 
     }
 
@@ -175,6 +211,11 @@ public class DiaryListActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         //根据打开类型判断是否需要展示信息流按钮
         switch (openType) {
+            case OPEN_FROM_DELETE_LIST:{
+                //只需要删除按钮，共用toolbar_day_detail
+                getMenuInflater().inflate(R.menu.toolbar_day_detail,menu);
+                break;
+            }
             case OPEN_FROM_FULL_SEARCH:
             case OPEN_FROM_TIME_AXIS:
             case OPEN_FROM_SEARCH_DIARY:
@@ -327,6 +368,7 @@ public class DiaryListActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:{
                 finish();
+                beSelectedToDelID.clear();
                 break;
             }
             case R.id.toolbar_diary_list_flow:{
@@ -362,8 +404,113 @@ public class DiaryListActivity extends AppCompatActivity {
                 builder.show();
                 break;
             }
+            case R.id.toolbar_day_sel:{
+                if(beSelectedToDelID.size()>0){
+                    Intent intent = new Intent(DiaryListActivity.this, TimeAscActivity.class);
+                    intent.putExtra(TimeAscActivity.OPEN_FROM_TYPE,TimeAscActivity.OPEN_FROM_DELETE_LIST);
+                    intent.putIntegerArrayListExtra("delIds",(ArrayList<Integer>) beSelectedToDelID);
+                    DiaryListActivity.this.startActivity(intent);
+                }else{
+                    BaseUtils.shortTipInSnack(recyclerView,"没有被选中的项目！");
+                }
+                break;
+            }
             default:break;
         }
         return true;
+    }
+
+    /**
+     * 需要更换点击事件，所以换了一个Adapter
+     */
+    private static class DiaryAxisAdapterForDeleteList extends RecyclerView.Adapter{
+        private List<DiaryVo> diaryVoList;
+        private Context context;
+
+        static class ViewHolder extends RecyclerView.ViewHolder{
+            View view;
+            TextView dateView;
+            TextView diaryCutView;
+            ImageView imageView;
+            int diaryId;
+            boolean beSelected =false;
+            String time;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                view = itemView;
+                dateView = itemView.findViewById(R.id.axis_item_date);
+                diaryCutView = itemView.findViewById(R.id.axis_item_diary_cut);
+                imageView = itemView.findViewById(R.id.axis_item_image);
+            }
+        }
+
+        public DiaryAxisAdapterForDeleteList(List<DiaryVo> diaryVoList) {
+            this.diaryVoList = diaryVoList;
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.diary_axis_item, parent, false);
+            if(null==context){
+                context = parent.getContext();
+            }
+            final DiaryAxisAdapterForDeleteList.ViewHolder viewHolder = new DiaryAxisAdapterForDeleteList.ViewHolder(view);
+            viewHolder.view.setOnClickListener(v->{
+                if(!viewHolder.beSelected){
+                    //改为被选中
+                    viewHolder.beSelected = true;
+                    viewHolder.dateView.setText("被选中");
+                    viewHolder.dateView.setBackgroundResource(R.drawable.axis_time4);
+                    beSelectedToDelID.add(viewHolder.diaryId);
+                }else{
+                    //改为不选中
+                    viewHolder.beSelected = false;
+                    viewHolder.dateView.setText(viewHolder.time);
+                    viewHolder.dateView.setBackgroundResource(R.drawable.axis_time2);
+                    beSelectedToDelID.remove((Integer) viewHolder.diaryId);
+                }
+                BaseUtils.shortTipInSnack(view,"已被选中个数："+beSelectedToDelID.size());
+            });
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            DiaryAxisAdapterForDeleteList.ViewHolder newHolder = (DiaryAxisAdapterForDeleteList.ViewHolder) holder;
+            DiaryVo diaryVo = diaryVoList.get(position);
+            newHolder.diaryId = diaryVo.getId();
+            newHolder.time = diaryVo.getModifiedDate();
+            newHolder.diaryCutView.setText(diaryVo.getContent());
+            if(beSelectedToDelID.contains(newHolder.diaryId)){
+                newHolder.beSelected = true;
+                newHolder.dateView.setText("被选中");
+                newHolder.dateView.setBackgroundResource(R.drawable.axis_time4);
+            }else{
+                //改为不选中
+                newHolder.dateView.setText(newHolder.time);
+                newHolder.dateView.setBackgroundResource(R.drawable.axis_time2);
+                newHolder.beSelected = false;
+            }
+            if (diaryVo.getPicSrcList().size()>0){
+//                Glide.with(context)
+//                        .load(diaryVo.getPicSrcList().get(0))
+//                        .into(newHolder.imageView);
+                RequestOptions options = new RequestOptions()
+                        .placeholder(R.drawable.load_image)//图片加载出来前，显示的图片
+                        .fallback( R.drawable.bad_image) //url为空的时候,显示的图片
+                        .error(R.drawable.bad_image);//图片加载失败后，显示的图片
+                Glide.with(context).load(diaryVo.getPicSrcList().get(0)).apply(options).into(newHolder.imageView);
+            }else{
+                newHolder.imageView.setImageResource(R.drawable.transparent);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return diaryVoList.size();
+        }
     }
 }

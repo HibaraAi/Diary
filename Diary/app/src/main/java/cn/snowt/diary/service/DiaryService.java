@@ -59,7 +59,7 @@ public interface DiaryService {
      * @param date1 date1
      * @param date2 date2
      * @return 返回的data为diaryVoList,diaryVo
-     * 仅包含id，经过处理后的时间Str，截取正文内容Str，和一张图片src(如果有)
+     * 仅包含id，经过处理后的时间Str，截取正文内容Str（大概88个汉字以内），和一张图片src(如果有)
      */
     SimpleResult getSimpleDiaryByDate(Date date1, Date date2);
 

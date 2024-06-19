@@ -104,19 +104,30 @@
             app:key="pay"
             app:title="为本软件点赞"
             app:summary="👍👍👍"/>
+        <Preference
+            app:key="deleteList"
+            app:title="批量删除"
+            app:summary="DELETE" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="导出/导入">
         <Preference
             app:key="txtOutput"
-            app:title="导出日记"
-            app:summary="纯明文的将所有日记导出到一个txt文件" />
-
+            app:title="导出TXT"
+            app:summary="明文导出日记正文、评论等内容到一个txt文件" />
+        <Preference
+            app:key="pdfOutput"
+            app:title="导出PDF"
+            app:summary="将日记正文、图片、视频缩略图等内容到一个PDF文件" />
         <Preference
             app:key="backupDiary"
             app:title="备份日记"
             app:summary="导出一个仅能由本软件读取的备份文件"/>
-
+        <SwitchPreferenceCompat
+            app:key="autoBackup"
+            app:defaultValue="false"
+            app:title="自动备份"
+            app:summary="定期输出一个备份文件" />
         <Preference
             app:key="recoveryDiary"
             app:title="恢复日记"
@@ -146,12 +157,6 @@
             app:summaryOn="当前:将图片复制到本应用的外部存储目录下，并修改文件名(包括后缀名)，原图片无论如何修改都与本应用无关。\n此修改仅对今后新增日记生效。"
             app:title="日记图片额外存储"/>
 
-        <SwitchPreferenceCompat
-            app:key="autoBackup"
-            app:defaultValue="false"
-            app:enabled="false"
-            app:title="自动备份"
-            app:summary="定期输出一个备份文件" />
 
         <SwitchPreferenceCompat
             app:key="removeTip"

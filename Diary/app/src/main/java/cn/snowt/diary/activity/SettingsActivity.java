@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -103,7 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
             ));
             //测试区功能
             boolean openTestFun = BaseUtils.getSharedPreference().getBoolean("openTestFun", false);
-            findPreference("autoBackup").setEnabled(openTestFun);
+//            findPreference("autoBackup").setEnabled(openTestFun);
             findPreference("removeTip").setEnabled(openTestFun);
             //读取当前字体大小
             float fontSize = MyConfiguration.getInstance().getFontSize();
@@ -197,7 +198,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 case "backupDiary":{
                     if(!PermissionUtils.haveExternalStoragePermission(context)){
-                        BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用备份功能，但你可以使用导出功能。你可以去修改头像的地方进行授权外部存储的读写权限");
+                        BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用备份功能，但你可以使用”导出TXT“功能。你可以去修改头像的地方进行授权外部存储的读写权限");
                     }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("设置读取密钥");
@@ -254,17 +255,17 @@ public class SettingsActivity extends AppCompatActivity {
                             SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
                             edit.putBoolean("openTestFun",true);
                             edit.apply();
-                            findPreference("autoBackup").setEnabled(true);
+//                            findPreference("autoBackup").setEnabled(true);
                             findPreference("removeTip").setEnabled(true);
                         }else{
                             BaseUtils.shortTipInCoast(context,"测试码不正确 UoU");
                         }
                     });
                     builder.setNegativeButton("直接关闭测试功能",(dialog, which) -> {
-                        findPreference("autoBackup").setEnabled(false);
+//                        findPreference("autoBackup").setEnabled(false);
                         findPreference("removeTip").setEnabled(false);
                         SharedPreferences.Editor edit1 = BaseUtils.getDefaultSharedPreferences().edit();
-                        edit1.putBoolean("autoBackup",false);
+//                        edit1.putBoolean("autoBackup",false);
                         edit1.putBoolean("removeTip",false);
                         edit1.apply();
                         SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
@@ -499,6 +500,22 @@ public class SettingsActivity extends AppCompatActivity {
                     });
                     dialog.setNegativeButton("取消", null);
                     dialog.show();
+                    break;
+                }
+                case "pdfOutput":{
+                    final String tip = "一开始想设置一键导出所有日记到PDF中的，想了一下不太合理，" +
+                            "我可能只想导出某个标签的，或者某个时间段的，况且一键导出没有预览。TIP：将时间范围选的很大，涵盖所有日记即可导出所有。\n\n" +
+                            "说这么多只是想告诉你，真正的导出PDF在”临时信息流“（时间轴、标签集、搜索结果-->右上角跳转信息流），" +
+                            "临时信息流预览的什么样导出就是什么样，且需要你先选好时间顺序还是倒叙。" +
+                            "PDF中默认打开评论区（如果评论不为空的话），视频采用一个低画质缩略图展示，图片也是压缩过的，防止PDF文件过大。\n\n" +
+                            "没有授权外部存储权限的话，不能导出PDF，但你可以导出TXT。";
+                    BaseUtils.alertDialogToShow(context,"这里只是提示",tip);
+                    break;
+                }
+                case "deleteList":{
+                    Intent intent = new Intent(context, DiaryListActivity.class);
+                    intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_DELETE_LIST);
+                    context.startActivity(intent);
                     break;
                 }
                 default:return false;

@@ -332,7 +332,8 @@ public class DiaryServiceImpl implements DiaryService {
             vo.setModifiedDate(subDateStr);
             if(diary.getEncryption()){
                 //需要解密
-                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+//                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+                diary.setContent(RSAUtils.decodePartial(diary.getContent(),MyConfiguration.getInstance().getPrivateKey(),1));
             }
             String subDiary = (diary.getContent().length()>30)
                     ? (diary.getContent().substring(0,30)+"...")
@@ -462,7 +463,8 @@ public class DiaryServiceImpl implements DiaryService {
             vo.setModifiedDate(subDateStr);
             if(diary.getEncryption()){
                 //需要解密
-                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+//                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+                diary.setContent(RSAUtils.decodePartial(diary.getContent(),MyConfiguration.getInstance().getPrivateKey(),1));
             }
             String subDiary = (diary.getContent().length()>30)
                     ? (diary.getContent().substring(0,30)+"...")
@@ -650,7 +652,8 @@ public class DiaryServiceImpl implements DiaryService {
             vo.setModifiedDate(subDateStr);
             if(diary.getEncryption()){
                 //需要解密
-                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+//                diary.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));
+                diary.setContent(RSAUtils.decodePartial(diary.getContent(),MyConfiguration.getInstance().getPrivateKey(),1));
             }
             String subDiary = (diary.getContent().length()>30)
                     ? (diary.getContent().substring(0,30)+"...")
@@ -1181,8 +1184,8 @@ public class DiaryServiceImpl implements DiaryService {
             SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
             edit.putString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_LATEST_DAIRY,dateToString);
             edit.apply();
-            //BaseUtils.simpleSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
-            BaseUtils.longTextSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
+            BaseUtils.simpleSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
+            //BaseUtils.longTextSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
         }
     }
 

@@ -36,6 +36,7 @@ import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.PDFUtils;
+import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
 
@@ -167,7 +168,12 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             builder.setPositiveButton("确定", (dialog, which) -> {
                 switch (select.get()) {
                     case "导出为PDF":{
-                        PDFUtils.saveViewAsPdf(view);
+                        //检查权限
+                        if (PermissionUtils.haveExternalStoragePermission(context)) {
+                            PDFUtils.saveViewAsPdf(view);
+                        }else{
+                            BaseUtils.alertDialogToShow(context,"提示","在你授予外部存储的读写权限前，你不能导出PDF。\n请在修改头像的地方授权。");
+                        }
                         break;
                     }
                     case "引用追更":{

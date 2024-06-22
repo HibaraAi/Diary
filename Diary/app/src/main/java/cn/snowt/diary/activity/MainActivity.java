@@ -79,28 +79,32 @@ public class MainActivity extends AppCompatActivity {
     public static final int CHOOSE_MAIN_BG = 2;
     public static final int REQUEST_CODE_PERMISSION = 3;
 
-    private long firstTime = 0;
+    private long firstTime = 0;  //辅助实现双击退出程序
 
 
-    private NavigationView navView;
-    private Toolbar toolbar;
-    private DrawerLayout drawerLayout;
+    private NavigationView navView;  //侧滑菜单的View
+    private Toolbar toolbar;  //顶部工具栏的View
+    private DrawerLayout drawerLayout;  //主界面容器View
 
-    RefreshLayout refreshLayout;
-    RecyclerView recyclerView = null;
-    private int nowIndex = 0;
+    RefreshLayout refreshLayout;  //下拉刷新上拉加载的View
+    RecyclerView recyclerView = null;  //主界面的RecyclerView
+    private int nowIndex = 0;  //读取日记的游标，初始为0
 
-    private DiaryService diaryService = new DiaryServiceImpl();
-    private List<DiaryVo> voList = new ArrayList<>();
+    private final DiaryService diaryService = new DiaryServiceImpl();
+    private final List<DiaryVo> voList = new ArrayList<>();  //存储日记展示的缓存，初始为空，通过getDiaryForFirstShow()默认加载5条
 
-    private CircleImageView headImg;
-    private TextView username;
-    private TextView motto;
-    private ImageView mainImageBg;
+    private CircleImageView headImg;  //侧滑菜单中的头像
+    private TextView username;  //侧滑菜单中的用户名
+    private TextView motto;  //侧滑菜单中的个性签名
+    private ImageView mainImageBg;  //主界面的背景图
 
-    private DiaryAdapter diaryAdapter;
-    private MyConfigurationService configurationService = new MyConfigurationServiceImpl();
-    boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
+    private DiaryAdapter diaryAdapter;  //主界面RecyclerView的适配器
+    private final MyConfigurationService configurationService = new MyConfigurationServiceImpl();  //读取用户的默认设置
+    boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);  //去除提示
+
+    private long eggTimeOne;  //连续点击背景图，触发彩蛋。 第一个时间
+    private int eggCount = 0;  //已经点击了多少次
+    private long eggTimeTwo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,7 +181,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case R.id.nav_help:{
-                    BaseUtils.gotoActivity(MainActivity.this,HelpActivity.class);
+                    Intent intent = new Intent(MainActivity.this, HelpActivity.class);
+                    intent.putExtra(HelpActivity.OPEN_TYPE,HelpActivity.OPEN_TYPE_HELP);
+                    startActivity(intent);
                     break;
                 }
                 case R.id.nav_time:{
@@ -383,6 +389,19 @@ public class MainActivity extends AppCompatActivity {
         if(!removeTip){
             mainImageBg.setOnClickListener(v->{
                 BaseUtils.shortTipInSnack(mainImageBg,"长按修改背景图 QaQ");
+                if (5==eggCount){
+                    eggTimeTwo = System.currentTimeMillis();
+                    if(eggTimeTwo-eggTimeOne<1000){
+                        Intent intent = new Intent(MainActivity.this, HelpActivity.class);
+                        intent.putExtra(HelpActivity.OPEN_TYPE,HelpActivity.OPEN_TYPE_EGG);
+                        startActivity(intent);
+                    }
+                    eggCount = 0;
+                }
+                if(0==eggCount){
+                    eggTimeOne = System.currentTimeMillis();
+                }
+                eggCount++;
             });
         }
         mainImageBg.setOnLongClickListener(v->{

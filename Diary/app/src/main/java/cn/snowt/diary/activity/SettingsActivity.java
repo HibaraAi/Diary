@@ -505,7 +505,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case "pdfOutput":{
                     final String tip = "一开始想设置一键导出所有日记到PDF中的，想了一下不太合理，" +
                             "我可能只想导出某个标签的，或者某个时间段的，况且一键导出没有预览。TIP：将时间范围选的很大，涵盖所有日记即可导出所有。\n\n" +
-                            "说这么多只是想告诉你，真正的导出PDF在”临时信息流“（时间轴、标签集、搜索结果-->右上角跳转信息流），" +
+                            "说这么多只是想告诉你，真正的导出PDF在“临时信息流”（时间轴、标签集、搜索结果-->右上角跳转信息流），" +
                             "临时信息流预览的什么样导出就是什么样，且需要你先选好时间顺序还是倒叙。" +
                             "PDF中默认打开评论区（如果评论不为空的话），视频采用一个低画质缩略图展示，图片也是压缩过的，防止PDF文件过大。\n\n" +
                             "没有授权外部存储权限的话，不能导出PDF，但你可以导出TXT。";
@@ -515,6 +515,12 @@ public class SettingsActivity extends AppCompatActivity {
                 case "deleteList":{
                     Intent intent = new Intent(context, DiaryListActivity.class);
                     intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_DELETE_LIST);
+                    context.startActivity(intent);
+                    break;
+                }
+                case "updateInfo":{
+                    Intent intent = new Intent(context, HelpActivity.class);
+                    intent.putExtra(HelpActivity.OPEN_TYPE,HelpActivity.OPEN_TYPE_UPDATE);
                     context.startActivity(intent);
                     break;
                 }

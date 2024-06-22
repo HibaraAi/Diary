@@ -1189,6 +1189,12 @@ public class DiaryServiceImpl implements DiaryService {
         }
     }
 
+    @Override
+    public boolean existById(Integer id) {
+        Diary diary = LitePal.find(Diary.class, id);
+        return null != diary;
+    }
+
     /**
      * 从DiaryVoForBackup写入一条日记记录
      * @param privateKey 解密时的密钥

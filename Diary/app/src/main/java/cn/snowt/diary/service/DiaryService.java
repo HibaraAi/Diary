@@ -197,4 +197,11 @@ public interface DiaryService {
      */
     void autoBackupDiary();
 
+    /**
+     * 通过id来确认是否存在这个日记
+     * @param id 需要检查的id
+     * @return true-存在    false-不存在
+     */
+    boolean existById(Integer id);
+
 }

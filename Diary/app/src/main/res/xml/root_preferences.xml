@@ -107,7 +107,11 @@
         <Preference
             app:key="deleteList"
             app:title="批量删除"
-            app:summary="DELETE" />
+            app:summary="列表展示所有日记，选中删除。" />
+        <Preference
+            app:key="updateInfo"
+            app:title="历次更新信息"
+            app:summary="包括本次更新内容及后续更新计划。" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="导出/导入">

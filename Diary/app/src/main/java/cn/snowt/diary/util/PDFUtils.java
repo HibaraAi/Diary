@@ -36,6 +36,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import org.litepal.LitePal;
+import org.litepal.LitePalApplication;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -68,6 +71,7 @@ import cn.snowt.diary.vo.DiaryVo;
  * @Description: PDFUtils
  */
 public class PDFUtils {
+    static DiaryService diaryService = new DiaryServiceImpl();
     /**
      * 将DiaryVoList的数据导出到PDF中，每一个DiaryVo保存为一张paper，样式使用的是CardView（R.layout.diary_item），
      * 宽度为手机屏幕宽度，高度自适应。所有paper导出到一个PDF文件。
@@ -80,6 +84,9 @@ public class PDFUtils {
         PdfDocument.Page page = null;
         for(int i =0;i<diaryVos.size();i++){
             DiaryVo diaryVo = diaryVos.get(i);
+            if (!diaryService.existById(diaryVo.getId())){  //如果不存在则跳过
+                continue;
+            }
             View view = voToView(diaryVo, context, parent);
             view.measure(View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -153,7 +160,7 @@ public class PDFUtils {
         String pdfDir = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION + "output/").getAbsolutePath()+"/PDF/";
         File file = new File(pdfDir);
         if(!file.exists()){
-            file.mkdir();
+            file.mkdirs();
         }
         String s = file.getAbsolutePath()+"/"+ BaseUtils.dateToStringWithout(new Date()).substring(0,10)+"-"+UUID.randomUUID().toString().substring(0,6) + ".pdf";
         try {
@@ -164,6 +171,7 @@ public class PDFUtils {
         }
         // close the document
         document.close();
+        BaseUtils.shortTipInCoast(LitePalApplication.getContext(),"PDF成功导出");
     }
 
     /**

@@ -5,10 +5,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -19,6 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,6 +48,8 @@ import java.util.UUID;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
+import cn.snowt.diary.async.GetDiaryByIdsTask;
+import cn.snowt.diary.async.MyAsyncTask;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.service.impl.LoginServiceImpl;
@@ -78,6 +85,56 @@ public class TimeAscActivity extends AppCompatActivity {
     private Integer intExtra;
     private List<Integer> realToDelIds = new ArrayList<>();  //批量删除中，真正需要删除的Id
 
+    private androidx.appcompat.app.AlertDialog ProgressADL;  //进度条的弹窗
+    Handler handler = new Handler(new Handler.Callback() {  //处理异步回调
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case MyAsyncTask.FINISH_TASK:{
+                    ProgressADL.cancel();
+                    SimpleResult result = (SimpleResult) msg.obj;
+                    if(!result.getSuccess()){
+                        BaseUtils.shortTipInSnack(recyclerView,"【BUG】程序异常222...");
+                    }else{
+                        switch (intExtra) {
+                            case OPEN_FROM_SIMPLE_DIARY_LIST:{
+                                voList = (List<DiaryVo>) result.getData();
+                                afterShowByIds2(getIntent().getIntExtra("sortType",1));
+                                diaryAdapter = new DiaryAdapter(voList);
+                                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(TimeAscActivity.this);
+                                recyclerView.setLayoutManager(linearLayoutManager);
+                                recyclerView.setAdapter(diaryAdapter);
+                                break;
+                            }
+                            case OPEN_FROM_DELETE_LIST:{
+                                voList = (List<DiaryVo>) result.getData();
+                                afterNewDeleteList();
+                                diaryAdapter = new DiaryAdapter(voList);
+                                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(TimeAscActivity.this);
+                                recyclerView.setLayoutManager(linearLayoutManager);
+                                recyclerView.setAdapter(diaryAdapter);
+                                break;
+                            }
+                            default:{
+                                BaseUtils.shortTipInSnack(recyclerView,"【BUG】程序异常222...");
+                                break;
+                            }
+                        }
+
+                    }
+                    break;
+                }
+                case MyAsyncTask.START_TASK:{
+                    showProgressAlertDialog();
+                    break;
+                }
+                default:break;
+            }
+            return false;
+        }
+    });
+
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,24 +158,14 @@ public class TimeAscActivity extends AppCompatActivity {
             case OPEN_FROM_SIMPLE_DIARY_LIST:{
                 actionBar.setTitle("临时信息流");
                 stopRefreshLayout();
-                showByIds(intent.getIntegerArrayListExtra("ids"),intent.getIntExtra("sortType",1));
+                //showByIds(intent.getIntegerArrayListExtra("ids"),intent.getIntExtra("sortType",1));
+                showByIds2(intent.getIntegerArrayListExtra("ids"),intent.getIntExtra("sortType",1));
                 break;
             }
             case OPEN_FROM_DELETE_LIST:{
-                ArrayList<Integer> delIds = intent.getIntegerArrayListExtra("delIds");
-                //处理ids到diaryVoList
-                delIds.forEach(id->{
-                    SimpleResult result = diaryService.getDiaryVoById(id);
-                    if(result.getSuccess()){
-                        //只有成功查到的才展示
-                        realToDelIds.add(id);
-                        voList.add((DiaryVo) result.getData());
-                    }
-                });
-                actionBar.setTitle("批量删除-条数:"+realToDelIds.size());
-                stopRefreshLayout();
-                BaseUtils.alertDialogToShow(this,"最后一次提示","这些是你选中且数据库中存在的项目，请浏览确认。\n\n下一个删除按钮将不再有任何提示！");
-               break;
+//                oldDeleteList();
+                newDeleteList();
+                break;
             }
             default:{
                 getDiaryForFirstShow();
@@ -152,6 +199,64 @@ public class TimeAscActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    /**
+     * 展示给定的几个id
+     *
+     * 异步加载，提供加载动画
+     * @param ids
+     * @param sortType 排序类型，1为时间倒序，2为时间顺序
+     */
+    private void showByIds2(ArrayList<Integer> ids,int sortType) {
+        GetDiaryByIdsTask task = new GetDiaryByIdsTask(handler);
+        task.getDiaryVoByIds(ids);
+    }
+
+    private void afterShowByIds2(int sortType){
+        if(sortType==2){
+            voList.sort((o1, o2) -> {
+                Date o1Date = BaseUtils.stringToDate(o1.getModifiedDate());
+                Date o2Date = BaseUtils.stringToDate(o2.getModifiedDate());
+                if (o1Date.after(o2Date)) {
+                    return 1;
+                } else if (o1Date.before(o2Date)) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+        }
+    }
+
+    private void oldDeleteList(){
+        ArrayList<Integer> delIds = getIntent().getIntegerArrayListExtra("delIds");
+        //处理ids到diaryVoList
+        delIds.forEach(id->{
+            SimpleResult result = diaryService.getDiaryVoById(id);
+            if(result.getSuccess()){
+                //只有成功查到的才展示
+                realToDelIds.add(id);
+                voList.add((DiaryVo) result.getData());
+            }
+        });
+        actionBar.setTitle("批量删除-条数:"+realToDelIds.size());
+        stopRefreshLayout();
+        BaseUtils.alertDialogToShow(this,"最后一次提示","这些是你选中且数据库中存在的项目，请浏览确认。\n\n下一个删除按钮将不再有任何提示！");
+    }
+
+
+    private void newDeleteList() {
+        GetDiaryByIdsTask task = new GetDiaryByIdsTask(handler);
+        task.getDiaryVoByIds(getIntent().getIntegerArrayListExtra("delIds"));
+    }
+
+    private void afterNewDeleteList(){
+        voList.forEach(diaryVo -> realToDelIds.add(diaryVo.getId()));
+        actionBar.setTitle("批量删除-条数:"+realToDelIds.size());
+        stopRefreshLayout();
+        BaseUtils.alertDialogToShow(this,"最后一次提示","这些是你选中且数据库中存在的项目，请浏览确认。\n\n下一个删除按钮将不再有任何提示！");
+
     }
 
     /**
@@ -326,6 +431,27 @@ public class TimeAscActivity extends AppCompatActivity {
             default:break;
         }
         return true;
+    }
+
+    private void showProgressAlertDialog(){
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        LinearLayout linearLayout = new LinearLayout(TimeAscActivity.this);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        ImageView imageView = new ImageView(TimeAscActivity.this);
+        imageView.setImageResource(R.drawable.loading);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(500,500);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Drawable drawable = imageView.getDrawable();
+        if(drawable instanceof AnimatedImageDrawable){
+            AnimatedImageDrawable animatedImageDrawable = (AnimatedImageDrawable) drawable;
+            animatedImageDrawable.start();
+        }
+        linearLayout.addView(imageView);
+        builder.setView(linearLayout);
+        ProgressADL = builder.show();
     }
 
 }

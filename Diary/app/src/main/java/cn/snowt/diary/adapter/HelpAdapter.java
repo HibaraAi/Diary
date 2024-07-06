@@ -84,12 +84,14 @@ public class HelpAdapter extends RecyclerView.Adapter{
             }else if ("复制地址".equals(diaryVo.getQuoteDiaryStr())){
                 newHolder.comment.setOnClickListener(v -> {
                     if (BaseUtils.copyInClipboard(context,"https://github.com/HibaraAi/Diary")) {
-                        BaseUtils.shortTipInCoast(context,"开源代码的网址已复制");
+//                        BaseUtils.shortTipInCoast(context,"开源代码的网址已复制");
+                        BaseUtils.shortTipInSnack(newHolder.headImg,"开源代码的网址已复制");
                     }
                 });
                 newHolder.comment.setOnLongClickListener(v -> {
                     if (BaseUtils.copyInClipboard(context,"https://gitee.com/HibaraAi/Diary")) {
-                        BaseUtils.shortTipInCoast(context,"镜像代码的网址已复制");
+//                        BaseUtils.shortTipInCoast(context,"镜像代码的网址已复制");
+                        BaseUtils.shortTipInSnack(newHolder.headImg,"镜像代码的网址已复制");
                     }
                     return true;
                 });

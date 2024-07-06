@@ -228,7 +228,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     private void openTip() {
         boolean needTip = BaseUtils.getDefaultSharedPreferences().getBoolean("inputTip", false);
         if(needTip){
-            BaseUtils.longTipInCoast(KeepDiaryActivity.this,"记得切换单机输入法哦(⊙o⊙)");
+//            BaseUtils.longTipInCoast(KeepDiaryActivity.this,"记得切换单机输入法哦(⊙o⊙)");
+            BaseUtils.shortTipInSnack(dateView,"记得切换单机输入法");
         }
     }
 
@@ -500,7 +501,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     if(labelStr.length()<=30 && flag){
                         labelView.setText(labelStr);
                     }else{
-                        BaseUtils.longTipInCoast(v.getContext(),"标签总字符数不超过30,格式必须正确");
+//                        BaseUtils.longTipInCoast(v.getContext(),"标签总字符数不超过30,格式必须正确");
+                        BaseUtils.shortTipInSnack(dateView,"标签的总字符数不超过30,且格式必须正确");
                     }
                 });
                 dialog.setNegativeButton("取消",null);

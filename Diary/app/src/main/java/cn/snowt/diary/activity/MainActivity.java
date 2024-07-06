@@ -5,33 +5,31 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.os.Handler;
+import android.os.Message;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,12 +44,15 @@ import com.scwang.smart.refresh.header.BezierRadarHeader;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
+import cn.snowt.diary.async.MyAsyncTask;
+import cn.snowt.diary.async.SearchTask;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.MyConfigurationService;
@@ -64,7 +65,6 @@ import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
-import cn.snowt.mine.MineGameActivity;
 import cn.snowt.note.NoteActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -105,6 +105,47 @@ public class MainActivity extends AppCompatActivity {
     private long eggTimeOne;  //连续点击背景图，触发彩蛋。 第一个时间
     private int eggCount = 0;  //已经点击了多少次
     private long eggTimeTwo;
+
+    private androidx.appcompat.app.AlertDialog ProgressADL;  //进度条的弹窗
+    private TextView progressInADL;  //进度条中的进度数字
+    private boolean showSearchResult = true;  //如果中途取消，则不展示结果
+
+    Handler handler = new Handler(new Handler.Callback() {  //处理异步回调
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case MyAsyncTask.FINISH_TASK:{
+                    if(!showSearchResult){
+                        showSearchResult = true;
+                        break;
+                    }
+                    ProgressADL.cancel();
+                    SimpleResult result = (SimpleResult) msg.obj;
+                    if(!result.getSuccess()){
+                        BaseUtils.shortTipInSnack(recyclerView,result.getMsg());
+                    }else{
+                        List<DiaryVo> voList = (List<DiaryVo>) result.getData();
+                        Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
+                        intent.putExtra("searchValue",result.getMsg());
+                        intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_ASYNC_SEARCH);
+                        intent.putExtra("diaryVos", (Serializable) voList);
+                        startActivity(intent);
+                    }
+                    break;
+                }
+                case MyAsyncTask.START_TASK:{
+                    showProgressAlertDialog();
+                    break;
+                }
+                case MyAsyncTask.UPDATE_PROGRESS:{
+                    updateProgressAlertDialog(msg.arg1);
+                    break;
+                }
+                default:break;
+            }
+            return false;
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -529,7 +570,7 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setCancelable(false);
                 builder.setTitle("搜索日记");
-                builder.setMessage("仅搜索日记标签和未加密的日记内容");
+                builder.setMessage("仅搜索日记及评论文本");
                 EditText editText = new EditText(MainActivity.this);
                 editText.setBackgroundResource(R.drawable.background_input);
                 editText.setHint("输入搜索内容");
@@ -538,26 +579,46 @@ public class MainActivity extends AppCompatActivity {
                 builder.setView(editText);
                 builder.setPositiveButton("搜索", (dialog, which) -> {
                     String searchValue = editText.getText().toString();
-                    searchValue = searchValue.trim();
-                    if("".equals(searchValue)){
-                        BaseUtils.shortTipInSnack(recyclerView,"不允许搜索空值！！！");
-                        return;
-                    }
-                    SimpleResult result = diaryService.searchDiary(searchValue);
-                    if(result.getSuccess()){
-                        Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
-                        intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_SEARCH_DIARY);
-                        intent.putIntegerArrayListExtra("ids",(ArrayList<Integer>)result.getData());
-                        intent.putExtra("searchValue",searchValue);
-                        startActivity(intent);
-                    }else{
-                        BaseUtils.longTipInCoast(MainActivity.this,result.getMsg());
-                    }
+                    SearchTask searchTask = new SearchTask(handler);
+                    searchTask.fullSearch(searchValue);
                 });
-                builder.setNegativeButton("取消",null);
+                builder.setNegativeButton("取消", null);
                 builder.show();
                 break;
             }
+//            case R.id.toolbar_search:{
+//                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                builder.setCancelable(false);
+//                builder.setTitle("搜索日记");
+//                builder.setMessage("仅搜索日记标签和未加密的日记内容");
+//                EditText editText = new EditText(MainActivity.this);
+//                editText.setBackgroundResource(R.drawable.background_input);
+//                editText.setHint("输入搜索内容");
+//                editText.setMaxLines(3);
+//                editText.setMinLines(3);
+//                builder.setView(editText);
+//                builder.setPositiveButton("搜索", (dialog, which) -> {
+//                    String searchValue = editText.getText().toString();
+//                    searchValue = searchValue.trim();
+//                    if("".equals(searchValue)){
+//                        BaseUtils.shortTipInSnack(recyclerView,"不允许搜索空值！！！");
+//                        return;
+//                    }
+//                    SimpleResult result = diaryService.searchDiary(searchValue);
+//                    if(result.getSuccess()){
+//                        Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
+//                        intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_SEARCH_DIARY);
+//                        intent.putIntegerArrayListExtra("ids",(ArrayList<Integer>)result.getData());
+//                        intent.putExtra("searchValue",searchValue);
+//                        startActivity(intent);
+//                    }else{
+//                        BaseUtils.longTipInCoast(MainActivity.this,result.getMsg());
+//                    }
+//                });
+//                builder.setNegativeButton("取消",null);
+//                builder.show();
+//                break;
+//            }
             default:{
                 Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
                 break;
@@ -589,5 +650,38 @@ public class MainActivity extends AppCompatActivity {
         } else {
             this.finish();
         }
+    }
+
+    private void showProgressAlertDialog(){
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        LinearLayout linearLayout = new LinearLayout(MainActivity.this);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        ImageView imageView = new ImageView(MainActivity.this);
+        imageView.setImageResource(R.drawable.loading);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(500,500);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+//        imageView.setColorFilter(Color.parseColor("#FA7298"));
+        Drawable drawable = imageView.getDrawable();
+        if(drawable instanceof AnimatedImageDrawable){
+            AnimatedImageDrawable animatedImageDrawable = (AnimatedImageDrawable) drawable;
+            animatedImageDrawable.start();
+        }
+        linearLayout.addView(imageView);
+        progressInADL = new TextView(MainActivity.this);
+        progressInADL.setGravity(Gravity.CENTER);
+        progressInADL.setTextSize(40);
+        linearLayout.addView(progressInADL);
+        builder.setView(linearLayout);
+        builder.setNegativeButton("取消搜索", (dialog, which) -> {
+            showSearchResult = false;
+        });
+        ProgressADL = builder.show();
+    }
+
+    private void updateProgressAlertDialog(Integer integer){
+        progressInADL.setText(integer+"%");
     }
 }

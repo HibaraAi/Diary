@@ -37,8 +37,8 @@ public class Constant {
      */
     public static final String STRING_ABOUT = "作者: HibaraAi\n" +
             "QQ：3192233122(注明添加缘由)\n" +
-            "版本: 1.5.0\n" +
-            "更新日期: 2024-06-22\n" +
+            "版本: 1.5.1\n" +
+            "更新日期: 2024-07-06\n" +
             "开源代码地址(短按复制): https://github.com/HibaraAi/Diary\n" +
             "镜像代码地址(长按复制)：https://gitee.com/HibaraAi/Diary";
 
@@ -221,7 +221,7 @@ public class Constant {
             "4. 压缩apk软件大小\n" +
             "5. 修复会被其他软件绕过登录的bug\n" +
             "6. 其他小优化";
-    public static final String STRING_UPDATE_14 = "1.4.0 2023年7月8日更新1.4.0版本。\n" +
+    public static final String STRING_UPDATE_14 = "2023年7月8日更新1.4.0版本。\n" +
             "1. 修复初始提示日记导致“恢复功能失效”的BUG\n" +
             "2. 修复编辑已删除日记会闪退的问题\n" +
             "3. 修复Android12下，“备份”功能会闪退的问题\n" +
@@ -230,15 +230,20 @@ public class Constant {
             "6. 便签数据支持备份/恢复\n" +
             "7. 添加感谢名单\n" +
             "8. 新增软件闪退时，保存闪退信息的功能";
-    public static final String STRING_UPDATE_0 = "本此更新内容（1.5.0）\n" +
-            "0. 给鸿蒙用户的提示，本软件目前不适配鸿蒙NEXT，你下次更新鸿蒙NEXT，本软件是安装不了的，请事先备份好数据，鸿蒙NEXT的适配正在计划中。\n\n" +
+    public static final String STRING_UPDATE_15 = "2024年6月22日更新1.5.0版本。\n" +
             "1. 新增导出PDF功能\n" +
             "2. 新增批量删除功能\n" +
             "3. 开放自动备份功能\n" +
             "4. 修复首页搜索可以搜索空值、软件通知异常、下拉刷新的颜色不能随主色调变更等bug\n" +
             "5. 扫雷游戏不再提供入口，改为软件的彩蛋\n" +
             "6. 优化权限请求的引导、部分场景的解密速度、帮助&关于的界面及内容\n" +
-            "7. 增加彩蛋、历次更新信息\n" +
+            "7. 增加彩蛋、历次更新信息";
+    public static final String STRING_UPDATE_0 = "2024-07-06本此更新内容（1.5.1）\n" +
+            "0. 给鸿蒙用户的提示，本软件目前不适配鸿蒙NEXT，你下次更新鸿蒙NEXT，本软件是安装不了的，请事先备份好数据，鸿蒙NEXT的适配正在计划中。\n" +
+            "1. 新增-部分界面支持加载动画（临时信息流、时间轴、批量删除、搜索界面）\n" +
+            "2. 移除“慢速搜索”功能的入口，将该功能与主界面的搜索按钮整合在一起了，并且支持搜索评论\n" +
+            "3. 优化搜索逻辑及速度\n" +
+            "4. 更换部分提示界面\n" +
             "\n待更新内容（超长期计划）\n" +
             "1. 解决Android11及以上的版本可能遇到的视频播放问题\n" +
             "2. 更换存储策略，给用户提供使用原图或是复制保存的选项。去除外部存储的读写权限申请（此项不再考虑，功能已远超最初的设想，存储权限影响太多功能。）\n" +
@@ -246,9 +251,8 @@ public class Constant {
             "4. 数据分析的优化\n" +
             "5. 更换图片、视频选择器，使其能一次选多个图片、视频\n" +
             "6. 更换图片浏览器，使其能打开超长图片，同时支持滑动切图和放大图片功能\n" +
-            "7. 增加耗时操作的进度条动画，解决软件很卡的现象。\n" +
-            "8. 优化“慢速搜索”，加快搜索速度。\n" +
-            "9. 修复超长图片不能软件内预览的问题。";
+            "7. 所有的耗时操作都适配进度条动画，解决软件很卡的问题。\n" +
+            "8. 修复超长图片不能软件内预览的问题。";
     public static final String STRING_HELP = STRING_HELP_1+STRING_HELP_2+STRING_HELP_3+STRING_HELP_4+STRING_HELP_5+STRING_HELP_6+STRING_HELP_7;
 
     public static final String SHARE_PREFERENCES_HEAD_SRC = "headSrc";

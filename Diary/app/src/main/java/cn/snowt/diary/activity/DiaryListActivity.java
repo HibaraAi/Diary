@@ -4,8 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -28,18 +33,18 @@ import com.bumptech.glide.request.RequestOptions;
 
 import org.litepal.LitePal;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAxisAdapter;
+import cn.snowt.diary.async.MyAsyncTask;
+import cn.snowt.diary.async.GetSimpleDiaryByDateTask;
 import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
@@ -67,6 +72,7 @@ public class DiaryListActivity extends AppCompatActivity {
     public static final int OPEN_FROM_LABEL_LIST = 5;
     public static final int OPEN_FROM_FULL_SEARCH = 6;
     public static final int OPEN_FROM_DELETE_LIST = 7;
+    public static final int OPEN_FROM_ASYNC_SEARCH = 8;
 
     private final DiaryService diaryService = new DiaryServiceImpl();
 
@@ -83,6 +89,48 @@ public class DiaryListActivity extends AppCompatActivity {
     private List<DiaryVo> diaryListBackup;
 
     static List<Integer> beSelectedToDelID = new ArrayList<>();
+
+    private androidx.appcompat.app.AlertDialog ProgressADL;  //进度条的弹窗
+    Handler handler = new Handler(new Handler.Callback() {  //处理异步回调
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case MyAsyncTask.FINISH_TASK:{
+                    ProgressADL.cancel();
+                    SimpleResult result = (SimpleResult) msg.obj;
+                    if(!result.getSuccess()){
+                        tipView.setText("【BUG】由于神秘力量，查询异常...");
+                    }else{
+                        switch (openType) {
+                            case OPEN_FROM_DELETE_LIST:{
+                                diaryList = (List<DiaryVo>) result.getData();
+                                afterShowDeleteList2();
+                                break;
+                            }
+                            case OPEN_FROM_TIME_AXIS:{
+                                diaryList = (List<DiaryVo>) result.getData();
+                                String[] strings = result.getMsg().split("#");
+                                afterShowSimpleDiary2(strings[0],strings[1]);
+                                break;
+                            }
+                            default:{
+                                tipView.setText("【BUG】程序异常......");
+                                break;
+                            }
+                        }
+
+                    }
+                    break;
+                }
+                case MyAsyncTask.START_TASK:{
+                    showProgressAlertDialog();
+                    break;
+                }
+                default:break;
+            }
+            return false;
+        }
+    });
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +145,8 @@ public class DiaryListActivity extends AppCompatActivity {
         openType = intent.getIntExtra(OPEN_FROM_TYPE, -1);
         switch (openType) {
             case OPEN_FROM_TIME_AXIS:{
-                showSimpleDiary(intent.getStringExtra(DATE_ONE),intent.getStringExtra(DATE_TWO));
+//                showSimpleDiary(intent.getStringExtra(DATE_ONE),intent.getStringExtra(DATE_TWO));
+                showSimpleDiary2(intent.getStringExtra(DATE_ONE),intent.getStringExtra(DATE_TWO));
                 break;
             }
             case OPEN_FROM_TEMP_DIARY:{
@@ -124,7 +173,14 @@ public class DiaryListActivity extends AppCompatActivity {
                 break;
             }
             case OPEN_FROM_DELETE_LIST:{
-                showDeleteList();
+//                showDeleteList();
+                showDeleteList2();
+                break;
+            }
+            case OPEN_FROM_ASYNC_SEARCH:{
+                List<DiaryVo> diaryVos = (List<DiaryVo>) intent.getSerializableExtra("diaryVos");
+                diaryList = diaryVos;
+                showAsyncSearchResult();
                 break;
             }
             default:break;
@@ -153,6 +209,29 @@ public class DiaryListActivity extends AppCompatActivity {
     }
 
     /**
+     * 处理批量删除的界面，异步加载，提供加载动画
+     */
+    private void showDeleteList2() {
+        //标题及提示
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle("批量删除");
+        tipView.setText("被选中日记的时间会被成蓝紫色，点击删除按钮预览确认被选中日记。");
+        //处理信息展示
+        GetSimpleDiaryByDateTask task = new GetSimpleDiaryByDateTask(handler);
+        task.getSimpleDiaryByDate("1024-06-16",BaseUtils.dateToString(new Date()).substring(0,10));
+
+
+    }
+
+    private void afterShowDeleteList2(){
+        DiaryAxisAdapterForDeleteList adapter = new DiaryAxisAdapterForDeleteList(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+    }
+
+    /**
      * 展示慢搜索的结果
      */
     private void showFullSearchResult() {
@@ -164,6 +243,21 @@ public class DiaryListActivity extends AppCompatActivity {
         assert supportActionBar != null;
         supportActionBar.setTitle("慢速搜索结果");
         tipView.setText("搜索到的日记共有"+diaryList.size()+"条");
+        adapter = new DiaryAxisAdapter(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+    }
+
+    /**
+     * 展示异步搜索的结果
+     */
+    private void showAsyncSearchResult() {
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle("搜索结果");
+        String searchValue = getIntent().getStringExtra("searchValue");
+        tipView.setText("搜索到包含【"+searchValue+"】的日记共有"+diaryList.size()+"条");
         adapter = new DiaryAxisAdapter(diaryList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -220,7 +314,7 @@ public class DiaryListActivity extends AppCompatActivity {
             case OPEN_FROM_TIME_AXIS:
             case OPEN_FROM_SEARCH_DIARY:
             case OPEN_FROM_SEARCH_LABEL:{
-                if(diaryList.size()>=2){
+                if(null!=diaryList && diaryList.size()>=2){
                     getMenuInflater().inflate(R.menu.toolbar_diary_lits,menu);
                     break;
                 }
@@ -297,6 +391,34 @@ public class DiaryListActivity extends AppCompatActivity {
     }
 
     /**
+     * 继续造屎山
+     *
+     *
+     * 展示从时间轴来的数据，异步加载，提供动画
+     * @param dateOneStr
+     * @param dateTwoStr
+     */
+    private void showSimpleDiary2(String dateOneStr,String dateTwoStr){
+        ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setTitle("时间轴");
+        GetSimpleDiaryByDateTask task = new GetSimpleDiaryByDateTask(handler);
+        task.getSimpleDiaryByDate(dateOneStr,dateTwoStr);
+        //这里加两个是为了显示右上角的信息流按钮。。。。
+        diaryList = new ArrayList<>();
+        diaryList.add(new DiaryVo());
+        diaryList.add(new DiaryVo());
+    }
+
+    private void afterShowSimpleDiary2(String dateOneStr,String dateTwoStr){
+        tipView.setText("在"+dateOneStr+"到"+dateTwoStr+"的时间段内，共有"+diaryList.size()+"条日记");
+        adapter = new DiaryAxisAdapter(diaryList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+    }
+
+    /**
      * 展示从搜索结果来的数据
      * @param ids
      */
@@ -362,6 +484,27 @@ public class DiaryListActivity extends AppCompatActivity {
         }
     }
 
+    private void showProgressAlertDialog(){
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        LinearLayout linearLayout = new LinearLayout(DiaryListActivity.this);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        ImageView imageView = new ImageView(DiaryListActivity.this);
+        imageView.setImageResource(R.drawable.loading);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(500,500);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Drawable drawable = imageView.getDrawable();
+        if(drawable instanceof AnimatedImageDrawable){
+            AnimatedImageDrawable animatedImageDrawable = (AnimatedImageDrawable) drawable;
+            animatedImageDrawable.start();
+        }
+        linearLayout.addView(imageView);
+        builder.setView(linearLayout);
+        ProgressADL = builder.show();
+    }
+
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -372,6 +515,11 @@ public class DiaryListActivity extends AppCompatActivity {
                 break;
             }
             case R.id.toolbar_diary_list_flow:{
+                //由于在时间轴界面默认显示信息流按钮，所以在这里加一个判断，如果列表的日记数量小于2，则按钮不响应
+                if(diaryList.size()<2){
+                    BaseUtils.shortTipInSnack(recyclerView,"日记数量小于2，不允许跳转信息流");
+                    break;
+                }
                 AtomicReference<String> select = new AtomicReference<>();
                 final String[] items = {"倒序","顺序"};
                 select.set(items[0]);

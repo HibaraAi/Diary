@@ -82,10 +82,10 @@
             app:key="funnyInfo"
             app:title="数据分析"
             app:summary="“消消乐”为你分析了一些有趣的数据"/>
-        <Preference
-            app:key="fullSearch"
-            app:title="慢速搜索"
-            app:summary="根据关键字搜索日记正文，列出匹配对象"/>
+<!--        <Preference-->
+<!--            app:key="fullSearch"-->
+<!--            app:title="慢速搜索"-->
+<!--            app:summary="根据关键字搜索日记正文，列出匹配对象"/>-->
         <Preference
             app:key="ascRead"
             app:title="时间升序浏览"

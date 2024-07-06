@@ -65,6 +65,7 @@ public class PicturesActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         Intent intent = getIntent();
         int openFromType = intent.getIntExtra(OPEN_FROM_TYPE, OPEN_FROM_PICTURE);
+        recyclerView = findViewById(R.id.at_pic_rv);
         if(openFromType==OPEN_FROM_PICTURE){
             if(null!=actionBar){
                 actionBar.setDisplayHomeAsUpEnabled(true);
@@ -73,7 +74,8 @@ public class PicturesActivity extends AppCompatActivity {
             DrawingService drawingService = new DrawIngServiceImpl();
             Map<Integer, List<Drawing>> allPic = drawingService.getAllPic();
             if(allPic.isEmpty()){
-                BaseUtils.longTipInCoast(this,"日记暂时没有存图片");
+                BaseUtils.longTipInSnack(recyclerView,"日记暂时没有存图片");
+//                BaseUtils.longTipInCoast(this,"日记暂时没有存图片");
             }else{
                 //去除标签为“图库”的日记
                 Set<Integer> integers = allPic.keySet();
@@ -97,7 +99,8 @@ public class PicturesActivity extends AppCompatActivity {
             VideoService videoService = new VideoServiceImpl();
             Map<Integer, List<Video>> allVideos = videoService.getAllVideos();
             if (allVideos.isEmpty()) {
-                BaseUtils.longTipInCoast(this,"日记暂时没有存视频");
+//                BaseUtils.longTipInCoast(this,"日记暂时没有存视频");
+                BaseUtils.longTipInSnack(recyclerView,"日记暂时没有存视频");
             }else{
                 //去除标签为“视频库”的日记
                 Set<Integer> integers = allVideos.keySet();

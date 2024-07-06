@@ -281,7 +281,8 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         viewHolder.label.setOnLongClickListener(v -> {
             String allLabel = viewHolder.label.getText().toString();
             BaseUtils.copyInClipboard(context,allLabel);
-            BaseUtils.shortTipInCoast(context,"已复制: "+allLabel);
+//            BaseUtils.shortTipInCoast(context,"已复制: "+allLabel);
+            BaseUtils.shortTipInSnack(view,"已复制: "+allLabel);
             return true;
         });
         //长按引用日记

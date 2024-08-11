@@ -357,6 +357,7 @@ public class DiaryServiceImpl implements DiaryService {
         }
         DiaryVo vo = new DiaryVo();
         vo.setId(diary.getId());
+        vo.setMyUuid(diary.getMyUuid());
         if(diary.getEncryption()){
             //需要解密
             vo.setContent(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()));

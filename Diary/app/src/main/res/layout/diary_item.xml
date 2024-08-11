@@ -149,10 +149,10 @@
         app:layout_constraintTop_toBottomOf="@+id/item_btn_comment"
         app:layout_constraintLeft_toRightOf="@id/blank_area_left"
         app:layout_constraintRight_toLeftOf="@id/blank_area_right"
-        app:cardCornerRadius="0dp"
+        app:cardCornerRadius="10dp"
         android:paddingBottom="10dp"
         android:visibility="gone"
-        android:elevation="0dp">
+        android:elevation="1dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -161,8 +161,10 @@
                 android:id="@+id/item_comment_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:minLines="2"
                 android:hint="在此输入评论"
-                android:background="@drawable/background_input"/>
+                android:background="@drawable/edge"/>
             <Button
                 android:id="@+id/item_comment_input_btn"
                 android:layout_width="wrap_content"
@@ -180,11 +182,13 @@
     </androidx.cardview.widget.CardView>
     <!--不知为何，评论区的cardView底边框会被遮住一些，所以需要下面的空行太高一下整个item-->
     <TextView
+        android:id="@+id/item_ddsggdgrhrh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_comment_area_parent"
-        android:text="      "/>
+        android:text="      "
+        android:textSize="3dp"/>
 
     <!--引用日记更新的日记文本内容-->
     <androidx.cardview.widget.CardView
@@ -192,11 +196,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintVertical_weight="1"
-        app:layout_constraintTop_toBottomOf="@+id/item_comment_area_parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_ddsggdgrhrh"
         app:layout_constraintLeft_toRightOf="@+id/blank_area_left"
         app:layout_constraintRight_toLeftOf="@+id/blank_area_right"
         android:paddingHorizontal="10dp"
         android:layout_marginTop="3dp"
+        app:cardCornerRadius="10dp"
+        android:elevation="1dp"
         android:visibility="gone">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_margin="5dp"

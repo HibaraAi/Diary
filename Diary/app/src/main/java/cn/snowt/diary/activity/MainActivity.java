@@ -214,7 +214,10 @@ public class MainActivity extends AppCompatActivity {
 //                    break;
 //                }
                 case R.id.nav_note:{
-                    BaseUtils.gotoActivity(MainActivity.this, NoteActivity.class);
+                    Intent intent = new Intent(MainActivity.this, NoteActivity.class);
+                    intent.putExtra(NoteActivity.OPEN_FROM,NoteActivity.OPEN_FROM_MAIN_ACTIVITY);
+                    startActivity(intent);
+//                    BaseUtils.gotoActivity(MainActivity.this, NoteActivity.class);
                     break;
                 }
                 case R.id.nav_settings:{
@@ -237,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     TextView timeOne = new TextView(MainActivity.this);
                     TextView timeTwo = new TextView(MainActivity.this);
+                    TextView blank = new TextView(MainActivity.this);
                     timeOne.setOnClickListener(v->{
                         Calendar calendar = Calendar.getInstance();
                         DatePickerDialog datePickerDialog = new DatePickerDialog(
@@ -261,13 +265,22 @@ public class MainActivity extends AppCompatActivity {
                         datePickerDialog.setCancelable(false);
                         datePickerDialog.show();
                     });
-                    timeOne.setBackgroundResource(R.drawable.background_input);
+                    timeOne.setBackgroundResource(R.drawable.edge);
+                    timeOne.setPadding(5,5,5,5);
+                    timeOne.setMinLines(2);
+                    timeOne.setGravity(Gravity.CENTER_VERTICAL);
                     timeOne.setHint("点击选择日期一");
-                    timeTwo.setBackgroundResource(R.drawable.background_input);
+                    timeTwo.setBackgroundResource(R.drawable.edge);
+                    timeTwo.setPadding(5,5,5,5);
+                    timeTwo.setMinLines(2);
+                    timeTwo.setGravity(Gravity.CENTER_VERTICAL);
                     timeTwo.setHint("点击选择日期二");
+                    blank.setText(" ");
+                    blank.setTextSize(2);
                     LinearLayout linearLayout = new LinearLayout(this);
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                     linearLayout.addView(timeOne);
+                    linearLayout.addView(blank);
                     linearLayout.addView(timeTwo);
                     builder.setView(linearLayout);
                     builder.setCancelable(false);
@@ -383,7 +396,9 @@ public class MainActivity extends AppCompatActivity {
             dialog.setMessage("请输入新的用户名");
             EditText editText = new EditText(MainActivity.this);
             editText.setHint("用户名不建议太长");
-            editText.setBackgroundResource(R.drawable.background_input);
+            editText.setBackgroundResource(R.drawable.edge);
+            editText.setMinLines(2);
+            editText.setPadding(10,10,10,10);
             dialog.setView(editText);
             dialog.setCancelable(false);
             dialog.setPositiveButton("确定", (dialog1, which) -> {
@@ -407,7 +422,9 @@ public class MainActivity extends AppCompatActivity {
             dialog.setMessage("请输入新的个性签名");
             EditText editText = new EditText(MainActivity.this);
             editText.setHint("在这里输入...");
-            editText.setBackgroundResource(R.drawable.background_input);
+            editText.setBackgroundResource(R.drawable.edge);
+            editText.setMinLines(2);
+            editText.setPadding(10,10,10,10);
             dialog.setView(editText);
             dialog.setCancelable(false);
             dialog.setPositiveButton("确定", (dialog1, which) -> {
@@ -572,7 +589,8 @@ public class MainActivity extends AppCompatActivity {
                 builder.setTitle("搜索日记");
                 builder.setMessage("仅搜索日记及评论文本");
                 EditText editText = new EditText(MainActivity.this);
-                editText.setBackgroundResource(R.drawable.background_input);
+                editText.setBackgroundResource(R.drawable.edge);
+                editText.setPadding(10,10,10,10);
                 editText.setHint("输入搜索内容");
                 editText.setMaxLines(3);
                 editText.setMinLines(3);

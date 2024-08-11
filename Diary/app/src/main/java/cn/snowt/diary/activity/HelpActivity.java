@@ -218,6 +218,15 @@ public class HelpActivity extends AppCompatActivity {
         diaryVo15.setContent(Constant.STRING_UPDATE_15);
         diaryVos.add(diaryVo15);
 
+        DiaryVo diaryVo16 = new DiaryVo();
+        diaryVo16.setId(R.drawable.head_hibara);
+        diaryVo16.setMyUuid("HibaraAi");
+        diaryVo16.setModifiedDate(BaseUtils.dateToString(new Date()));
+        diaryVo16.setLocationStr("我已经在尽力完善APP了");
+        diaryVo16.setLabelStr("#1.5.1版本#");
+        diaryVo16.setContent(Constant.STRING_UPDATE_16);
+        diaryVos.add(diaryVo16);
+
         helpAdapter = new HelpAdapter(diaryVos);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setAdapter(helpAdapter);
@@ -232,70 +241,70 @@ public class HelpActivity extends AppCompatActivity {
         
         DiaryVo diaryVo = new DiaryVo();
         diaryVo.setId(R.drawable.head_hibara);
-        diaryVo.setMyUuid("帮助");
+        diaryVo.setMyUuid("HibaraAi");
         diaryVo.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVo.setLocationStr("这里要有字才好看");
-        diaryVo.setLabelStr("#功能介绍#");
+        diaryVo.setLabelStr("#帮助##功能介绍#");
         diaryVo.setContent(Constant.STRING_HELP_1);
         diaryVos.add(diaryVo);
         
         DiaryVo diaryVo2 = new DiaryVo();
         diaryVo2.setId(R.drawable.head_hibara);
-        diaryVo2.setMyUuid("帮助");
+        diaryVo2.setMyUuid("HibaraAi");
         diaryVo2.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVo2.setLocationStr("这里要有字才好看");
-        diaryVo2.setLabelStr("#安全相关#");
+        diaryVo2.setLabelStr("#帮助##安全相关#");
         diaryVo2.setContent(Constant.STRING_HELP_2);
         diaryVos.add(diaryVo2);
         
         DiaryVo diaryVo3 = new DiaryVo();
         diaryVo3.setId(R.drawable.head_hibara);
-        diaryVo3.setMyUuid("帮助");
+        diaryVo3.setMyUuid("HibaraAi");
         diaryVo3.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVo3.setLocationStr("这里要有字才好看");
-        diaryVo3.setLabelStr("#权限使用说明#");
+        diaryVo3.setLabelStr("#帮助##权限使用说明#");
         diaryVo3.setContent(Constant.STRING_HELP_3);
         diaryVos.add(diaryVo3);
         
         DiaryVo diaryVo4 = new DiaryVo();
         diaryVo4.setId(R.drawable.head_hibara);
-        diaryVo4.setMyUuid("帮助");
+        diaryVo4.setMyUuid("HibaraAi");
         diaryVo4.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVo4.setLocationStr("这里要有字才好看");
-        diaryVo4.setLabelStr("#登录有关#");
+        diaryVo4.setLabelStr("#帮助##登录有关#");
         diaryVo4.setContent(Constant.STRING_HELP_4);
         diaryVos.add(diaryVo4);
         
         DiaryVo diaryVo5 = new DiaryVo();
         diaryVo5.setId(R.drawable.head_hibara);
-        diaryVo5.setMyUuid("帮助");
+        diaryVo5.setMyUuid("HibaraAi");
         diaryVo5.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVo5.setLocationStr("这里要有字才好看");
-        diaryVo5.setLabelStr("#设置项说明#");
+        diaryVo5.setLabelStr("#帮助##设置项说明#");
         diaryVo5.setContent(Constant.STRING_HELP_5);
         diaryVos.add(diaryVo5);
         
         DiaryVo diaryVo6 = new DiaryVo();
         diaryVo6.setId(R.drawable.head_hibara);
-        diaryVo6.setMyUuid("帮助");
+        diaryVo6.setMyUuid("HibaraAi");
         diaryVo6.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVo6.setLocationStr("这里要有字才好看");
-        diaryVo6.setLabelStr("#Q&A#");
+        diaryVo6.setLabelStr("#帮助##Q&A#");
         diaryVo6.setContent(Constant.STRING_HELP_6);
         diaryVos.add(diaryVo6);
         
         DiaryVo diaryVo7 = new DiaryVo();
         diaryVo7.setId(R.drawable.head_hibara);
-        diaryVo7.setMyUuid("帮助");
+        diaryVo7.setMyUuid("HibaraAi");
         diaryVo7.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVo7.setLocationStr("这里要有字才好看");
-        diaryVo7.setLabelStr("#写在最后#");
+        diaryVo7.setLabelStr("#帮助##写在最后#");
         diaryVo7.setContent(Constant.STRING_HELP_7);
         diaryVos.add(diaryVo7);
 
         DiaryVo diaryVoAb = new DiaryVo();
         diaryVoAb.setId(R.drawable.head_hibara);
-        diaryVoAb.setMyUuid("关于");
+        diaryVoAb.setMyUuid("HibaraAi");
         diaryVoAb.setModifiedDate(BaseUtils.dateToString(new Date()));
         diaryVoAb.setLocationStr("这里要有字才好看");
         diaryVoAb.setLabelStr("#关于#");

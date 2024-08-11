@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 
 import org.litepal.LitePal;
@@ -66,6 +67,13 @@ public class PicturesActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int openFromType = intent.getIntExtra(OPEN_FROM_TYPE, OPEN_FROM_PICTURE);
         recyclerView = findViewById(R.id.at_pic_rv);
+        View parent = (View) recyclerView.getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            parent.setBackgroundResource(R.drawable.day_detail_bg);
+
+        }else{
+            parent.setBackgroundResource(R.drawable.night_bg);
+        }
         if(openFromType==OPEN_FROM_PICTURE){
             if(null!=actionBar){
                 actionBar.setDisplayHomeAsUpEnabled(true);

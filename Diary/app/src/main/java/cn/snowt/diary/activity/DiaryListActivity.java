@@ -266,6 +266,13 @@ public class DiaryListActivity extends AppCompatActivity {
 
     private void bindViewAndSetListener(){
         recyclerView = findViewById(R.id.axis_recyclerview);
+        View parent = (View) recyclerView.getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            parent.setBackgroundResource(R.drawable.day_detail_bg);
+
+        }else{
+            parent.setBackgroundResource(R.drawable.night_bg);
+        }
         tipView = findViewById(R.id.axis_tip);
         toolbar = findViewById(R.id.axis_toolbar);
         searchView = findViewById(R.id.axis_search);
@@ -313,7 +320,8 @@ public class DiaryListActivity extends AppCompatActivity {
             case OPEN_FROM_FULL_SEARCH:
             case OPEN_FROM_TIME_AXIS:
             case OPEN_FROM_SEARCH_DIARY:
-            case OPEN_FROM_SEARCH_LABEL:{
+            case OPEN_FROM_SEARCH_LABEL:
+            case OPEN_FROM_ASYNC_SEARCH:{
                 if(null!=diaryList && diaryList.size()>=2){
                     getMenuInflater().inflate(R.menu.toolbar_diary_lits,menu);
                     break;
@@ -331,6 +339,7 @@ public class DiaryListActivity extends AppCompatActivity {
         ActionBar supportActionBar = getSupportActionBar();
         assert supportActionBar != null;
         supportActionBar.setTitle("草稿箱");
+        BaseUtils.shortTipInSnack(tipView,"注意：草稿箱的数据不会加密！！");
         List<TempDiary> tempDiaries = LitePal.order("id desc").find(TempDiary.class);
         if(tempDiaries.size()>0){
             tipView.setText("草稿箱共有"+tempDiaries.size()+"条记录");

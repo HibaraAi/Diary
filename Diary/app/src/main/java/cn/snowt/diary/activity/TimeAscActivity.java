@@ -363,15 +363,16 @@ public class TimeAscActivity extends AppCompatActivity {
                 }
                 android.app.AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("验证你的身份");
-                builder.setMessage("\n\n将临时信息流的日记导出到一个PDF文件中，如果你在信息流删除了某个日记，请重新进入信息流，否则会导出失败。");
+                builder.setMessage("\n将临时信息流的日记导出到一个PDF文件中，如果你在信息流删除了某个日记，请重新进入信息流，否则会导出失败。");
                 EditText pinView = new EditText(context);
-                pinView.setHint("输入登陆密码");
-                pinView.setBackgroundResource(R.drawable.background_input);
+                pinView.setBackgroundResource(R.drawable.edge);
+                pinView.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 pinView.setMinLines(2);
                 pinView.setMaxLines(2);
+                pinView.setHint("输入登录密码");
+                pinView.setPadding(10,10,10,10);
                 builder.setView(pinView);
                 builder.setCancelable(false);
-                pinView.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 builder.setPositiveButton("验证密码并导出PDF", (dialog, which) -> {
                     String pinInput = pinView.getText().toString();
                     //空输入

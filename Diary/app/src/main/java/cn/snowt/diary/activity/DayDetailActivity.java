@@ -145,6 +145,13 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
             dayVo.setNeedNotice(isChecked);
         });
         img.setOnClickListener(this);
+        View parent = (View) img.getParent().getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            parent.setBackgroundResource(R.drawable.day_detail_bg);
+
+        }else{
+            parent.setBackgroundResource(R.drawable.night_bg);
+        }
     }
 
     private void changeEndDate() {

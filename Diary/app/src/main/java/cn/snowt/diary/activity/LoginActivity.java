@@ -79,7 +79,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //LOGIN_TYPE_GOTO_NOTE= 3;
             case 3:{
                 if (!getIntent().getBooleanExtra("trueLogin",false)) {
-                    BaseUtils.gotoActivity(LoginActivity.this,NoteActivity.class);
+//                    BaseUtils.gotoActivity(LoginActivity.this,NoteActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, NoteActivity.class);
+                    intent.putExtra(NoteActivity.OPEN_FROM,NoteActivity.OPEN_FROM_BEFORE_LOGIN);
+                    startActivity(intent);
                     finish();
                 }
                 break;

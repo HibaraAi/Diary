@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,8 +31,9 @@ public class ThanksActivity extends AppCompatActivity {
 
     private void initThanks(){
         thanksVoList = new ArrayList<>();
-        thanksVoList.add(new ThanksVo(R.drawable.thanks_01,"戟间血：","BUG反馈--Android11的存储兼容性问题"));
-        thanksVoList.add(new ThanksVo(R.drawable.thanks_02,"看哔哩世界：","BUG反馈--“备份与恢复”功能会闪退"));
+        thanksVoList.add(new ThanksVo(R.drawable.thanks_01,"戟间血","BUG反馈--Android11的存储兼容性问题"));
+        thanksVoList.add(new ThanksVo(R.drawable.thanks_02,"看哔哩世界","BUG反馈--“备份与恢复”功能会闪退"));
+        thanksVoList.add(new ThanksVo(R.drawable.thanks_03,"鱼缸要睡个好觉","功能建议--日记编辑界面在意外关闭的情况下支持恢复日记文本"));
     }
 
     @Override
@@ -46,6 +48,13 @@ public class ThanksActivity extends AppCompatActivity {
         }
         initThanks();
         RecyclerView recyclerView = findViewById(R.id.at_thank_ryv);
+        View parent = (View) recyclerView.getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            parent.setBackgroundResource(R.drawable.day_detail_bg);
+
+        }else{
+            parent.setBackgroundResource(R.drawable.night_bg);
+        }
         ThanksAdapter thanksAdapter = new ThanksAdapter(thanksVoList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

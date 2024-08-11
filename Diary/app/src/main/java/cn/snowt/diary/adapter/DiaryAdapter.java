@@ -344,17 +344,23 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         GridLayoutManager layoutManager2 = new GridLayoutManager(context, 1);
         commentRecyclerView.setAdapter(commentAdapter);
         commentRecyclerView.setLayoutManager(layoutManager2);
+        androidx.cardview.widget.CardView commentAreaParent=newHolder.diaryView.findViewById(R.id.item_comment_area_parent);
+        if (context.getResources().getConfiguration().uiMode == 0x11) {
+            commentAreaParent.setCardBackgroundColor(Color.parseColor("#EFEAEB"));
+        }else{
+            commentAreaParent.setCardBackgroundColor(Color.parseColor("#525050"));
+        }
         if(!diaryVo.getCommentList().isEmpty()){
             newHolder.comment.setText("评论("+diaryVo.getCommentList().size()+")");
             //改为可见
             if(MyConfiguration.getInstance().isAutoOpenComment()){
-                newHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.VISIBLE);
+                commentAreaParent.setVisibility(View.VISIBLE);
                 newHolder.visible = true;
             }
         }else{
             newHolder.comment.setText("评论");
             //改为不可见
-            newHolder.diaryView.findViewById(R.id.item_comment_area_parent).setVisibility(View.GONE);
+            commentAreaParent.setVisibility(View.GONE);
             newHolder.visible = false;
         }
         //处理引用日记

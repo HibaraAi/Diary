@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <ImageView
-        android:id="@+id/thank_item_head"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:padding="10dp"
-        android:src="@drawable/thanks_01"
-        android:scaleType="centerCrop"/>
-
-
-    <TextView
-        android:id="@+id/thank_item_name"
-        android:layout_width="0dp"
-        android:layout_height="18dp"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintTop_toTopOf="@+id/thank_item_head"
-        app:layout_constraintLeft_toRightOf="@+id/thank_item_head"
-        android:text="我是你说的的撒旦是德国的:"
-        android:textColor="?attr/colorPrimary"
-        android:padding="1dp"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:gravity="center_vertical"/>
-    <TextView
-        android:id="@+id/thank_item_text"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintTop_toBottomOf="@+id/thank_item_name"
-        app:layout_constraintBottom_toBottomOf="@+id/thank_item_head"
-        app:layout_constraintLeft_toRightOf="@+id/thank_item_head"
-        android:text="BUG反馈--Android11兼容性问题"
-        android:padding="1dp"
-        android:layout_marginLeft="10dp"
-        android:textSize="11dp"/>
-    <View
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="7dp"
+    android:padding="10dp"
+    app:cardCornerRadius="10dp"
+    android:elevation="1dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="?attr/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <ImageView
+            android:id="@+id/thanks_item_img"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/nav_icon"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:elevation="2dp"/>
+
+        <TextView
+            android:id="@+id/thanks_item_name"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/thanks_item_img"
+            app:layout_constraintLeft_toRightOf="@+id/thanks_item_img"
+            app:layout_constraintRight_toRightOf="parent"
+            android:padding="5dp"
+            android:textSize="20dp"
+            android:textColor="?attr/colorPrimary"
+            android:text="春节春节春节春节"/>
+
+        <TextView
+            android:id="@+id/thanks_item_text"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/thanks_item_name"
+            app:layout_constraintLeft_toRightOf="@+id/thanks_item_img"
+            app:layout_constraintRight_toRightOf="parent"
+            android:padding="5dp"
+            android:text="2021-10-09" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

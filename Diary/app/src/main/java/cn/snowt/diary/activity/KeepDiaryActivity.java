@@ -6,12 +6,14 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,6 +69,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
 
     public static final String TAG = "KeepDiaryActivity";
     public static final String OPEN_FROM_TYPE = "openFrom";
+    public static final String AUTO_SAVE_DIARY_KEY = "autoSaveInSP";
     public static final int OPEN_FROM_TEMP_DIARY = 1; //草稿箱来
     public static final int OPEN_FROM_UPDATE_DIARY = 2; //更新日记
     public static final int OPEN_FROM_QUOTE_ADD = 3; //引用了某条日记的新增
@@ -122,17 +125,22 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
      */
     private String quoteDiaryId = "";
 
-    private DiaryService diaryService = new DiaryServiceImpl();
+    private final DiaryService diaryService = new DiaryServiceImpl();
 
     /**
      * 日记图片的最大数量
      */
-    private static int IMG_MAX_NUM = 50;
+    private static final int IMG_MAX_NUM = 50;
 
     /**
      * 日记视频的最大数量
      */
-    private static int VIDEO_MAX_NUM = 10;
+    private static final int VIDEO_MAX_NUM = 10;
+
+    /**
+     * 为了应对APP被突然关闭的情况，增加自动保存的功能
+     */
+    private boolean autoSave = true;
 
     boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
 
@@ -161,6 +169,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 }
                 case OPEN_FROM_UPDATE_DIARY:{
                     //从编辑已有日记来,将日记内容回写到输入框
+                    autoSave = false;   //编辑已有日记，不提供自动保存
                     updateDiaryId = intent.getIntExtra("id", -1);
                     SimpleResult result = diaryService.getDiaryVoById(updateDiaryId);
                     if(result!=null){
@@ -192,9 +201,10 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     break;
                 }
                 case OPEN_FROM_QUOTE_ADD:{
+                    autoSave = false;  //引用追根也不支持自动保存
                     quoteDiaryId = intent.getStringExtra("uuid");
                     if(null==quoteDiaryId || "".equals(quoteDiaryId)){
-                        BaseUtils.shortTipInCoast(this,"貌似出现了未知错误呢...");
+                        BaseUtils.shortTipInCoast(this,"貌似出现了未知错误呢...2233");
                         finish();
                     }else{
                         if("noUuid".equals(quoteDiaryId)){
@@ -217,7 +227,20 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     }
                     break;
                 }
-                default:break;
+                default:{
+                    //默认就是无特殊情况的打开编辑界面
+                    //读取有无之前自动保存的日记
+                    String autoSaveInSP = getAutoSaveInSP();
+                    if(!"".equals(autoSaveInSP)){
+                        diaryInputView.setText(autoSaveInSP);
+                        String tiptip = "之前貌似闪退了？已为你恢复之前未保存的日记文本。" +
+                                "\n注意：从草稿箱、更新日记文本、引用追更打开编辑界面的日记文本不会自动恢复的。" +
+                                "自动恢复只会记文本内容，且自动恢复只能记最新的一个文本。";
+                        BaseUtils.alertDialogToShow(KeepDiaryActivity.this,"提示",tiptip);
+                        delAutoSaveInSP();  //已读取则删除这个自动保存的内容。
+                    }
+                    break;
+                }
             }
         }
     }
@@ -246,6 +269,16 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         weatherView = findViewById(R.id.keep_diary_weather);
         labelView = findViewById(R.id.keep_diary_label);
         dateView = findViewById(R.id.keep_diary_date);
+        //让图片按钮的颜色与主色调一致
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        int color =  typedValue.data;
+        addPicBtn.setColorFilter(color);
+        addLabelBtn.setColorFilter(color);
+        loadLocationBtn.setColorFilter(color);
+        loadWeatherBtn.setColorFilter(color);
+        addDateBtn.setColorFilter(color);
+        addVideoBtn.setColorFilter(color);
         //处理图片展示区
         imageTempSrcList = new ArrayList<>();
         imageAdapter = new DiaryImageAdapter((ArrayList<String>) imageTempSrcList);
@@ -330,6 +363,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 }else if(diaryInputStr.length()>2000){
                     BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存 ORz");
                 }else{
+                    //开始保存日记
                     Date date = null;
                     String dateStr = dateView.getText().toString();
                     if(!"".equals(dateStr)){
@@ -337,11 +371,13 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     }
                     SimpleResult result;
                     if(-1!=updateDiaryId){
+                        //更新日记文本
                         Diary diary = new Diary();
                         diary.setContent(diaryInputStr);
                         diary.setId(updateDiaryId);
                         result = diaryService.updateDiaryContentById(diary);
                     }else{
+                        //正常的保存
                         result = diaryService.addOneByArgs(diaryInputStr,
                                 labelView.getText().toString(),
                                 locationView.getText().toString(),
@@ -359,6 +395,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                         if(-1!=tempDiaryId){
                             LitePal.delete(TempDiary.class,tempDiaryId);
                         }
+                        autoSave = false;  //日记保存成功，不需要自动保存
+                        delAutoSaveInSP();
                         finish();
                     }else{
                         BaseUtils.shortTipInSnack(diaryInputView,result.getMsg());
@@ -410,7 +448,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     dialog.setMessage("暂时不支持读取地理位置，请手动输入");
                 }
                 EditText editText = new EditText(KeepDiaryActivity.this);
-                editText.setBackgroundResource(R.drawable.background_input);
+                editText.setBackgroundResource(R.drawable.edge);
                 editText.setMinLines(4);
                 editText.setMaxLines(4);
                 editText.setGravity(Gravity.START);
@@ -443,7 +481,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                             dialog2.setTitle("手动输入天气");
                             dialog2.setMessage("15字符以内");
                             EditText editText = new EditText(KeepDiaryActivity.this);
-                            editText.setBackgroundResource(R.drawable.background_input);
+                            editText.setBackgroundResource(R.drawable.edge);
                             editText.setMinLines(4);
                             editText.setMaxLines(4);
                             editText.setGravity(Gravity.START);
@@ -480,7 +518,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     dialog.setMessage("可输入多个标签，但请用英文#隔开。\ne.g:#美食##周末#");
                 }
                 EditText editText = new EditText(KeepDiaryActivity.this);
-                editText.setBackgroundResource(R.drawable.background_input);
+                editText.setBackgroundResource(R.drawable.edge);
                 editText.setMinLines(4);
                 editText.setMaxLines(4);
                 editText.setGravity(Gravity.START);
@@ -586,7 +624,45 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //清除图片缓存
         clearTempPinInEdit();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //自动保存未保存的日记到草稿箱
+        if(autoSave){
+            String trim = diaryInputView.getText().toString().trim();
+            if(!"".equals(trim)){
+                BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"消消乐：日记编辑已切到后台，触发某保护机制。");
+                autoSaveInSP(trim);
+            }
+        }
+    }
+
+    /**
+     * 为防止APP意外关闭时，日记文本没有保存，这里增加自动保存
+     * 自动保存未保存的日记。
+     * @param trim 日记文本
+     */
+    private void autoSaveInSP(String trim) {
+        SharedPreferences.Editor editor = BaseUtils.getSharedPreference().edit();
+        editor.putString(AUTO_SAVE_DIARY_KEY,trim);
+        editor.apply();
+    }
+
+    /**
+     * 删除自动保存的
+     */
+    private void delAutoSaveInSP(){
+        SharedPreferences.Editor editor = BaseUtils.getSharedPreference().edit();
+        editor.remove(AUTO_SAVE_DIARY_KEY);
+        editor.apply();
+    }
+
+    private String getAutoSaveInSP(){
+        return BaseUtils.getSharedPreference().getString(AUTO_SAVE_DIARY_KEY,"");
     }
 
     @Override
@@ -622,6 +698,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                         saveSuccess = tempDiary.save();
                     }
                     if(saveSuccess){
+                        autoSave = false;  //成功保存到草稿箱，不再需要自动保存
+                        delAutoSaveInSP();
                         finish();
                     }else{
                         BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
@@ -632,6 +710,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 if(-1!=tempDiaryId){
                     LitePal.delete(TempDiary.class,tempDiaryId);
                 }
+                autoSave = false;  //直接退出，也不再需要自动保存
+                delAutoSaveInSP();
                 finish();
             });
             builder.show();

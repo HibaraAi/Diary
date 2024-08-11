@@ -18,7 +18,8 @@
             android:maxLines="2"
             android:minLines="2"
             android:padding="10dp"
-            android:background="@drawable/background_input" />
+            android:layout_margin="2dp"
+            android:background="@drawable/edge" />
 
         <ListView
             android:id="@+id/ac_funny_list"

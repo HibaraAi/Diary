@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
@@ -72,6 +73,13 @@ public class SpecialDayActivity extends AppCompatActivity {
             actionBar.setTitle("纪念日");
         }
         recyclerView = findViewById(R.id.special_day_rv);
+        View parent = (View) recyclerView.getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            parent.setBackgroundResource(R.drawable.day_detail_bg);
+
+        }else{
+            parent.setBackgroundResource(R.drawable.night_bg);
+        }
     }
 
     @Override

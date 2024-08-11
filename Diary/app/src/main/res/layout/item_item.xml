@@ -1,44 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <TextView
-        android:id="@+id/item_date"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="7dp"
+    android:padding="10dp"
+    app:cardCornerRadius="10dp"
+    android:elevation="1dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:paddingLeft="10dp"
-        android:text="2023-01-19(周一) 15:90"
-        android:textSize="12dp"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_height="100dp"
+        android:padding="5dp">
 
-    <TextView
-        android:id="@+id/item_text"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:textSize="25dp"
-        android:text="测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是"
-        app:layout_constraintTop_toBottomOf="@+id/item_date"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/item_del"/>
+        <TextView
+            android:id="@+id/item_date"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:paddingLeft="10dp"
+            android:text="2023-01-19(周一) 15:90"
+            android:textSize="12dp"
+            android:textColor="?attr/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <ImageView
-        android:id="@+id/item_del"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/img_del"
-        android:paddingRight="10dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="?attr/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/item_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textSize="25dp"
+            android:text="测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是测试啊还是低hi哦啊返回oh股市的回顾还是安徽第哦啊是第哦啊是"
+            app:layout_constraintTop_toBottomOf="@+id/item_date"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/item_del"/>
+
+        <ImageView
+            android:id="@+id/item_del"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/img_del"
+            android:paddingRight="10dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

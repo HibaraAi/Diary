@@ -164,9 +164,12 @@ public class SettingsActivity extends AppCompatActivity {
                     builder.setTitle("警告");
                     builder.setMessage("此操作仅供卸载前执行。清除外存数据会删除所有软件数据，包括但不限于日记图片、备份文件、密钥文件。\n请输入登录密码确认此操作");
                     EditText editText = new EditText(context);
-                    editText.setBackgroundResource(R.drawable.background_input);
+                    editText.setBackgroundResource(R.drawable.edge);
                     editText.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD | InputType.TYPE_CLASS_NUMBER );
                     editText.setHint("输入登录密码");
+                    editText.setMinLines(2);
+                    editText.setMaxLines(2);
+                    editText.setPadding(10,5,10,5);
                     builder.setView(editText);
                     builder.setPositiveButton("确认清除数据", (dialog, which) -> {
                         String s = editText.getText().toString();
@@ -208,9 +211,10 @@ public class SettingsActivity extends AppCompatActivity {
                                 "\n3.同名标签设置");
                         EditText pinView = new EditText(context);
                         pinView.setHint("设置一个读取口令");
-                        pinView.setBackgroundResource(R.drawable.background_input);
+                        pinView.setBackgroundResource(R.drawable.edge);
                         pinView.setMinLines(2);
                         pinView.setMaxLines(2);
+                        pinView.setPadding(10,10,10,10);
                         builder.setView(pinView);
                         builder.setCancelable(false);
                         builder.setPositiveButton("备份", (dialog, which) -> {
@@ -245,10 +249,10 @@ public class SettingsActivity extends AppCompatActivity {
                     builder.setMessage("测试功能仅共开发者测试使用,输入测试码开启");
                     builder.setCancelable(false);
                     EditText editText = new EditText(context);
-                    editText.setBackgroundResource(R.drawable.background_input);
+                    editText.setBackgroundResource(R.drawable.edge);
                     editText.setMinLines(2);
                     editText.setMaxLines(2);
-                    editText.setPadding(30,10,10,30);
+                    editText.setPadding(10,10,10,10);
                     builder.setView(editText);
                     builder.setPositiveButton("开启", (dialog, which) -> {
                         if(Constant.TEST_FUN_KEY.equals(editText.getText().toString())){
@@ -290,13 +294,14 @@ public class SettingsActivity extends AppCompatActivity {
                     builder.setMessage("将所有日记以纯文本、不加密的方式导出到一个txt文件中。\n提示：导出需要解密数据，此过程非常久，有卡住现象属正常，请耐心等待，完成后自有提示。\n\n" +
                             "导出以下数据：1.日记正文  2.日记时间、地点、天气情况  3.日记评论内容及评论时间");
                     EditText pinView = new EditText(context);
+                    pinView.setBackgroundResource(R.drawable.edge);
+                    pinView.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     pinView.setHint("输入登陆密码");
-                    pinView.setBackgroundResource(R.drawable.background_input);
                     pinView.setMinLines(2);
                     pinView.setMaxLines(2);
+                    pinView.setPadding(10,10,10,10);
                     builder.setView(pinView);
                     builder.setCancelable(false);
-                    pinView.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     builder.setPositiveButton("验证密码并导出", (dialog, which) -> {
 //                        DiaryService diaryService = new DiaryServiceImpl();
                         String pinInput = pinView.getText().toString();
@@ -340,13 +345,23 @@ public class SettingsActivity extends AppCompatActivity {
                                 true)
                                 .show();
                     });
-                    timeOne.setBackgroundResource(R.drawable.background_input);
+                    timeOne.setBackgroundResource(R.drawable.edge);
+                    timeOne.setPadding(10,5,5,5);
+                    timeOne.setMinLines(2);
+                    timeOne.setGravity(Gravity.CENTER_VERTICAL);
                     timeOne.setHint("开始时间");
-                    timeTwo.setBackgroundResource(R.drawable.background_input);
+                    timeTwo.setBackgroundResource(R.drawable.edge);
+                    timeTwo.setPadding(10,5,5,5);
+                    timeTwo.setMinLines(2);
+                    timeTwo.setGravity(Gravity.CENTER_VERTICAL);
                     timeTwo.setHint("结束时间");
+                    TextView blank = new TextView(context);
+                    blank.setText(" ");
+                    blank.setTextSize(2);
                     LinearLayout linearLayout = new LinearLayout(context);
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                     linearLayout.addView(timeOne);
+                    linearLayout.addView(blank);
                     linearLayout.addView(timeTwo);
                     builder.setView(linearLayout);
                     builder.setCancelable(false);
@@ -443,9 +458,10 @@ public class SettingsActivity extends AppCompatActivity {
                                 "现在请为自动备份文件设置读取口令");
                         EditText pinView = new EditText(context);
                         pinView.setHint("设置一个读取口令");
-                        pinView.setBackgroundResource(R.drawable.background_input);
+                        pinView.setBackgroundResource(R.drawable.edge);
                         pinView.setMinLines(2);
                         pinView.setMaxLines(2);
+                        pinView.setPadding(10,10,10,10);
                         builder.setView(pinView);
                         builder.setCancelable(false);
                         builder.setPositiveButton("设置口令", (dialog, which) -> {

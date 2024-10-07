@@ -677,7 +677,7 @@ public class DiaryServiceImpl implements DiaryService {
         Location location1 = new Location(null,null,null,"广东省河源市");
         location1.save();
         String tip = "初次使用软件，建议先看看右侧菜单栏的“帮助”部分的内容，" +
-                "特别是关于本软件的登录、加密、备份相关的说明";
+                "特别是关于本软件的登录、加密、备份和本软件需要的权限的相关说明";
         Diary diary1 = new Diary(null,
                 "#初次使用软件#",
                 tip,

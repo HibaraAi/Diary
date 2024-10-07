@@ -1,6 +1,7 @@
 package cn.snowt.diary.activity;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,9 +77,9 @@ public class SpecialDayActivity extends AppCompatActivity {
         View parent = (View) recyclerView.getParent();
         if(this.getResources().getConfiguration().uiMode == 0x11){
             parent.setBackgroundResource(R.drawable.day_detail_bg);
-
         }else{
-            parent.setBackgroundResource(R.drawable.night_bg);
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
         }
     }
 

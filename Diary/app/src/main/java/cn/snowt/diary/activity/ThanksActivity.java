@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,10 +51,11 @@ public class ThanksActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.at_thank_ryv);
         View parent = (View) recyclerView.getParent();
         if(this.getResources().getConfiguration().uiMode == 0x11){
-            parent.setBackgroundResource(R.drawable.day_detail_bg);
-
+            //parent.setBackgroundResource(R.drawable.day_detail_bg);
+            parent.setBackgroundColor(Color.parseColor("#eeeeee"));
         }else{
-            parent.setBackgroundResource(R.drawable.night_bg);
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
         }
         ThanksAdapter thanksAdapter = new ThanksAdapter(thanksVoList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

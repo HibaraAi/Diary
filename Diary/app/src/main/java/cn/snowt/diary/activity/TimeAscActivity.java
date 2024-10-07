@@ -287,6 +287,14 @@ public class TimeAscActivity extends AppCompatActivity {
             BaseUtils.shortTipInSnack(this.recyclerView,"已返回顶部 OvO");
         });
         recyclerView = findViewById(R.id.asc_recyclerview);
+        View parent = (View) recyclerView.getParent().getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            //parent.setBackgroundResource(R.drawable.day_detail_bg);
+            parent.setBackgroundColor(Color.parseColor("#eeeeee"));
+        }else{
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
+        }
         refreshLayout = findViewById(R.id.asc_refresh);
         TypedValue typedValue = new TypedValue();
         getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);

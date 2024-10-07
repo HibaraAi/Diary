@@ -1,6 +1,7 @@
 package cn.snowt.note;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,10 +45,11 @@ public class FinishActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.at_finish_list);
         View parent = (View) recyclerView.getParent();
         if(this.getResources().getConfiguration().uiMode == 0x11){
-            parent.setBackgroundResource(R.drawable.day_detail_bg);
-
+            //parent.setBackgroundResource(R.drawable.day_detail_bg);
+            parent.setBackgroundColor(Color.parseColor("#eeeeee"));
         }else{
-            parent.setBackgroundResource(R.drawable.night_bg);
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
         }
         itemAdapter= new ItemAdapter(itemList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

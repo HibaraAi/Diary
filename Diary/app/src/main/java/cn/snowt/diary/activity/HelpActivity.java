@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -227,6 +228,15 @@ public class HelpActivity extends AppCompatActivity {
         diaryVo16.setContent(Constant.STRING_UPDATE_16);
         diaryVos.add(diaryVo16);
 
+        DiaryVo diaryVo17 = new DiaryVo();
+        diaryVo17.setId(R.drawable.head_hibara);
+        diaryVo17.setMyUuid("HibaraAi");
+        diaryVo17.setModifiedDate(BaseUtils.dateToString(new Date()));
+        diaryVo17.setLocationStr("我已经在尽力完善APP了");
+        diaryVo17.setLabelStr("#1.5.2版本#");
+        diaryVo17.setContent(Constant.STRING_UPDATE_17);
+        diaryVos.add(diaryVo17);
+
         helpAdapter = new HelpAdapter(diaryVos);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setAdapter(helpAdapter);
@@ -325,6 +335,14 @@ public class HelpActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         recyclerView = findViewById(R.id.help_recyclerview);
+        View parent = (View) recyclerView.getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            //parent.setBackgroundResource(R.drawable.day_detail_bg);
+            parent.setBackgroundColor(Color.parseColor("#eeeeee"));
+        }else{
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
+        }
     }
 
     /**

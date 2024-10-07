@@ -172,7 +172,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                         if (PermissionUtils.haveExternalStoragePermission(context)) {
                             PDFUtils.saveViewAsPdf(view);
                         }else{
-                            BaseUtils.alertDialogToShow(context,"提示","在你授予外部存储的读写权限前，你不能导出PDF。\n请在修改头像的地方授权。");
+                            BaseUtils.alertDialogToShow(context,"提示","在你授予外部存储的读写权限前，你不能导出PDF。\n请在主界面长按背景图进行授权。");
                         }
                         break;
                     }

@@ -199,6 +199,11 @@ public class MainActivity extends AppCompatActivity {
         }
         setSupportActionBar(toolbar);
         drawerLayout = findViewById(R.id.drawer_activity_main);
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            drawerLayout.setBackgroundColor(Color.parseColor("#eeeeee"));
+        }else{
+            drawerLayout.setBackgroundColor(Color.parseColor("#212b2e"));
+        }
         navView = findViewById(R.id.nav_view);
         ActionBar actionBar = getSupportActionBar();
         if(null!=actionBar){

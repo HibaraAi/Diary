@@ -107,7 +107,7 @@ public class SetRSAActivity extends AppCompatActivity implements View.OnClickLis
         switch (v.getId()) {
             case R.id.rsa_create_key:{
                 if(!PermissionUtils.haveExternalStoragePermission(SetRSAActivity.this)){
-                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能启用加密功能，因为加密密钥必须存储在外部存储中。你可以去修改头像的地方进行授权外部存储的读写权限");
+                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能启用加密功能，因为加密密钥必须存储在外部存储中给你。你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
                     List<String> randomKey = RSAUtils.getRandomKey();
                     publicKey = randomKey.get(0);

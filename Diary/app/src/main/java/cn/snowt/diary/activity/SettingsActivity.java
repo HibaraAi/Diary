@@ -201,7 +201,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 case "backupDiary":{
                     if(!PermissionUtils.haveExternalStoragePermission(context)){
-                        BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用备份功能，但你可以使用”导出TXT“功能。你可以去修改头像的地方进行授权外部存储的读写权限");
+                        BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用备份功能，但你可以使用”导出TXT“功能。你可以去主界面长按背景图进行授权外部存储的读写权限");
                     }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("设置读取密钥");
@@ -237,7 +237,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 case "recoveryDiary":{
                     if(!PermissionUtils.haveExternalStoragePermission(context)){
-                        BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用恢复功能。你可以去修改头像的地方进行授权外部存储的读写权限");
+                        BaseUtils.alertDialogToShow(context,"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能使用恢复功能，因为没有权限不能读取备份文件。\n你可以去主界面长按背景图进行授权。");
                     }else{
                         BaseUtils.gotoActivity((Activity) context,RecoveryDiaryActivity.class);
                     }

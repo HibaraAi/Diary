@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -329,7 +330,14 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
 
     private void initToolbar(){
         Toolbar toolbar = findViewById(R.id.keep_diary_toolbar);
-        //toolbar.setTitleTextColor(Color.parseColor("#D84214"));
+        View parent = (View) toolbar.getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            //parent.setBackgroundResource(R.drawable.day_detail_bg);
+            parent.setBackgroundColor(Color.parseColor("#eeeeee"));
+        }else{
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
+        }
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if(null!=actionBar){
@@ -430,7 +438,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_btn_image:{
                 //判断权限
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
-                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
+                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
                     if(imageTempSrcList.size()>=IMG_MAX_NUM){
                         BaseUtils.shortTipInSnack(v,"你最多选择"+IMG_MAX_NUM+"张图片。长按图片可将其移除。QaQ");
@@ -572,7 +580,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_video_tip:{
                 //判断权限
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
-                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去修改头像的地方进行授权外部存储的读写权限");
+                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
                     if(imageTempSrcList.size()>=VIDEO_MAX_NUM){
                         BaseUtils.shortTipInSnack(v,"你最多选择"+VIDEO_MAX_NUM+"个视频。长按视频可将其移除。QaQ");

@@ -266,7 +266,7 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
             case R.id.day_add_img_help:{
                 //判断权限
                 if(!PermissionUtils.haveExternalStoragePermission(AddSpecialDayActivity.this)){
-                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能为纪念日添加配图。\n你可以去修改头像的地方进行授权外部存储的读写权限");
+                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你不能为纪念日添加配图。\n你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
                     BaseUtils.openAlbum(this, Constant.OPEN_ALBUM_TYPE_ADD_DAY_ADD_PIC,CHOOSE_PICTURE);
                 }

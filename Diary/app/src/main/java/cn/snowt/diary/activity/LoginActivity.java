@@ -255,19 +255,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
+//    private void applyPermission() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+//        builder.setTitle("存储权限申请");
+//        builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，" +
+//                "你之后可以在“帮助”中看到申请的权限用在何处。" +
+//                "\n\n你可以拒绝授权，但涉及存储的功能，你都用不了。（你可以在后续使用中,前往修改头像得地方重新授予权限）");
+//        builder.setCancelable(false);
+//        builder.setPositiveButton("去授权", (dialog, which) -> PermissionUtils.applyExternalStoragePermission(LoginActivity.this,1));
+//        builder.setNegativeButton("暂不授权",((dialog, which) -> {
+//            //跳转设置登录密码界面
+//            BaseUtils.gotoActivity(this, SetPasswordActivity.class);
+//        }));
+//        builder.show();
+//    }
+
     private void applyPermission() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-        builder.setTitle("存储权限申请");
-        builder.setMessage("为了能更好的使用本软件，“消消乐”需要你许可外部存储的读写权限，" +
-                "你之后可以在“帮助”中看到申请的权限用在何处。" +
-                "\n\n你可以拒绝授权，但涉及存储的功能，你都用不了。（你可以在后续使用中,前往修改头像得地方重新授予权限）");
-        builder.setCancelable(false);
-        builder.setPositiveButton("去授权", (dialog, which) -> PermissionUtils.applyExternalStoragePermission(LoginActivity.this,1));
-        builder.setNegativeButton("暂不授权",((dialog, which) -> {
-            //跳转设置登录密码界面
-            BaseUtils.gotoActivity(this, SetPasswordActivity.class);
-        }));
-        builder.show();
+        //改版，软件刚安装时不申请权限，直接跳转登录
+        BaseUtils.gotoActivity(this, SetPasswordActivity.class);
     }
 
     /**

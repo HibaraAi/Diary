@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -87,6 +89,14 @@ public class DiaryDetailActivity extends AppCompatActivity {
     private void bingViewAndSetListener() {
         toolbar = findViewById(R.id.detail_toolbar);
         recyclerView = findViewById(R.id.detail_recyclerview);
+        View parent = (View) recyclerView.getParent().getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            //parent.setBackgroundResource(R.drawable.day_detail_bg);
+            parent.setBackgroundColor(Color.parseColor("#eeeeee"));
+        }else{
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
+        }
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if(null!=supportActionBar){

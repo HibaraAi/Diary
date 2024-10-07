@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -268,10 +269,11 @@ public class DiaryListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.axis_recyclerview);
         View parent = (View) recyclerView.getParent();
         if(this.getResources().getConfiguration().uiMode == 0x11){
-            parent.setBackgroundResource(R.drawable.day_detail_bg);
-
+            //parent.setBackgroundResource(R.drawable.day_detail_bg);
+            parent.setBackgroundColor(Color.parseColor("#eeeeee"));
         }else{
-            parent.setBackgroundResource(R.drawable.night_bg);
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
         }
         tipView = findViewById(R.id.axis_tip);
         toolbar = findViewById(R.id.axis_toolbar);

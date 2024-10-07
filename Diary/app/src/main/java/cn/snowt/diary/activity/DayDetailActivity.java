@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -148,9 +149,9 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
         View parent = (View) img.getParent().getParent();
         if(this.getResources().getConfiguration().uiMode == 0x11){
             parent.setBackgroundResource(R.drawable.day_detail_bg);
-
         }else{
-            parent.setBackgroundResource(R.drawable.night_bg);
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
         }
     }
 

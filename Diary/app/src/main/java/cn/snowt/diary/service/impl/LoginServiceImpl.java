@@ -138,13 +138,52 @@ public class LoginServiceImpl implements LoginService {
         return flag;
     }
 
+//    /**
+//     * 检查用户输入的登录密码是否正确
+//     * @param inputPassword 用户输入的面膜
+//     * @return true-正确
+//     */
+//    private Boolean checkLoginPassword(String inputPassword){
+//        return sharedPreferences.getString("loginPassword","").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX+inputPassword));
+//    }
+
     /**
+     * 第二版登录，可以使用旧密码登录，旧密码之只能用五次
      * 检查用户输入的登录密码是否正确
      * @param inputPassword 用户输入的面膜
      * @return true-正确
      */
     private Boolean checkLoginPassword(String inputPassword){
-        return sharedPreferences.getString("loginPassword","").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX+inputPassword));
+        boolean nowPassword = sharedPreferences.getString("loginPassword", "").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX + inputPassword));
+        if(nowPassword){
+            //新密码登录成功
+            if(!"".equals(sharedPreferences.getString("oldLoginPassword", ""))){
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+                //存在旧密码，旧密码的可用次数减一
+                int oldPasswordNum = sharedPreferences.getInt("oldPasswordNum", 5);
+                oldPasswordNum = oldPasswordNum-1;
+                if(0==oldPasswordNum){
+                    //可用次数为0，清除旧密码
+                    BaseUtils.longTipInCoast(LitePalApplication.getContext(),"已使用新密码登录5次，旧密码不再可用");
+                    edit.putString("oldLoginPassword","");
+                }
+                else{
+                    BaseUtils.longTipInCoast(LitePalApplication.getContext(),"提示：再用新密码登录"+oldPasswordNum+"次后，旧密码即被删除。");
+                    edit.putInt("oldPasswordNum",oldPasswordNum);
+                }
+                edit.apply();
+            }
+            return true;
+        }else{
+            boolean oldPassword = sharedPreferences.getString("oldLoginPassword", "").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX + inputPassword));
+            if(oldPassword){
+                //旧密码登录成功，提示应该使用新密码登录
+                BaseUtils.longTipInCoast(LitePalApplication.getContext(),"建议使用新密码登录。如忘记新密码请及时修改");
+                return true;
+            }
+        }
+        //新旧密码都不对
+        return false;
     }
 
     /**
@@ -201,17 +240,49 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
+//    /**
+//     * 检查旧密码是否正确
+//     * @param old 输入的旧密码
+//     * @return SimpleResult
+//     */
+//    private Boolean checkOldPassword(String old){
+//        String loginPinInSharedP = sharedPreferences.getString("loginPassword", null);
+//        return loginPinInSharedP.equals(MD5Utils.encrypt(old));
+//    }
+
     /**
+     * 第二版，旧密码可用时，旧密码也可以用户修改登录密码
      * 检查旧密码是否正确
      * @param old 输入的旧密码
      * @return SimpleResult
      */
     private Boolean checkOldPassword(String old){
         String loginPinInSharedP = sharedPreferences.getString("loginPassword", null);
-        return loginPinInSharedP.equals(MD5Utils.encrypt(old));
+        String loginPinInSharedP2 = sharedPreferences.getString("oldLoginPassword", null);
+        return loginPinInSharedP.equals(MD5Utils.encrypt(old)) || loginPinInSharedP2.equals(MD5Utils.encrypt(old));
     }
 
+//    /**
+//     * 尝试更新密码
+//     * @param newPasswordStr newPassword
+//     * @param newPasswordAgainStr newPasswordAgain
+//     * @return SimpleResult
+//     */
+//    private SimpleResult tryUpdatePassword(String newPasswordStr,String newPasswordAgainStr){
+//        SimpleResult result = checkNewPassword(newPasswordStr, newPasswordAgainStr);
+//        if(result.getSuccess()){
+//            SharedPreferences.Editor edit = sharedPreferences.edit();
+//            edit.putString("loginPassword",MD5Utils.encrypt(Constant.PASSWORD_PREFIX+newPasswordStr));
+//            edit.putBoolean("firstUse",false);
+//            edit.apply();
+//            return result.msg("设置启动密码成功!");
+//        }else{
+//            return result;
+//        }
+//    }
+
     /**
+     * 第二版，把旧密码也存起来
      * 尝试更新密码
      * @param newPasswordStr newPassword
      * @param newPasswordAgainStr newPasswordAgain
@@ -220,7 +291,10 @@ public class LoginServiceImpl implements LoginService {
     private SimpleResult tryUpdatePassword(String newPasswordStr,String newPasswordAgainStr){
         SimpleResult result = checkNewPassword(newPasswordStr, newPasswordAgainStr);
         if(result.getSuccess()){
+            String string = sharedPreferences.getString("loginPassword", "");
             SharedPreferences.Editor edit = sharedPreferences.edit();
+            edit.putString("oldLoginPassword",string);
+            edit.putInt("oldPasswordNum",5);
             edit.putString("loginPassword",MD5Utils.encrypt(Constant.PASSWORD_PREFIX+newPasswordStr));
             edit.putBoolean("firstUse",false);
             edit.apply();

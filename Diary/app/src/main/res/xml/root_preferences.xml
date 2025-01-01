@@ -44,8 +44,8 @@
 
         <Preference
             app:key="loginType"
-            app:title="伪装方式"
-            app:summary="选择登录方式" />
+            app:title="首屏设置"
+            app:summary="其实就是跳过登录界面" />
 
         <Preference
             app:key="setPassword"

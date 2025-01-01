@@ -5,10 +5,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,7 +26,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import org.litepal.LitePal;
+import org.litepal.LitePalApplication;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -158,7 +169,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         //长按日记文字
         viewHolder.content.setOnLongClickListener(v->{
             AtomicReference<String> select = new AtomicReference<>();
-            final String[] items = {"复制日记","置顶日记","引用追更","查看详情","编辑日记","导出为PDF","删除"};
+            final String[] items = {"复制日记","置顶日记","引用追更","查看详情","编辑日记","存为图片","删除"};
             select.set(items[0]);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("日记菜单");
@@ -167,10 +178,11 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             });
             builder.setPositiveButton("确定", (dialog, which) -> {
                 switch (select.get()) {
-                    case "导出为PDF":{
+                    case "存为图片":{
                         //检查权限
                         if (PermissionUtils.haveExternalStoragePermission(context)) {
-                            PDFUtils.saveViewAsPdf(view);
+                            //PDFUtils.saveViewAsPdf(view);
+                            saveViewAsImage(view);
                         }else{
                             BaseUtils.alertDialogToShow(context,"提示","在你授予外部存储的读写权限前，你不能导出PDF。\n请在主界面长按背景图进行授权。");
                         }
@@ -300,6 +312,50 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             }
         });
         return viewHolder;
+    }
+
+    /**
+     * 将View保存为图片
+     * @param view
+     */
+    private void saveViewAsImage(View view) {
+        RecyclerView parent = (RecyclerView) view.getParent();
+//        view.measure(View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY),
+//                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+////        view.setDrawingCacheEnabled(true);
+////        view.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        view.draw(canvas);
+        FileOutputStream fos;
+        String imagePath = "";
+        try {
+            // 判断手机设备是否有SD卡
+            boolean isHasSDCard = Environment.getExternalStorageState().equals(
+                    android.os.Environment.MEDIA_MOUNTED);
+            if (isHasSDCard) {
+                // SD卡根目录
+                //File sdRoot = Environment.getExternalStorageDirectory();
+                String absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath()+"/消消乐/";
+                File sdRoot = new File(absolutePath);
+                File file = new File(sdRoot, Calendar.getInstance().getTimeInMillis()+".png");
+                fos = new FileOutputStream(file);
+                imagePath = file.getAbsolutePath();
+            } else
+                throw new Exception("创建文件失败!");
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+
+            fos.flush();
+            fos.close();
+            BaseUtils.alertDialogToShow(context,"提示","保存成功，存储地址为：相机目录\\消消乐");
+        } catch (Exception e) {
+            e.printStackTrace();
+            BaseUtils.shortTipInCoast(context,"保存失败");
+        }
+//        view.destroyDrawingCache();
     }
 
     @SuppressLint("SetTextI18n")

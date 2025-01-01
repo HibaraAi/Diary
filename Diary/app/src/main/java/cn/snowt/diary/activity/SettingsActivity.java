@@ -45,6 +45,7 @@ import cn.snowt.diary.util.MD5Utils;
 import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
+import cn.snowt.note.NoteActivity;
 
 /**
  * @Author: HibaraAi
@@ -176,7 +177,7 @@ public class SettingsActivity extends AppCompatActivity {
                         boolean truePassword = BaseUtils.getSharedPreference().getString("loginPassword","").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX+s));
                         if(truePassword){
                             String path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath();
-                            FileUtils.deleteFolder(path);
+                            FileUtils.safeDeleteFolder(path);
                             //重新展示缓存大小
                             Preference clearROMPreference = findPreference("clearROM");
                             //读取缓存大小并展示
@@ -399,7 +400,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case "themes":{
                     android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
                     dialog.setTitle("选择一个颜色");
-                    String[] items = {"默认","黑色","蓝色","绿色","紫色","红色","黄色"};
+                    String[] items = {"默认","黑色","蓝色","粉色","紫色","红色","黄色"};
                     final int[] themesId = new int[1];
                     dialog.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                         @Override
@@ -412,8 +413,8 @@ public class SettingsActivity extends AppCompatActivity {
                                 case "黑色":{
                                     themesId[0] = R.style.Theme_black;break;
                                 }
-                                case "绿色":{
-                                    themesId[0] = R.style.Theme_green;break;
+                                case "粉色":{
+                                    themesId[0] = R.style.Theme_消消乐;break;
                                 }
                                 case "红色":{
                                     themesId[0] = R.style.Theme_red;break;
@@ -425,7 +426,7 @@ public class SettingsActivity extends AppCompatActivity {
                                     themesId[0] = R.style.Theme_purple;break;
                                 }
                                 default:{
-                                    themesId[0] = R.style.Theme_消消乐;break;
+                                    themesId[0] = R.style.Theme_green;break;
                                 }
                             }
                         }
@@ -486,36 +487,67 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 }
                 case "loginType":{
-                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
-                    dialog.setTitle("伪装方式");
-                    String[] items = {"手动登录(默认)","自动登录","便签界面(新增一个“123”便签跳转登录)"};
-                    final int[] selectId = new int[1];
-                    dialog.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+                    AlertDialog.Builder builder  = new AlertDialog.Builder(context);
+                    builder.setTitle("必须要有个提示");
+                    builder.setMessage("设置的首屏是软件启动后的第一个界面，是为了方便快速启动。\n" +
+                            "默认就是登录界面；\n" +
+                            "还提供自动登录，这个只是帮你输入密码登录了而已，登录密码仍然是非常重要的数据！请不要忘记；\n" +
+                            "便签界面也允许不登录就能访问，能方便快捷记录东西，你新增一个内容为“123”的便签就能跳转登录。");
+                    builder.setCancelable(false);
+                    builder.setNegativeButton("没懂，我不使用此功能",null);
+                    builder.setPositiveButton("懂了，去选择首屏模式", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            switch (which) {
+                        public void onClick(DialogInterface dialog2222, int which2222) {
+                            int beSelected = 0;
+                            int loginType = BaseUtils.getSharedPreference().getInt("loginType", 2);
+                            switch (loginType){
+                                //LOGIN_TYPE_GOTO_NOTE= 3;
+                                case 3:{
+                                    beSelected = 2;
+                                    break;
+                                }
+                                //LOGIN_TYPE_AUTO_LOGIN = 1;
                                 case 1:{
-                                    selectId[0] = LoginActivity.LOGIN_TYPE_AUTO_LOGIN; break;
+                                    beSelected = 1;
+                                    break;
                                 }
-                                case 2:{
-                                    selectId[0] = LoginActivity.LOGIN_TYPE_GOTO_NOTE;break;
-                                }
-                                default:{
-                                    selectId[0] = LoginActivity.LOGIN_TYPE_DEFAULT;break;
-                                }
+                                default:
+                                    break;
                             }
+
+                            android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
+                            dialog.setTitle("首屏设置");
+                            String[] items = {"默认","自动登录","便签界面"};
+                            final int[] selectId = new int[1];
+                            dialog.setSingleChoiceItems(items, beSelected, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    switch (which) {
+                                        case 1:{
+                                            selectId[0] = LoginActivity.LOGIN_TYPE_AUTO_LOGIN; break;
+                                        }
+                                        case 2:{
+                                            selectId[0] = LoginActivity.LOGIN_TYPE_GOTO_NOTE;break;
+                                        }
+                                        default:{
+                                            selectId[0] = LoginActivity.LOGIN_TYPE_DEFAULT;break;
+                                        }
+                                    }
+                                }
+                            });
+                            dialog.setCancelable(false);
+                            dialog.setPositiveButton("确定", (dialog12, which) -> {
+                                SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+                                edit.putInt("loginType", selectId[0]);
+                                edit.apply();
+                                BaseUtils.shortTipInCoast(context,"重启后生效");
+                            });
+                            dialog.setNegativeButton("取消", null);
+                            dialog.show();
                         }
                     });
-                    dialog.setCancelable(false);
-                    dialog.setPositiveButton("确定", (dialog12, which) -> {
-                        SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
-                        edit.putInt("loginType", selectId[0]);
-                        edit.apply();
-                        BaseUtils.shortTipInCoast(context,"重启后生效");
-                    });
-                    dialog.setNegativeButton("取消", null);
-                    dialog.show();
+                    builder.show();
                     break;
                 }
                 case "pdfOutput":{

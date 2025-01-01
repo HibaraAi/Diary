@@ -1,6 +1,7 @@
 package cn.snowt.diary.util;
 
 import android.os.Environment;
+import android.util.Log;
 
 import org.litepal.LitePalApplication;
 
@@ -99,8 +100,36 @@ public class FileUtils {
      *  根据路径删除指定的目录或文件，无论存在与否
      *@param sPath  要删除的目录或文件
      *@return 删除成功返回 true，否则返回 false。
+     * @deprecated 这个方法不安全，有可能会删除用户的未见，建议使用safeDeleteFolder
      */
+    @Deprecated
     public static boolean deleteFolder(String sPath) {
+        boolean flag = false;
+        File file = new File(sPath);
+        // 判断目录或文件是否存在
+        if (!file.exists()) {
+            return flag;
+        } else {
+            // 判断是否为文件
+            if (file.isFile()) {
+                return deleteFile(sPath);
+            } else {  // 为目录时调用删除目录方法
+                return deleteDirectory(sPath);
+            }
+        }
+    }
+
+    /**
+     *  根据路径删除指定的目录或文件，无论存在与否
+     *  只删除自己创建的目录Hibara/Diary下的文件
+     *@param sPath  要删除的目录或文件
+     *@return 删除成功返回 true，否则返回 false。
+     */
+    public static boolean safeDeleteFolder(String sPath) {
+        if(!sPath.contains(Constant.EXTERNAL_STORAGE_LOCATION)){
+            Log.e("FileUtils","保险起见，如果要删除目录、文件的路径中不包含"+Constant.EXTERNAL_STORAGE_LOCATION+"的话，不执行删除操作");
+            return false;
+        }
         boolean flag = false;
         File file = new File(sPath);
         // 判断目录或文件是否存在

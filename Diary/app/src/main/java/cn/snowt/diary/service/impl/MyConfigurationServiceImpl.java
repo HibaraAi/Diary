@@ -14,6 +14,7 @@ import java.util.UUID;
 import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
+import cn.snowt.diary.util.FileUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
 
@@ -46,8 +47,9 @@ public class MyConfigurationServiceImpl implements MyConfigurationService {
             //String oldHeadImg = MyConfiguration.getInstance().getHeadImg();
             String oldHeadImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_HEAD_SRC,null);
             if(null!=oldHeadImg){
-                File file = new File(oldHeadImg);
-                file.delete();
+                FileUtils.safeDeleteFolder(oldHeadImg);
+//                File file = new File(oldHeadImg);
+//                file.delete();
                 Log.i(TAG,"------旧头像已删除");
             }
             SharedPreferences.Editor edit = sharedPreference.edit();
@@ -106,8 +108,9 @@ public class MyConfigurationServiceImpl implements MyConfigurationService {
             //String oldBgImg = MyConfiguration.getInstance().getBgImg();
             String oldBgImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_MAIN_IMG_BG,null);
             if(null!=oldBgImg){
-                File file = new File(oldBgImg);
-                file.delete();
+//                File file = new File(oldBgImg);
+//                file.delete();
+                FileUtils.safeDeleteFolder(oldBgImg);
                 Log.i(TAG,"------旧图片已删除");
             }
             SharedPreferences.Editor edit = sharedPreference.edit();
@@ -122,7 +125,8 @@ public class MyConfigurationServiceImpl implements MyConfigurationService {
         }finally {
             File tempFile = new File(UriUtils.getFilePathFromURI(LitePalApplication.getContext(),bgImageUri));
             if (tempFile.exists()){
-                tempFile.delete();
+//                tempFile.delete();
+                FileUtils.safeDeleteFolder(tempFile.getAbsolutePath());
                 Log.i(TAG,"------删除临时文件成功");
             }
         }

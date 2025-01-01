@@ -26,7 +26,7 @@ public class MyApplication extends org.litepal.LitePalApplication{
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-                int theme = BaseUtils.getSharedPreference().getInt("theme", R.style.Theme_消消乐);
+                int theme = BaseUtils.getSharedPreference().getInt("theme", R.style.Theme_green);
                 activity.setTheme(theme);
             }
 

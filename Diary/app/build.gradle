@@ -10,7 +10,7 @@ android {
         minSdk 29
         targetSdk 30
         versionCode 1
-        versionName "1.5.2.1"
+        versionName "1.5.3"
         resConfigs "zh", "zh-rCN"
 //        ndk {
 //            abiFilters 'x86_64','x86'/*, 'armeabi-v7a'*/
@@ -57,12 +57,15 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:2.1.0'
 
     // https://mvnrepository.com/artifact/com.github.bumptech.glide/glide
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
+//    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
 
     //SmartRefreshLayout
     implementation  'com.scwang.smart:refresh-layout-kernel:2.0.3'  //核心必须依赖
     implementation  'com.scwang.smart:refresh-header-radar:2.0.3'  //雷达刷新头
     implementation  'com.scwang.smart:refresh-footer-ball:2.0.3'  //球脉冲加载
 
-    implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.83'
+    implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.83'  //JSON
+
+    implementation 'io.github.lucksiege:pictureselector:v3.11.2'  //图片选择器
 }

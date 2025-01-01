@@ -205,7 +205,7 @@ public class LoginServiceImpl implements LoginService {
                 //删除数据库
                 LitePal.deleteDatabase("diary");
                 String path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath();
-                FileUtils.deleteFolder(path);
+                FileUtils.safeDeleteFolder(path);
                 BaseUtils.longTipInCoast(LitePalApplication.getContext(),"你输入错误密码的次数太多了，程序已自动删除所有存储的数据,密码已无意义，请卸载本程序。");
             }
             int tempLevel = Math.min((punishmentLevel), 10);

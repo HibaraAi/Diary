@@ -114,7 +114,7 @@ public class SpecialDayServiceImpl implements SpecialDayService {
         specialDay.delete();
         //还需要删除配图文件
         if(null!=specialDay.getImageSrc() && !"".equals(specialDay.getImageSrc())){
-            FileUtils.deleteFolder(specialDay.getImageSrc());
+            FileUtils.safeDeleteFolder(specialDay.getImageSrc());
         }
     }
 

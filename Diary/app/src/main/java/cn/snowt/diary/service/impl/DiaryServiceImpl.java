@@ -296,7 +296,8 @@ public class DiaryServiceImpl implements DiaryService {
         List<Drawing> drawings = LitePal.where("diaryId = ?", diaryId+"").find(Drawing.class);
         if(null!=drawings && drawings.size()>0){
             drawings.forEach(drawing -> {
-                new File(drawing.getImgSrc()).delete();
+//                new File(drawing.getImgSrc()).delete();
+                FileUtils.safeDeleteFolder(drawing.getImgSrc());
                 drawing.delete();
             });
         }
@@ -304,7 +305,8 @@ public class DiaryServiceImpl implements DiaryService {
         List<Video> videos = LitePal.where("diaryId = ?", diaryId + "").find(Video.class);
         if(null!=videos && videos.size()>0){
             videos.forEach(video -> {
-                new File(video.getVideoSrc()).delete();
+//                new File(video.getVideoSrc()).delete();
+                FileUtils.safeDeleteFolder(video.getVideoSrc());
                 video.delete();
             });
         }
@@ -1040,6 +1042,12 @@ public class DiaryServiceImpl implements DiaryService {
             calendar.add(Calendar.YEAR,-1);
             date = calendar.getTime();
         }
+        //为Diary按时间顺序排序
+        voList.sort((o1, o2) -> {
+            Date date1 = BaseUtils.stringToDate(o1.getModifiedDate());
+            Date date2 = BaseUtils.stringToDate(o2.getModifiedDate());
+            return date1.compareTo(date2);
+        });
         return voList;
     }
 

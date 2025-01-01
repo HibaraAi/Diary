@@ -35,6 +35,11 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.config.SelectMimeType;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnResultCallbackListener;
+
 import org.litepal.LitePal;
 
 import java.io.File;
@@ -56,6 +61,7 @@ import cn.snowt.diary.service.impl.DiaryServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
+import cn.snowt.diary.util.GlideEngine;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
@@ -436,15 +442,41 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         switch (v.getId()) {
             case R.id.keep_diary_btn_image_tip:
             case R.id.keep_diary_btn_image:{
+//                //判断权限
+//                if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
+//                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
+//                }else{
+//                    if(imageTempSrcList.size()>=IMG_MAX_NUM){
+//                        BaseUtils.shortTipInSnack(v,"你最多选择"+IMG_MAX_NUM+"张图片。长按图片可将其移除。QaQ");
+//                    }else{
+//                        BaseUtils.openAlbum(KeepDiaryActivity.this, Constant.OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC,CHOOSE_PICTURE);
+//                    }
+//                }
                 //判断权限
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
-                    if(imageTempSrcList.size()>=IMG_MAX_NUM){
-                        BaseUtils.shortTipInSnack(v,"你最多选择"+IMG_MAX_NUM+"张图片。长按图片可将其移除。QaQ");
-                    }else{
-                        BaseUtils.openAlbum(KeepDiaryActivity.this, Constant.OPEN_ALBUM_TYPE_KEEP_DIARY_ADD_PIC,CHOOSE_PICTURE);
-                    }
+                    PictureSelector.create(this)
+                            .openGallery(SelectMimeType.ofImage())
+                            .setImageEngine(GlideEngine.createGlideEngine())
+                            .isDisplayCamera(false)
+                            .setMaxSelectNum(IMG_MAX_NUM)
+                            .forResult(new OnResultCallbackListener<LocalMedia>() {
+                                @SuppressLint("NotifyDataSetChanged")
+                                @Override
+                                public void onResult(ArrayList<LocalMedia> result) {
+                                    result.forEach(localMedia -> {
+                                        imageTempSrcList.add(localMedia.getRealPath());
+                                        imageAdapter.notifyDataSetChanged();
+                                        //判断视频/图片有多大，给予等待提示
+                                        romSizeTip();
+                                    });
+                                }
+                                @Override
+                                public void onCancel() {
+
+                                }
+                            });
                 }
                 break;
             }
@@ -521,37 +553,51 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             case R.id.keep_diary_label:
             case R.id.keep_diary_btn_label:{
                 android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
-                dialog.setTitle("请输入标签");
+                dialog.setTitle("输入1个或多个标签");
                 if(!removeTip){
-                    dialog.setMessage("可输入多个标签，但请用英文#隔开。\ne.g:#美食##周末#");
+                    dialog.setMessage("标签总长度不能超过30个字符，点击弹窗外取消修改，标签支持以下两种输入方式：\n#美食##周末#\n美食。周末");
                 }
                 EditText editText = new EditText(KeepDiaryActivity.this);
                 editText.setBackgroundResource(R.drawable.edge);
                 editText.setMinLines(4);
                 editText.setMaxLines(4);
                 editText.setGravity(Gravity.START);
-                editText.setHint("空输入视为删除原有输入");
+                editText.setHint("两种输入方式最后都展示为#美食##周末#");
                 editText.setPadding(30,10,30,10);
                 dialog.setView(editText);
-                dialog.setCancelable(false);
-                dialog.setPositiveButton("添加", (dialog1, which) -> {
+                dialog.setCancelable(true);
+                dialog.setPositiveButton("添加标签", (dialog1, which) -> {
                     String labelStr = editText.getText().toString();
                     labelStr = labelStr.trim();
-                    int num = 0;
-                    for (char c : labelStr.toCharArray()) {
-                        if(c == '#'){
-                            num++;
+                    if(labelStr.length()<=30 && labelStr.contains("。")){  //新的标签解析，用。解析
+                        String[] split = labelStr.split("。");
+                        if(split.length>0){
+                            StringBuilder builder = new StringBuilder();
+                            for (String s : split) {
+                                builder.append("#").append(s).append("#");
+                            }
+                            labelView.setText(builder.toString());
+                        }else{
+                            BaseUtils.shortTipInSnack(dateView,"标签的总字符数不超过30,且格式必须正确");
+                        }
+                    } else{  //旧的标签解析，用#解析
+                        int num = 0;
+                        for (char c : labelStr.toCharArray()) {
+                            if(c == '#'){
+                                num++;
+                            }
+                        }
+                        boolean flag = (num%2==0 && num!=0);
+                        if(labelStr.length()<=30 && flag){
+                            labelView.setText(labelStr);
+                        }else{
+                            BaseUtils.shortTipInSnack(dateView,"标签的总字符数不超过30,且格式必须正确");
                         }
                     }
-                    boolean flag = (num%2==0 && num!=0);
-                    if(labelStr.length()<=30 && flag){
-                        labelView.setText(labelStr);
-                    }else{
-//                        BaseUtils.longTipInCoast(v.getContext(),"标签总字符数不超过30,格式必须正确");
-                        BaseUtils.shortTipInSnack(dateView,"标签的总字符数不超过30,且格式必须正确");
-                    }
                 });
-                dialog.setNegativeButton("取消",null);
+                dialog.setNegativeButton("删除标签",(dialog1, which) -> {
+                    labelView.setText("");
+                });
                 dialog.show();
                 break;
             }
@@ -578,18 +624,44 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
             }
             case R.id.keep_diary_btn_video:
             case R.id.keep_diary_video_tip:{
+//                //判断权限
+//                if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
+//                    BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
+//                }else{
+//                    if(imageTempSrcList.size()>=VIDEO_MAX_NUM){
+//                        BaseUtils.shortTipInSnack(v,"你最多选择"+VIDEO_MAX_NUM+"个视频。长按视频可将其移除。QaQ");
+//                    }else{
+//                        BaseUtils.longTipInCoast(this,"请选择需要的视频...\n视频过大会卡住，请耐心等待");
+//                        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+//                        intent.setType("video/*");
+//                        this.startActivityForResult(intent,CHOOSE_VIDEO);
+//                    }
+//                }
                 //判断权限
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
-                    if(imageTempSrcList.size()>=VIDEO_MAX_NUM){
-                        BaseUtils.shortTipInSnack(v,"你最多选择"+VIDEO_MAX_NUM+"个视频。长按视频可将其移除。QaQ");
-                    }else{
-                        BaseUtils.longTipInCoast(this,"请选择需要的视频...\n视频过大会卡住，请耐心等待");
-                        Intent intent = new Intent("android.intent.action.GET_CONTENT");
-                        intent.setType("video/*");
-                        this.startActivityForResult(intent,CHOOSE_VIDEO);
-                    }
+                    PictureSelector.create(this)
+                            .openGallery(SelectMimeType.ofVideo())
+                            .setImageEngine(GlideEngine.createGlideEngine())
+                            .isDisplayCamera(false)
+                            .setMaxSelectNum(VIDEO_MAX_NUM)
+                            .forResult(new OnResultCallbackListener<LocalMedia>() {
+                                @SuppressLint("NotifyDataSetChanged")
+                                @Override
+                                public void onResult(ArrayList<LocalMedia> result) {
+                                    result.forEach(localMedia -> {
+                                        videoTempSrcList.add(localMedia.getRealPath());
+                                        videoAdapter.notifyDataSetChanged();
+                                        //判断视频/图片有多大，给予等待提示
+                                        romSizeTip();
+                                    });
+                                }
+                                @Override
+                                public void onCancel() {
+
+                                }
+                            });
                 }
                 break;
             }
@@ -740,11 +812,12 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     @SuppressLint("NotifyDataSetChanged")
     public static void deleteTempPicInEdit(String src){
         imageTempSrcList.remove(src);
-        File file = new File(src);
-        if(file.exists()){
-            file.delete();
-            Log.i(TAG,"------删除一张临时图片");
-        }
+//        File file = new File(src);
+//        if(file.exists()){
+//            file.delete();
+//            Log.i(TAG,"------删除一张临时图片");
+//        }
+        FileUtils.safeDeleteFolder(src);
         imageAdapter.notifyDataSetChanged();
     }
 
@@ -755,11 +828,12 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     @SuppressLint("NotifyDataSetChanged")
     public static void deleteTempVideoInEdit(String src){
         videoTempSrcList.remove(src);
-        File file = new File(src);
-        if(file.exists()){
-            file.delete();
-            Log.i(TAG,"------删除一个临时视频");
-        }
+//        File file = new File(src);
+//        if(file.exists()){
+//            file.delete();
+//            Log.i(TAG,"------删除一个临时视频");
+//        }
+        FileUtils.safeDeleteFolder(src);
         videoAdapter.notifyDataSetChanged();
     }
 
@@ -770,20 +844,22 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         Iterator<String> iterator = imageTempSrcList.iterator();
         while (iterator.hasNext()) {
             String tempSrc = iterator.next();
-            File file = new File(tempSrc);
-            if(file.exists()){
-                file.delete();
-                Log.i(TAG,"------删除一张临时图片");
-            }
+//            File file = new File(tempSrc);
+//            if(file.exists()){
+//                file.delete();
+//                Log.i(TAG,"------删除一张临时图片");
+//            }
+            FileUtils.safeDeleteFolder(tempSrc);
         }
         Iterator<String> iterator2 = videoTempSrcList.iterator();
         while (iterator2.hasNext()) {
             String tempSrc = iterator2.next();
-            File file = new File(tempSrc);
-            if(file.exists()){
-                file.delete();
-                Log.i(TAG,"------删除一个临时视频");
-            }
+//            File file = new File(tempSrc);
+//            if(file.exists()){
+//                file.delete();
+//                Log.i(TAG,"------删除一个临时视频");
+//            }
+            FileUtils.safeDeleteFolder(tempSrc);
         }
     }
 }

@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.AnimatedImageDrawable;
@@ -218,6 +220,24 @@ public class MainActivity extends AppCompatActivity {
 //                    BaseUtils.gotoActivity(MainActivity.this, MineGameActivity.class);
 //                    break;
 //                }
+                case R.id.nav_update:{
+                    Context context = MainActivity.this;
+                    String versionName = "[读取失败]";
+                    try {
+                        PackageInfo packageInfo = context.getApplicationContext()
+                                .getPackageManager()
+                                .getPackageInfo(context.getPackageName(), 0);
+                        versionName = packageInfo.versionName;
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    BaseUtils.alertDialogToShow(context,
+                            "提示",
+                            "本软件没有接入互联网，请前往Bilibili查看置顶评论的版本，检查是否有更新，当前的版本为"+versionName+"。" +
+                                    "\n已为你复制链接地址https://www.bilibili.com/video/BV1Bb4y1v7qm");
+                    BaseUtils.copyInClipboard(context,"https://www.bilibili.com/video/BV1Bb4y1v7qm");
+                    break;
+                }
                 case R.id.nav_note:{
                     Intent intent = new Intent(MainActivity.this, NoteActivity.class);
                     intent.putExtra(NoteActivity.OPEN_FROM,NoteActivity.OPEN_FROM_MAIN_ACTIVITY);
@@ -482,16 +502,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case 1:{
-                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                    BaseUtils.shortTipInCoast(MainActivity.this,"已获取权限，请重新操作一次");
-                }else{
-                    BaseUtils.shortTipInCoast(MainActivity.this,"你没有授权外部存储的读取权限");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    BaseUtils.shortTipInCoast(MainActivity.this, "已获取权限，请重新操作一次");
+                } else {
+                    BaseUtils.shortTipInCoast(MainActivity.this, "你没有授权外部存储的读取权限");
                 }
                 break;
             }
-            default:break;
+            default:
+                break;
         }
     }
 

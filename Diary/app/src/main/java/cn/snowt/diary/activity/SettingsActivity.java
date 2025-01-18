@@ -491,8 +491,9 @@ public class SettingsActivity extends AppCompatActivity {
                     builder.setTitle("必须要有个提示");
                     builder.setMessage("设置的首屏是软件启动后的第一个界面，是为了方便快速启动。\n" +
                             "默认就是登录界面；\n" +
-                            "还提供自动登录，这个只是帮你输入密码登录了而已，登录密码仍然是非常重要的数据！请不要忘记；\n" +
-                            "便签界面也允许不登录就能访问，能方便快捷记录东西，你新增一个内容为“123”的便签就能跳转登录。");
+                            "自动登录，这个只是帮你输入密码登录了而已，登录密码仍然是非常重要的数据！请不要忘记；\n" +
+                            "便签界面，允许不登录就访问，能方便快捷记录东西，你新增一个内容为“123”的便签就能跳转登录；\n" +
+                            "画板界面，允许不登录就访问，能方便快捷记录东西，你新增一个内容为“123”的文本框画笔就能跳转登录。");
                     builder.setCancelable(false);
                     builder.setNegativeButton("没懂，我不使用此功能",null);
                     builder.setPositiveButton("懂了，去选择首屏模式", new DialogInterface.OnClickListener() {
@@ -511,13 +512,17 @@ public class SettingsActivity extends AppCompatActivity {
                                     beSelected = 1;
                                     break;
                                 }
+                                //LOGIN_TYPE_GOTO_DRAW = 4;
+                                case 4:{
+                                    beSelected = 3;
+                                }
                                 default:
                                     break;
                             }
 
                             android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
                             dialog.setTitle("首屏设置");
-                            String[] items = {"默认","自动登录","便签界面"};
+                            String[] items = {"默认","自动登录","便签界面","画板界面"};
                             final int[] selectId = new int[1];
                             dialog.setSingleChoiceItems(items, beSelected, new DialogInterface.OnClickListener() {
                                 @Override
@@ -529,6 +534,9 @@ public class SettingsActivity extends AppCompatActivity {
                                         }
                                         case 2:{
                                             selectId[0] = LoginActivity.LOGIN_TYPE_GOTO_NOTE;break;
+                                        }
+                                        case 3:{
+                                            selectId[0] = LoginActivity.LOGIN_TYPE_GOTO_DRAW;break;
                                         }
                                         default:{
                                             selectId[0] = LoginActivity.LOGIN_TYPE_DEFAULT;break;

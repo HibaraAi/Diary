@@ -26,6 +26,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnExternalPreviewEventListener;
+
+import org.litepal.LitePalApplication;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +41,7 @@ import java.util.UUID;
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.GlideEngine;
 import cn.snowt.diary.util.UriUtils;
 
 /**
@@ -46,6 +52,7 @@ import cn.snowt.diary.util.UriUtils;
 public class DiaryVideoAdapter extends RecyclerView.Adapter{
     private Context context;
     private ArrayList<String> videoSrcList;
+    private ArrayList<LocalMedia> mediaList;
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         View videoArea;
@@ -62,6 +69,12 @@ public class DiaryVideoAdapter extends RecyclerView.Adapter{
 
     public DiaryVideoAdapter(ArrayList<String> videoSrcList) {
         this.videoSrcList = videoSrcList;
+        this.mediaList = new ArrayList<>(videoSrcList.size());
+        videoSrcList.forEach(s -> {
+            LocalMedia localMedia = LocalMedia.generateLocalMedia(LitePalApplication.getContext(), s);
+            localMedia.setMimeType("video/*");
+            mediaList.add(localMedia);
+        });
     }
 
     @NonNull
@@ -77,16 +90,37 @@ public class DiaryVideoAdapter extends RecyclerView.Adapter{
                 .inflate(R.layout.diary_image_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.diaryVideo.setOnClickListener(v->{
-            boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !removeTip){
-                //高于或等于Android11
-                BaseUtils.longTipInCoast(context,"如果播放异常，可长按保存");
+//            boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
+//            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !removeTip){
+//                //高于或等于Android11
+//                BaseUtils.longTipInCoast(context,"如果播放异常，可长按保存");
+//            }
+//            //为Android 10
+//            Intent intent = new Intent(Intent.ACTION_VIEW);
+//            Uri uri = Uri.parse(viewHolder.videoSrc);
+//            intent.setDataAndType(uri, "video/*");
+//            context.startActivity(intent);
+            if(null==mediaList || mediaList.isEmpty() || mediaList.size()!=videoSrcList.size()){
+                this.mediaList = new ArrayList<>(videoSrcList.size());
+                videoSrcList.forEach(s -> {
+                    LocalMedia localMedia = LocalMedia.generateLocalMedia(LitePalApplication.getContext(), s);
+                    localMedia.setMimeType("video/*");
+                    mediaList.add(localMedia);
+                });
             }
-            //为Android 10
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            Uri uri = Uri.parse(viewHolder.videoSrc);
-            intent.setDataAndType(uri, "video/*");
-            context.startActivity(intent);
+            PictureSelector.create(context)
+                    .openPreview()
+                    .setImageEngine(GlideEngine.createGlideEngine())
+                    .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
+                        @Override
+                        public void onPreviewDelete(int position) {
+
+                        }
+                        @Override
+                        public boolean onLongPressDownload(Context context, LocalMedia media) {
+                            return false;
+                        }
+                    }).startActivityPreview(viewHolder.mPosition, false, mediaList);
         });
         viewHolder.diaryVideo.setOnLongClickListener(v->{
             ViewParent parent1 = viewHolder.diaryVideo.getParent();

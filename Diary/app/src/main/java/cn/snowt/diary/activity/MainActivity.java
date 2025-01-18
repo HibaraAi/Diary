@@ -14,7 +14,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -67,6 +66,7 @@ import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
+import cn.snowt.drawboard.DrawBoardActivity;
 import cn.snowt.note.NoteActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -220,6 +220,12 @@ public class MainActivity extends AppCompatActivity {
 //                    BaseUtils.gotoActivity(MainActivity.this, MineGameActivity.class);
 //                    break;
 //                }
+                case R.id.nav_draw:{
+                    Intent intent = new Intent(MainActivity.this, DrawBoardActivity.class);
+                    intent.putExtra(DrawBoardActivity.OPEN_FROM,DrawBoardActivity.OPEN_FROM_MAIN_ACTIVITY);
+                    startActivity(intent);
+                    break;
+                }
                 case R.id.nav_update:{
                     Context context = MainActivity.this;
                     String versionName = "[读取失败]";

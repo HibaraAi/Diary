@@ -26,9 +26,11 @@
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
         <activity
-            android:name=".activity.PayActivity"
+            android:name="cn.snowt.drawboard.DrawBoardActivity"
             android:exported="false" />
-        <!-- 鸣谢界面 -->
+        <activity
+            android:name=".activity.PayActivity"
+            android:exported="false" /> <!-- 鸣谢界面 -->
         <activity
             android:name=".activity.ThanksActivity"
             android:exported="false"
@@ -121,12 +123,12 @@
             android:name="cn.snowt.note.FinishActivity"
             android:exported="false"
             android:launchMode="singleTop"
-            android:theme="@style/TopTransparent" /><!--已完成的便签-->
+            android:theme="@style/TopTransparent" /> <!-- 已完成的便签 -->
         <activity
             android:name="cn.snowt.note.NoteActivity"
             android:exported="false"
             android:launchMode="singleTop"
-            android:theme="@style/TopTransparent" /><!--便签列表-->
+            android:theme="@style/TopTransparent" /> <!-- 便签列表 -->
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true">

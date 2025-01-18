@@ -35,6 +35,7 @@ public class ThanksActivity extends AppCompatActivity {
         thanksVoList.add(new ThanksVo(R.drawable.thanks_01,"戟间血","BUG反馈--Android11的存储兼容性问题"));
         thanksVoList.add(new ThanksVo(R.drawable.thanks_02,"看哔哩世界","BUG反馈--“备份与恢复”功能会闪退"));
         thanksVoList.add(new ThanksVo(R.drawable.thanks_03,"鱼缸要睡个好觉","功能建议--日记编辑界面在意外关闭的情况下支持恢复日记文本"));
+        thanksVoList.add(new ThanksVo(R.drawable.thanks_04,"蓝白_-_--_-_","功能建议--画板（画布）"));
     }
 
     @Override

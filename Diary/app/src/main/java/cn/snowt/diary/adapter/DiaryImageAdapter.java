@@ -18,11 +18,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnExternalPreviewEventListener;
+
+import org.litepal.LitePalApplication;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import cn.snowt.diary.R;
@@ -35,6 +41,7 @@ import cn.snowt.diary.service.VideoService;
 import cn.snowt.diary.service.impl.DrawIngServiceImpl;
 import cn.snowt.diary.service.impl.VideoServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.GlideEngine;
 import cn.snowt.diary.util.UriUtils;
 
 /**
@@ -45,6 +52,7 @@ import cn.snowt.diary.util.UriUtils;
 public class DiaryImageAdapter extends RecyclerView.Adapter{
     private Context context;
     private ArrayList<String> imageSrcList;
+    private ArrayList<LocalMedia> mediaList;
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         View imageArea;
@@ -61,6 +69,11 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
 
     public DiaryImageAdapter(ArrayList<String> imageSrcList) {
         this.imageSrcList = imageSrcList;
+        this.mediaList = new ArrayList<>(imageSrcList.size());
+        imageSrcList.forEach(s -> {
+            LocalMedia localMedia = LocalMedia.generateLocalMedia(LitePalApplication.getContext(), s);
+            mediaList.add(localMedia);
+        });
     }
 
     @NonNull
@@ -78,22 +91,61 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
             RecyclerView recyclerView = (RecyclerView) parent2;
             if(recyclerView.getId()==R.id.video_day_item_ry){
                 //视频库中的单击
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri uri = Uri.parse(viewHolder.imageSrc);
-                intent.setDataAndType(uri, "video/*");
-                context.startActivity(intent);
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                Uri uri = Uri.parse(viewHolder.imageSrc);
+//                intent.setDataAndType(uri, "video/*");
+//                context.startActivity(intent);
+                this.mediaList = new ArrayList<>(imageSrcList.size());
+                imageSrcList.forEach(s -> {
+                    LocalMedia localMedia = LocalMedia.generateLocalMedia(LitePalApplication.getContext(), s);
+                    localMedia.setMimeType("video/*");
+                    mediaList.add(localMedia);
+                });
+                PictureSelector.create(context)
+                        .openPreview()
+                        .setImageEngine(GlideEngine.createGlideEngine())
+                        .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
+                            @Override
+                            public void onPreviewDelete(int position) {
+
+                            }
+                            @Override
+                            public boolean onLongPressDownload(Context context, LocalMedia media) {
+                                return false;
+                            }
+                        }).startActivityPreview(viewHolder.mPosition, false, mediaList);
             }else{
                 //其他的为之前的默认情况——图片单击
-                if(imageSrcList.size()==1){
-                    Intent intent1 = new Intent(context, ZoomImageActivity.class);
-                    intent1.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,imageSrcList.get(0));
-                    context.startActivity(intent1);
-                }else{
-                    Intent intent = new Intent(context, BigImgActivity.class);
-                    intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,viewHolder.mPosition);
-                    intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,imageSrcList);
-                    context.startActivity(intent);
+//                if(imageSrcList.size()==1){
+//                    Intent intent1 = new Intent(context, ZoomImageActivity.class);
+//                    intent1.putExtra(ZoomImageActivity.EXTRA_IMAGE_SRC,imageSrcList.get(0));
+//                    context.startActivity(intent1);
+//                }else{
+//                    Intent intent = new Intent(context, BigImgActivity.class);
+//                    intent.putExtra(BigImgActivity.INTENT_DATA_IMG_POSITION,viewHolder.mPosition);
+//                    intent.putStringArrayListExtra(BigImgActivity.INTENT_DATA_IMG_LIST,imageSrcList);
+//                    context.startActivity(intent);
+//                }
+                if(null==mediaList || mediaList.isEmpty() || mediaList.size()!=imageSrcList.size()){
+                    this.mediaList = new ArrayList<>(imageSrcList.size());
+                    imageSrcList.forEach(s -> {
+                        LocalMedia localMedia = LocalMedia.generateLocalMedia(LitePalApplication.getContext(), s);
+                        mediaList.add(localMedia);
+                    });
                 }
+                PictureSelector.create(context)
+                        .openPreview()
+                        .setImageEngine(GlideEngine.createGlideEngine())
+                        .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
+                            @Override
+                            public void onPreviewDelete(int position) {
+
+                            }
+                            @Override
+                            public boolean onLongPressDownload(Context context, LocalMedia media) {
+                                return false;
+                            }
+                        }).startActivityPreview(viewHolder.mPosition, false, mediaList);
             }
         });
         viewHolder.diaryImage.setOnLongClickListener(v->{

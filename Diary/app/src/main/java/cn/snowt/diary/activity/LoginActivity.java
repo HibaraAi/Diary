@@ -38,6 +38,7 @@ import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
+import cn.snowt.drawboard.DrawBoardActivity;
 import cn.snowt.mine.MineGameActivity;
 import cn.snowt.note.NoteActivity;
 
@@ -50,6 +51,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public static Integer LOGIN_TYPE_AUTO_LOGIN = 1;
     public static Integer LOGIN_TYPE_DEFAULT= 2;
     public static Integer LOGIN_TYPE_GOTO_NOTE= 3;
+    public static Integer LOGIN_TYPE_GOTO_DRAW = 4;
 
     private  Button[] buttons = new Button[12];
     private TextView password;
@@ -91,6 +93,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case 1:{
                 BaseUtils.gotoActivity(LoginActivity.this,MainActivity.class);
                 finish();
+                break;
+            }
+            //LOGIN_TYPE_GOTO_DRAW = 4;
+            case 4:{
+                if (!getIntent().getBooleanExtra("trueLogin",false)) {
+                    Intent intent = new Intent(LoginActivity.this, DrawBoardActivity.class);
+                    intent.putExtra(DrawBoardActivity.OPEN_FROM,DrawBoardActivity.OPEN_FROM_BEFORE_LOGIN);
+                    startActivity(intent);
+                    finish();
+                }
                 break;
             }
             default:
@@ -243,7 +255,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //免责声明
             AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
             builder.setTitle("免责声明")
-                    .setMessage("本软件不会盗取你任何数据，有开源代码可查，开源网址https://github.com/HibaraAi/Diary或https://gitee.com/HibaraAi/Diary。因此，如果你在使用本软件的过程中，产生无论何种形式的损失，都与本作者无关。")
+                    .setMessage("本软件不会盗取你任何数据，有开源代码可查，开源网址https://github.com/HibaraAi/Diary或https://gitee.com/HibaraAi/Diary。" +
+                            "\n此外，如果你在使用本软件的过程中，产生无论何种形式的损失，都与本作者无关，你不准追究本作者的责任。")
                     .setPositiveButton("了解并接受", (dialog, which) -> {
                         //申请存储权限
                         applyPermission();
@@ -284,18 +297,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case 1:{
-                if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                    BaseUtils.shortTipInCoast(LoginActivity.this,"已获取外部存储的读写权限");
-                }else{
-                    BaseUtils.shortTipInCoast(LoginActivity.this,"你没有授权外部存储的读写权限");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    BaseUtils.shortTipInCoast(LoginActivity.this, "已获取外部存储的读写权限");
+                } else {
+                    BaseUtils.shortTipInCoast(LoginActivity.this, "你没有授权外部存储的读写权限");
                 }
                 //跳转设置登录密码界面
                 BaseUtils.gotoActivity(this, SetPasswordActivity.class);
                 break;
             }
-            default:break;
+            default:
+                break;
         }
     }
 

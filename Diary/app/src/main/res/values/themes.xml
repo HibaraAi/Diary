@@ -13,4 +13,8 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+    <style name="OnClick">
+        <item name="android:onClick">onClick</item>
+        <item name="android:clickable">true</item>
+    </style>
 </resources>

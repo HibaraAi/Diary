@@ -10,6 +10,7 @@
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_add_special_day.xml" value="0.26992753623188404" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_day_detail.xml" value="0.3333333333333333" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_diary_detail.xml" value="0.18659420289855072" />
+        <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_draw_board.xml" value="0.1" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_finish.xml" value="0.24728260869565216" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_funny_info.xml" value="0.1" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/activity_help.xml" value="0.25" />
@@ -40,6 +41,7 @@
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/item_item.xml" value="0.24728260869565216" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/nav_header.xml" value="0.25" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/pic_day_item.xml" value="0.3038949275362319" />
+        <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/pop_select.xml" value="0.18802083333333333" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/settings_activity.xml" value="0.20108695652173914" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/thanks_item.xml" value="0.3038949275362319" />
         <entry key="..\:/PC/Desktop/Diary/Diary/app/src/main/res/layout/video_day_item.xml" value="0.3038949275362319" />

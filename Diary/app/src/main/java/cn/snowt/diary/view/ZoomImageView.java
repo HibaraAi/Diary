@@ -20,6 +20,7 @@ import androidx.viewpager.widget.ViewPager;
  * @Date: 2021-08-28 09:21
  * @Description:
  */
+@Deprecated
 public class ZoomImageView
         extends AppCompatImageView
         implements ViewTreeObserver.OnGlobalLayoutListener,

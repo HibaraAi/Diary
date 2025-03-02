@@ -147,6 +147,7 @@ public class SetRSAActivity extends AppCompatActivity implements View.OnClickLis
                     String path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION+"output/").getAbsolutePath();
                     AlertDialog.Builder builder  = new AlertDialog.Builder(v.getContext());
                     builder.setTitle("提示");
+                    builder.setCancelable(false);
                     builder.setMessage("密钥保存在【"+path+"】目录下，请妥善保管长密钥，恢复日记时将用到长密钥。今后都不再支持密钥生成和保存。\n(短密钥用于加密，长密钥用于解密。虽然短密钥对你来说无用，但还是给你一份，让你看看密钥长啥样)\n\n另外，请重启软件。");
                     builder.setPositiveButton("OK,我会妥善保管密钥", (dialog, which) -> finish());
                     builder.show();

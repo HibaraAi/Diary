@@ -144,6 +144,13 @@ public interface DiaryService {
     SimpleResult updateDiaryContentById(Diary diary);
 
     /**
+     * 更新日记文本
+     * @param diary
+     * @return
+     */
+    SimpleResult updateDiaryLabelById(Diary diary);
+
+    /**
      * 获取全部DiaryVoForFunny形式的日记
      * @return
      */

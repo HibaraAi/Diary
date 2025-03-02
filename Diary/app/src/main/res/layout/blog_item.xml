@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="7dp"
+    android:padding="10dp"
+    app:cardCornerRadius="10dp"
+    android:elevation="1dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <ImageView
+            android:id="@+id/thanks_item_img"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/nav_icon"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:elevation="2dp"/>
+
+        <TextView
+            android:id="@+id/thanks_item_name"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/thanks_item_img"
+            app:layout_constraintLeft_toRightOf="@+id/thanks_item_img"
+            app:layout_constraintRight_toRightOf="parent"
+            android:padding="5dp"
+            android:textSize="20dp"
+            android:textColor="?attr/colorPrimary"
+            android:text="春节春节春节春节"/>
+
+        <TextView
+            android:id="@+id/thanks_item_text"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/thanks_item_name"
+            app:layout_constraintLeft_toRightOf="@+id/thanks_item_img"
+            app:layout_constraintRight_toRightOf="parent"
+            android:padding="5dp"
+            android:text="2021-10-09" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import cn.snowt.blog.BlogListActivity;
 import cn.snowt.diary.R;
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
@@ -52,6 +53,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public static Integer LOGIN_TYPE_DEFAULT= 2;
     public static Integer LOGIN_TYPE_GOTO_NOTE= 3;
     public static Integer LOGIN_TYPE_GOTO_DRAW = 4;
+
+    public static Integer LOGIN_TYPE_GOTO_BLOG = 5;
 
     private  Button[] buttons = new Button[12];
     private TextView password;
@@ -104,6 +107,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     finish();
                 }
                 break;
+            }
+            //LOGIN_TYPE_GOTO_BLOG = 5;
+            case 5:{
+                if (!getIntent().getBooleanExtra("trueLogin",false)) {
+                    Intent intent = new Intent(LoginActivity.this, BlogListActivity.class);
+                    intent.putExtra(BlogListActivity.OPEN_FROM,BlogListActivity.OPEN_FROM_BEFORE_LOGIN);
+                    startActivity(intent);
+                    finish();
+                }
             }
             default:
                 break;

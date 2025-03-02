@@ -400,7 +400,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case "themes":{
                     android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
                     dialog.setTitle("选择一个颜色");
-                    String[] items = {"默认","黑色","蓝色","粉色","紫色","红色","黄色"};
+                    String[] items = {"默认","黑色","蓝色","粉色","紫色","红色","黄色","根据时间变换(每小时)"};
                     final int[] themesId = new int[1];
                     dialog.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                         @Override
@@ -424,6 +424,9 @@ public class SettingsActivity extends AppCompatActivity {
                                 }
                                 case "紫色":{
                                     themesId[0] = R.style.Theme_purple;break;
+                                }
+                                case "根据时间变换(每小时)":{
+                                    themesId[0] = -20250215;break;
                                 }
                                 default:{
                                     themesId[0] = R.style.Theme_green;break;
@@ -515,6 +518,12 @@ public class SettingsActivity extends AppCompatActivity {
                                 //LOGIN_TYPE_GOTO_DRAW = 4;
                                 case 4:{
                                     beSelected = 3;
+                                    break;
+                                }
+                                //LOGIN_TYPE_GOTO_BLOG = 5;
+                                case 5:{
+                                    beSelected = 4;
+                                    break;
                                 }
                                 default:
                                     break;
@@ -522,7 +531,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                             android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
                             dialog.setTitle("首屏设置");
-                            String[] items = {"默认","自动登录","便签界面","画板界面"};
+                            String[] items = {"默认","自动登录","便签界面","画板界面","Blog界面"};
                             final int[] selectId = new int[1];
                             dialog.setSingleChoiceItems(items, beSelected, new DialogInterface.OnClickListener() {
                                 @Override
@@ -537,6 +546,9 @@ public class SettingsActivity extends AppCompatActivity {
                                         }
                                         case 3:{
                                             selectId[0] = LoginActivity.LOGIN_TYPE_GOTO_DRAW;break;
+                                        }
+                                        case 4:{
+                                            selectId[0] = LoginActivity.LOGIN_TYPE_GOTO_BLOG;break;
                                         }
                                         default:{
                                             selectId[0] = LoginActivity.LOGIN_TYPE_DEFAULT;break;

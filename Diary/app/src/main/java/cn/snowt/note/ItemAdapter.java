@@ -114,7 +114,7 @@ public class ItemAdapter extends RecyclerView.Adapter{
         EditText editText = new EditText(context);
         editText.setLines(10);
         editText.setGravity(Gravity.TOP);
-        editText.setBackgroundResource(R.drawable.edit_bg);
+        editText.setBackgroundResource(R.drawable.edge);
         editText.setHint("输入......");
         editText.setText(s);
         editText.setPadding(5,5,5,5);

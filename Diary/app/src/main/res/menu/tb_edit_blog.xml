@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/toolbar_select_picture"
+        android:icon="@drawable/icon_image"
+        android:title="添加图片"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/toolbar_select_video"
+        android:icon="@drawable/icon_video"
+        android:title="添加视频"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/toolbar_save_blog"
+        android:icon="@drawable/bar_send"
+        android:title="保存Blog"
+        app:showAsAction="always"/>
+</menu>

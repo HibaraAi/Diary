@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -107,6 +108,13 @@ public class AddSpecialDayActivity extends AppCompatActivity implements View.OnC
         imgHelp.setOnClickListener(this);
         img.setOnClickListener(this);
         remark.setMovementMethod(ScrollingMovementMethod.getInstance());
+        View parent = (View) img.getParent().getParent();
+        if(this.getResources().getConfiguration().uiMode == 0x11){
+            parent.setBackgroundResource(R.drawable.day_detail_bg);
+        }else{
+//            parent.setBackgroundResource(R.drawable.night_bg);
+            parent.setBackgroundColor(Color.parseColor("#212b2e"));
+        }
     }
 
     @Override

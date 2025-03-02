@@ -255,8 +255,13 @@ public class TimeAscActivity extends AppCompatActivity {
         voList.forEach(diaryVo -> realToDelIds.add(diaryVo.getId()));
         actionBar.setTitle("批量删除-条数:"+realToDelIds.size());
         stopRefreshLayout();
-        BaseUtils.alertDialogToShow(this,"最后一次提示","这些是你选中且数据库中存在的项目，请浏览确认。\n\n下一个删除按钮将不再有任何提示！");
-
+        //BaseUtils.alertDialogToShow(this,"最后一次提示","这些是你选中且数据库中存在的项目，请浏览确认。\n\n下一个删除按钮将不再有任何提示！");
+        AlertDialog.Builder builder  = new AlertDialog.Builder(TimeAscActivity.this);
+        builder.setTitle("最后一次提示");
+        builder.setMessage("这些是你选中且数据库中存在的项目，请浏览确认。\n\n下一个删除按钮将不再有任何提示！");
+        builder.setCancelable(false);
+        builder.setPositiveButton("OK" ,  null );
+        builder.show();
     }
 
     /**
@@ -396,7 +401,7 @@ public class TimeAscActivity extends AppCompatActivity {
                             PDFUtils.createPdf(voList,TimeAscActivity.this,(ViewGroup) fab.getParent());
                             BaseUtils.simpleSysNotice(TimeAscActivity.this,"PDF导出成功！");
                         }).start();
-                        final String tip = "已开始导出PDF，完成时将在通知栏通知你。(过程比较慢，在一次导出完成前，请不要再次发起导出PDF请求。)\n\n导出的文件存放路径为【Hibara\\Dairy\\putput\\PDF】\n\n";
+                        final String tip = "已开始导出PDF，完成时将在通知栏通知你。(过程比较慢，在一次导出完成前，请不要关闭本软件以及再次发起导出PDF请求，你可以切换其他界面进行操作。给你个参考，经华为Mate40Pro测试，包含1.4G媒体资源、约7万字的数据量导出时间约1分钟，PDF大小约150兆。\n\n导出的文件存放路径为【Hibara\\Dairy\\output\\PDF】\n\n";
                         BaseUtils.alertDialogToShow(this,"提示",tip);
                     }
                 });

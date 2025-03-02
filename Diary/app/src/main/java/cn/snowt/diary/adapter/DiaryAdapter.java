@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -40,6 +42,7 @@ import cn.snowt.diary.R;
 import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.DiaryListActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
+import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.service.CommentService;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.CommentServiceImpl;
@@ -50,6 +53,7 @@ import cn.snowt.diary.util.PDFUtils;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.vo.DiaryVo;
+import cn.snowt.note.ItemAdapter;
 
 /**
  * @Author: HibaraAi
@@ -169,7 +173,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         //长按日记文字
         viewHolder.content.setOnLongClickListener(v->{
             AtomicReference<String> select = new AtomicReference<>();
-            final String[] items = {"复制日记","置顶日记","引用追更","查看详情","编辑日记","存为图片","删除"};
+            final String[] items = {"复制日记","置顶日记","引用追更","查看详情","编辑日记","修改标签","存为图片","删除"};
             select.set(items[0]);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("日记菜单");
@@ -178,6 +182,67 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             });
             builder.setPositiveButton("确定", (dialog, which) -> {
                 switch (select.get()) {
+                    case "修改标签":{
+                        Diary diary = LitePal.find(Diary.class, viewHolder.diaryId);
+                        if(null!=diary){
+                            androidx.appcompat.app.AlertDialog.Builder builder2 = new androidx.appcompat.app.AlertDialog.Builder(context);
+                            builder2.setTitle("修改标签");
+                            EditText editText = new EditText(context);
+                            editText.setLines(2);
+                            editText.setGravity(Gravity.TOP);
+                            editText.setBackgroundResource(R.drawable.edge);
+                            editText.setHint("输入......");
+                            editText.setText(diary.getLabel());
+                            editText.setPadding(5,5,5,5);
+                            builder2.setView(editText);
+                            builder2.setPositiveButton("修改", (dialog1, which1) -> {
+                                String labelStr = editText.getText().toString();
+                                String finalLabelStr = new String();
+                                boolean needUpdate = true;
+                                if(labelStr.length()<=30 && labelStr.contains("。")){  //新的标签解析，用。解析
+                                    String[] split = labelStr.split("。");
+                                    if(split.length>0){
+                                        StringBuilder builder33 = new StringBuilder();
+                                        for (String s : split) {
+                                            builder33.append("#").append(s).append("#");
+                                        }
+                                        finalLabelStr = builder33.toString();
+                                    }else{
+                                        BaseUtils.shortTipInSnack(parent,"标签的总字符数不超过30,且格式必须正确");
+                                        needUpdate = false;
+                                    }
+                                } else{  //旧的标签解析，用#解析
+                                    int num = 0;
+                                    for (char c : labelStr.toCharArray()) {
+                                        if(c == '#'){
+                                            num++;
+                                        }
+                                    }
+                                    boolean flag = (num%2==0 && num!=0);
+                                    if(labelStr.length()<=30 && flag){
+                                        finalLabelStr = labelStr;
+                                    }else{
+                                        BaseUtils.shortTipInSnack(parent,"标签的总字符数不超过30,且格式必须正确");
+                                        needUpdate = false;
+                                    }
+                                }
+                                if(needUpdate){
+                                    diary.setLabel(finalLabelStr);
+                                    SimpleResult result = diaryService.updateDiaryLabelById(diary);
+                                    if(result.getSuccess()){
+                                        BaseUtils.shortTipInSnack(parent,"修改标签成功，请手动刷新。");
+                                    }else{
+                                        BaseUtils.shortTipInSnack(parent,result.getMsg());
+                                    }
+                                }
+                            });
+                            builder2.setNegativeButton("取消",null);
+                            builder2.show();
+                        }else{
+                            BaseUtils.shortTipInSnack(parent,"貌似已被删除了。");
+                        }
+                        break;
+                    }
                     case "存为图片":{
                         //检查权限
                         if (PermissionUtils.haveExternalStoragePermission(context)) {
@@ -340,6 +405,9 @@ public class DiaryAdapter extends RecyclerView.Adapter{
                 //File sdRoot = Environment.getExternalStorageDirectory();
                 String absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath()+"/消消乐/";
                 File sdRoot = new File(absolutePath);
+                if(!sdRoot.exists()){
+                    sdRoot.mkdirs();
+                }
                 File file = new File(sdRoot, Calendar.getInstance().getTimeInMillis()+".png");
                 fos = new FileOutputStream(file);
                 imagePath = file.getAbsolutePath();

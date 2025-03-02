@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import cn.snowt.blog.BlogListActivity;
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
 import cn.snowt.diary.async.MyAsyncTask;
@@ -220,6 +221,12 @@ public class MainActivity extends AppCompatActivity {
 //                    BaseUtils.gotoActivity(MainActivity.this, MineGameActivity.class);
 //                    break;
 //                }
+                case R.id.nav_blog:{
+                    Intent intent = new Intent(MainActivity.this, BlogListActivity.class);
+                    intent.putExtra(BlogListActivity.OPEN_FROM,BlogListActivity.OPEN_FROM_MAIN_ACTIVITY);
+                    startActivity(intent);
+                    break;
+                }
                 case R.id.nav_draw:{
                     Intent intent = new Intent(MainActivity.this, DrawBoardActivity.class);
                     intent.putExtra(DrawBoardActivity.OPEN_FROM,DrawBoardActivity.OPEN_FROM_MAIN_ACTIVITY);
@@ -265,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("查找指定时间段的日记");
                     if(!removeTip){
-                        builder.setMessage("提示：如果时间段内的日记数量很多，则查找过程可能会很久，尽量缩短查找时间段。\n只选一个日期则查找当天的日记\n");
+                        builder.setMessage("提示：只选一个日期则查找当天的日记\n");
                     }else{
                         builder.setMessage("\n");
                     }

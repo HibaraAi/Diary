@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cn.snowt.blog.BlogDetailActivity">
+    <!--标题栏-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:background="?attr/colorPrimary">
+    </androidx.appcompat.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/act_blog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:paddingLeft="5dp"
+        android:textSize="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+
+    <TextView
+        android:id="@+id/act_blog_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/act_blog_title"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#9E9E9E"
+        android:paddingLeft="5dp"
+        android:layout_marginLeft="5dp"/>
+
+    <TextView
+        android:id="@+id/act_blog_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@+id/act_blog_title"
+        app:layout_constraintLeft_toRightOf="@+id/act_blog_time"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="#9E9E9E"
+        android:gravity="end"
+        android:paddingRight="5dp"
+        android:layout_marginRight="10dp" />
+
+    <cn.snowt.blog.view.RichTextView
+        android:id="@+id/act_blog_rich_text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintVertical_weight="1"
+        app:rt_view_text_size="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/act_blog_time"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/edge"
+        android:layout_margin="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,13 +26,21 @@ import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnExternalPreviewEventListener;
+import com.luck.picture.lib.style.PictureSelectorStyle;
+import com.luck.picture.lib.style.TitleBarStyle;
 
 import org.litepal.LitePalApplication;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.snowt.diary.R;
 
@@ -278,5 +287,81 @@ public class BaseUtils {
         builder.setStyle(bigTextStyle); //设置大文本样式
         Notification notification = builder.build();
         manager.notify(1, notification);
+    }
+
+    /**
+     * 使用PictureSelector预览资源，注意仅解析Hibara文件夹下的资源
+     * @param position 图所在的位置
+     * @param imageSrcList 资源总列表
+     */
+    public static void openHibaraMediaPreview(Context context, int position, List<String> imageSrcList){
+        if(null==imageSrcList || imageSrcList.isEmpty()){
+            return;
+        }
+        ArrayList<LocalMedia> imageList = new ArrayList<>();
+        ArrayList<LocalMedia> videoList = new ArrayList<>();
+        AtomicInteger imageIndex = new AtomicInteger();
+        AtomicInteger videoIndex = new AtomicInteger();
+        AtomicInteger i = new AtomicInteger();
+        imageSrcList.forEach(s -> {
+            //根据提供的文件路径，判断媒体类型，因为存的时候一定存在了自己的目录下，包含image的为图片、包含video的为视频
+            if(s.contains("image")){
+                LocalMedia localMedia = LocalMedia.generateLocalMedia(context, s);
+                localMedia.setMimeType("image/*");
+                imageList.add(localMedia);
+                if(i.get() ==position){
+                    imageIndex.set(imageList.size() - 1);
+                }
+            }else if(s.contains("video")){
+                LocalMedia localMedia = LocalMedia.generateLocalMedia(context, s);
+                localMedia.setMimeType("video/*");
+                videoList.add(localMedia);
+                if(i.get() ==position){
+                    videoIndex.set(videoList.size() - 1);
+                }
+            }
+            i.getAndIncrement();
+        });
+        PictureSelectorStyle pictureSelectorStyle = new PictureSelectorStyle();
+        if(context.getResources().getConfiguration().uiMode == 0x11){
+            TypedValue typedValue = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);
+            TitleBarStyle titleBarStyle = new TitleBarStyle();
+            titleBarStyle.setTitleBackgroundColor(typedValue.data);
+            pictureSelectorStyle.setTitleBarStyle(titleBarStyle);
+        }
+        //对点击的资源进行解析，以打开对应的预览器
+        String s = imageSrcList.get(position);
+        if(s.contains("video")){
+            PictureSelector.create(context)
+                    .openPreview()
+                    .setImageEngine(GlideEngine.createGlideEngine())
+                    .setSelectorUIStyle(pictureSelectorStyle)
+                    .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
+                        @Override
+                        public void onPreviewDelete(int position) {
+
+                        }
+                        @Override
+                        public boolean onLongPressDownload(Context context, LocalMedia media) {
+                            return false;
+                        }
+                    }).startActivityPreview(videoIndex.get(), false, videoList);
+        }else{
+            PictureSelector.create(context)
+                    .openPreview()
+                    .setImageEngine(GlideEngine.createGlideEngine())
+                    .setSelectorUIStyle(pictureSelectorStyle)
+                    .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
+                        @Override
+                        public void onPreviewDelete(int position) {
+
+                        }
+                        @Override
+                        public boolean onLongPressDownload(Context context, LocalMedia media) {
+                            return false;
+                        }
+                    }).startActivityPreview(imageIndex.get(), false, imageList);
+        }
     }
 }

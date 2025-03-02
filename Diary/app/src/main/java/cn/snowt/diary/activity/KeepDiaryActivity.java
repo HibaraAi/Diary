@@ -39,6 +39,10 @@ import com.luck.picture.lib.basic.PictureSelector;
 import com.luck.picture.lib.config.SelectMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.interfaces.OnResultCallbackListener;
+import com.luck.picture.lib.style.BottomNavBarStyle;
+import com.luck.picture.lib.style.PictureSelectorStyle;
+import com.luck.picture.lib.style.SelectMainStyle;
+import com.luck.picture.lib.style.TitleBarStyle;
 
 import org.litepal.LitePal;
 
@@ -456,10 +460,19 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
+                    PictureSelectorStyle pictureSelectorStyle = new PictureSelectorStyle();
+                    if(this.getResources().getConfiguration().uiMode == 0x11){
+                        TypedValue typedValue = new TypedValue();
+                        getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);
+                        TitleBarStyle titleBarStyle = new TitleBarStyle();
+                        titleBarStyle.setTitleBackgroundColor(typedValue.data);
+                        pictureSelectorStyle.setTitleBarStyle(titleBarStyle);
+                    }
                     PictureSelector.create(this)
                             .openGallery(SelectMimeType.ofImage())
                             .setImageEngine(GlideEngine.createGlideEngine())
                             .isDisplayCamera(false)
+                            .setSelectorUIStyle(pictureSelectorStyle)
                             .setMaxSelectNum(IMG_MAX_NUM)
                             .forResult(new OnResultCallbackListener<LocalMedia>() {
                                 @SuppressLint("NotifyDataSetChanged")
@@ -641,10 +654,19 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 if(!PermissionUtils.haveExternalStoragePermission(KeepDiaryActivity.this)){
                     BaseUtils.alertDialogToShow(v.getContext(),"提示","你并没有授予外部存储的读写权限,在你许可之前，你只能记录纯文字的日记，你可以去主界面长按背景图进行授权外部存储的读写权限");
                 }else{
+                    PictureSelectorStyle pictureSelectorStyle = new PictureSelectorStyle();
+                    if(this.getResources().getConfiguration().uiMode == 0x11){
+                        TypedValue typedValue = new TypedValue();
+                        getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);
+                        TitleBarStyle titleBarStyle = new TitleBarStyle();
+                        titleBarStyle.setTitleBackgroundColor(typedValue.data);
+                        pictureSelectorStyle.setTitleBarStyle(titleBarStyle);
+                    }
                     PictureSelector.create(this)
                             .openGallery(SelectMimeType.ofVideo())
                             .setImageEngine(GlideEngine.createGlideEngine())
                             .isDisplayCamera(false)
+                            .setSelectorUIStyle(pictureSelectorStyle)
                             .setMaxSelectNum(VIDEO_MAX_NUM)
                             .forResult(new OnResultCallbackListener<LocalMedia>() {
                                 @SuppressLint("NotifyDataSetChanged")

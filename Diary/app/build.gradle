@@ -10,7 +10,7 @@ android {
         minSdk 29
         targetSdk 30
         versionCode 1
-        versionName "1.5.4"
+        versionName "1.6.0"
         resConfigs "zh", "zh-rCN"
 //        ndk {
 //            abiFilters 'x86_64','x86'/*, 'armeabi-v7a'*/
@@ -68,4 +68,7 @@ dependencies {
     implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.83'  //JSON
 
     implementation 'io.github.lucksiege:pictureselector:v3.11.2'  //图片选择器
+
+    implementation "io.reactivex.rxjava2:rxjava:2.2.3"  //rxjava
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'  //rxjava
 }

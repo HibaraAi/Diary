@@ -24,11 +24,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 
+import org.litepal.LitePal;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.activity.LoginActivity;
+import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.drawboard.view.DrawBoardView;
 import cn.snowt.note.NoteActivity;
@@ -136,7 +140,8 @@ public class DrawBoardActivity extends AppCompatActivity {
         if (uri != null) {
             try (OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
                 drawBoardView.getResultBitmap().compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                BaseUtils.shortTipInCoast(context,"保存成功");
+//                BaseUtils.shortTipInCoast(context,"保存成功");
+                BaseUtils.alertDialogToShow(context,"保存成功","保存目录为【Pictures/xiaoxiaole】");
             } catch (IOException e) {
                 e.printStackTrace();
                 BaseUtils.shortTipInCoast(context,"保存失败");
@@ -178,9 +183,17 @@ public class DrawBoardActivity extends AppCompatActivity {
             case R.id.ivRedo:
                 drawBoardView.redo();
                 break;
-            case R.id.ivSave:
-                saveBitmap();
+            case R.id.ivSave:{
+                androidx.appcompat.app.AlertDialog.Builder builder=new androidx.appcompat.app.AlertDialog.Builder(DrawBoardActivity.this);
+                builder.setTitle("提示：");
+                builder.setMessage("真的要保存这张图吗？");
+                builder.setNegativeButton("不保存，刚刚点错了", null);
+                builder.setPositiveButton("保存",(dialog, which) -> {
+                    saveBitmap();
+                });
+                builder.show();
                 break;
+            }
             case R.id.ivPath:
                 changeDrawMode(DrawBoardView.DrawMode.DRAW_PATH, R.drawable.btn_menu_path);
                 break;
@@ -229,5 +242,17 @@ public class DrawBoardActivity extends AppCompatActivity {
                 changeDrawMode(DrawBoardView.DrawMode.ERASER, R.drawable.btn_menu_eraser);
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        androidx.appcompat.app.AlertDialog.Builder builder=new androidx.appcompat.app.AlertDialog.Builder(DrawBoardActivity.this);
+        builder.setTitle("提示：");
+        builder.setMessage("你即将画板！请确认");
+        builder.setNegativeButton("不退出", null);
+        builder.setPositiveButton("直接退出",(dialog, which) -> {
+            finish();
+        });
+        builder.show();
     }
 }

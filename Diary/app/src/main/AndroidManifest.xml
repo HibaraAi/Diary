@@ -26,6 +26,15 @@
         android:theme="@style/Theme.消消乐"
         tools:ignore="HardcodedDebugMode">
         <activity
+            android:name="cn.snowt.blog.EditBlogActivity"
+            android:exported="false" />
+        <activity
+            android:name="cn.snowt.blog.BlogDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name="cn.snowt.blog.BlogListActivity"
+            android:exported="false" />
+        <activity
             android:name="cn.snowt.drawboard.DrawBoardActivity"
             android:exported="false" />
         <activity

@@ -255,6 +255,15 @@ public class HelpActivity extends AppCompatActivity {
         diaryVo19.setContent(Constant.STRING_UPDATE_19);
         diaryVos.add(diaryVo19);
 
+        DiaryVo diaryVo20 = new DiaryVo();
+        diaryVo20.setId(R.drawable.head_hibara);
+        diaryVo20.setMyUuid("HibaraAi");
+        diaryVo20.setModifiedDate(BaseUtils.dateToString(new Date()));
+        diaryVo20.setLocationStr("我已经在尽力完善APP了");
+        diaryVo20.setLabelStr("#1.5.4版本#");
+        diaryVo20.setContent(Constant.STRING_UPDATE_20);
+        diaryVos.add(diaryVo20);
+
         helpAdapter = new HelpAdapter(diaryVos);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setAdapter(helpAdapter);

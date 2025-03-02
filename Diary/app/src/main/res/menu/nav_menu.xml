@@ -10,6 +10,10 @@
             android:icon="@drawable/nav_note"
             android:title="便签"/>
         <item
+            android:id="@+id/nav_blog"
+            android:icon="@drawable/icon_blog"
+            android:title="Blog"/>
+        <item
             android:id="@+id/nav_temp"
             android:icon="@drawable/nav_temp"
             android:title="草稿箱" />

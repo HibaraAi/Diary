@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.luck.picture.lib.basic.PictureSelector;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.interfaces.OnExternalPreviewEventListener;
+import com.luck.picture.lib.style.PictureSelectorStyle;
+import com.luck.picture.lib.style.TitleBarStyle;
 
 import org.litepal.LitePalApplication;
 
@@ -101,9 +104,18 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                     localMedia.setMimeType("video/*");
                     mediaList.add(localMedia);
                 });
+                PictureSelectorStyle pictureSelectorStyle = new PictureSelectorStyle();
+                if(context.getResources().getConfiguration().uiMode == 0x11){
+                    TypedValue typedValue = new TypedValue();
+                    context.getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);
+                    TitleBarStyle titleBarStyle = new TitleBarStyle();
+                    titleBarStyle.setTitleBackgroundColor(typedValue.data);
+                    pictureSelectorStyle.setTitleBarStyle(titleBarStyle);
+                }
                 PictureSelector.create(context)
                         .openPreview()
                         .setImageEngine(GlideEngine.createGlideEngine())
+                        .setSelectorUIStyle(pictureSelectorStyle)
                         .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
                             @Override
                             public void onPreviewDelete(int position) {
@@ -133,9 +145,18 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                         mediaList.add(localMedia);
                     });
                 }
+                PictureSelectorStyle pictureSelectorStyle = new PictureSelectorStyle();
+                if(context.getResources().getConfiguration().uiMode == 0x11){
+                    TypedValue typedValue = new TypedValue();
+                    context.getTheme().resolveAttribute(R.attr.colorPrimary,typedValue,true);
+                    TitleBarStyle titleBarStyle = new TitleBarStyle();
+                    titleBarStyle.setTitleBackgroundColor(typedValue.data);
+                    pictureSelectorStyle.setTitleBarStyle(titleBarStyle);
+                }
                 PictureSelector.create(context)
                         .openPreview()
                         .setImageEngine(GlideEngine.createGlideEngine())
+                        .setSelectorUIStyle(pictureSelectorStyle)
                         .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
                             @Override
                             public void onPreviewDelete(int position) {

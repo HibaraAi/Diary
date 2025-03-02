@@ -955,6 +955,28 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
+    public SimpleResult updateDiaryLabelById(Diary diary) {
+        //此方法目前仅用于更新日记文本，修改错别字，仅此而已
+        SimpleResult result = new SimpleResult();
+        Diary diaryInDb = LitePal.find(Diary.class, diary.getId());
+        if(null==diaryInDb){
+            result.setSuccess(false);
+            result.setMsg("没有找到需要更新的日记");
+        }else{
+            diaryInDb.setLabel(diary.getLabel());
+            int update = diaryInDb.update(diaryInDb.getId());
+            if(1==update){
+                result.setSuccess(true);
+                result.setMsg("更新成功，请刷新");
+            }else{
+                result.setSuccess(false);
+                result.setMsg("数据库更新失败，请重试");
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<DiaryVoForFunny> getDiaryVoForFunny() {
         List<DiaryVoForFunny> voList = new ArrayList<>();
         List<Diary> all = LitePal.order("modifiedDate desc").find(Diary.class);

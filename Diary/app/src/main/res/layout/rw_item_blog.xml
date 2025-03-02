@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="7dp"
+    android:padding="10dp"
+    app:cardCornerRadius="10dp"
+    android:elevation="1dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <ImageView
+            android:id="@+id/blog_item_img"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:elevation="2dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="背景图" />
+
+        <TextView
+            android:id="@+id/blog_item_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/blog_item_img"
+            app:layout_constraintLeft_toRightOf="@+id/blog_item_img"
+            android:textSize="10dp"
+            android:layout_marginLeft="3dp"
+            android:text="2020-02-20 99:22:44 周六"/>
+
+        <TextView
+            android:id="@+id/blog_item_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/blog_item_img"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textSize="10dp"
+            android:layout_marginRight="3dp"
+            android:textColor="?attr/colorPrimary"
+            android:text="#深度##规划然后##让他问题#"/>
+
+        <TextView
+            android:id="@+id/blog_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/blog_item_label"
+            app:layout_constraintLeft_toRightOf="@+id/blog_item_img"
+            android:textSize="23dp"
+            android:paddingLeft="3dp"
+            android:text="2春节春节春节春节"/>
+
+        <TextView
+            android:id="@+id/blog_item_content"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="0dp"
+            app:layout_constraintVertical_weight="1"
+            app:layout_constraintTop_toBottomOf="@+id/blog_item_title"
+            app:layout_constraintBottom_toBottomOf="@+id/blog_item_img"
+            app:layout_constraintLeft_toLeftOf="@+id/blog_item_title"
+            app:layout_constraintRight_toRightOf="parent"
+            android:paddingLeft="3dp"
+            android:gravity="top"
+            android:textSize="10dp"
+            android:text="哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

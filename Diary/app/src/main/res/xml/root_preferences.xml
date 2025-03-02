@@ -86,10 +86,10 @@
 <!--            app:key="fullSearch"-->
 <!--            app:title="慢速搜索"-->
 <!--            app:summary="根据关键字搜索日记正文，列出匹配对象"/>-->
-        <Preference
-            app:key="ascRead"
-            app:title="时间升序浏览"
-            app:summary="和主界面的浏览顺序反过来查看日记"/>
+<!--        <Preference-->
+<!--            app:key="ascRead"-->
+<!--            app:title="时间升序浏览"-->
+<!--            app:summary="和主界面的浏览顺序反过来查看日记"/>-->
         <SwitchPreferenceCompat
             app:key="inputTip"
             app:defaultValue="false"

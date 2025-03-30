@@ -15,6 +15,10 @@ import cn.snowt.diary.util.SimpleResult;
  * 需要提供一个Handler。
  * 子类需要重写doAsync()方法，将耗时操作放入重写的方法，需要在重写的方法里调用updateProgress()通知主线程更新进度。
  * 调用startAsyncTask()方法即可启动异步任务。
+ * handler中message的obj包含异步执行的结果--->SimpleResult result = (SimpleResult) msg.obj。
+ * msg.what = FINISH_TASK表示完成了异步任务;
+ * msg.what = START_TASK表示刚开启了异步任务,这个时候可以弹出进度条;
+ * msg.what = UPDATE_PROGRESS可以通知主线程更新进度条的进度
  */
 public abstract class MyAsyncTask {
     public static final int FINISH_TASK = 1;

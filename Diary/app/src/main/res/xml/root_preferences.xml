@@ -112,6 +112,10 @@
             app:key="updateInfo"
             app:title="历次更新信息"
             app:summary="包括本次更新内容及后续更新计划。" />
+        <Preference
+            app:key="updateCheck"
+            app:title="检查更新"
+            app:summary="我也要有灰字提示QaQ😤。" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="导出/导入">

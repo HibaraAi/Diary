@@ -20,8 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="1"
-        android:paddingLeft="5dp"
-        android:textSize="25dp"
+        android:paddingLeft="15dp"
+        android:textSize="23dp"
+        android:text="标题"
+        android:textColor="?attr/colorPrimary"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
     <TextView
@@ -31,6 +33,7 @@
         app:layout_constraintTop_toBottomOf="@+id/act_blog_title"
         app:layout_constraintLeft_toLeftOf="parent"
         android:textColor="#9E9E9E"
+        android:text="2025-03-22 16:38:00 星期六"
         android:paddingLeft="5dp"
         android:layout_marginLeft="5dp"/>
 
@@ -45,6 +48,7 @@
         android:textColor="#9E9E9E"
         android:gravity="end"
         android:paddingRight="5dp"
+        android:text="#测试##测试##测试##测试#"
         android:layout_marginRight="10dp" />
 
     <cn.snowt.blog.view.RichTextView

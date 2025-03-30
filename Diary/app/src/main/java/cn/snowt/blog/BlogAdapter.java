@@ -1,5 +1,6 @@
 package cn.snowt.blog;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -16,8 +17,10 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.DiaryListActivity;
 import cn.snowt.diary.util.BaseUtils;
 
 /**
@@ -70,7 +73,47 @@ public class BlogAdapter extends  RecyclerView.Adapter{
             intent.putExtra(BlogDetailActivity.INTENT_BLOG_ID,viewHolder.blogId);
             context.startActivity(intent);
         });
+        //点击标签
+        viewHolder.labelView.setOnClickListener(v-> responseToClickLabel(viewHolder.labelView.getText().toString()));
+        viewHolder.labelView.setOnLongClickListener(v -> {
+            String allLabel = viewHolder.labelView.getText().toString();
+            BaseUtils.copyInClipboard(context,allLabel);
+            BaseUtils.shortTipInSnack(view,"已复制: "+allLabel);
+            return true;
+        });
         return viewHolder;
+    }
+
+    /**
+     * 相应被标签被点击
+     * @param allLabel 需要提供被点击标签的值
+     */
+    private void responseToClickLabel(String allLabel){
+        AtomicReference<String> selectLabel = new AtomicReference<>();
+        final String[] items = allLabel.split("##");
+        if(items.length>1){
+            items[0] = items[0]+"#";
+            items[items.length-1] = "#"+items[items.length-1];
+        }
+        if(items.length>=3){
+            for(int i=1;i<=items.length-2;i++){
+                items[i] = "#"+items[i]+"#";
+            }
+        }
+        selectLabel.set(items[0]);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("按标签查看日记");
+        builder.setTitle("请选择一个标签,将展示同标签的所有日记和Blog");
+        builder.setSingleChoiceItems(items, 0, (dialogInterface, i) -> selectLabel.set(items[i]));
+        builder.setPositiveButton("查看", (dialog, which) -> {
+            Intent intent = new Intent(context, DiaryListActivity.class);
+            intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_SEARCH_LABEL);
+            intent.putExtra("label",selectLabel.get());
+            context.startActivity(intent);
+        });
+        builder.setNegativeButton("取消",null);
+        builder.setCancelable(true);
+        builder.show();
     }
 
     @Override

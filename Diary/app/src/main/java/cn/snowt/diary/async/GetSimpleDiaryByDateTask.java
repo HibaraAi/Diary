@@ -6,16 +6,21 @@ import android.os.Handler;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import cn.snowt.blog.BlogService;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
+import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.SimpleResult;
+import cn.snowt.diary.vo.DiaryVo;
 
 /**
  * 处理时间轴界面的动画
  */
 public class GetSimpleDiaryByDateTask extends MyAsyncTask{
     private DiaryService diaryService = new DiaryServiceImpl();
+    private BlogService blogService = new BlogService();
 
     private Date date1;
     private Date date2;
@@ -28,8 +33,20 @@ public class GetSimpleDiaryByDateTask extends MyAsyncTask{
     void doAsync() {
         try {
             SimpleResult simpleResult = diaryService.getSimpleDiaryByDate(date1, date2);
+            List<DiaryVo> blosList =  blogService.getSimpleBlogAsDiaryVo(date1, date2);
             result.setSuccess(true);
-            result.setData(simpleResult.getData());
+            List<DiaryVo> diaryVoList = (List<DiaryVo>) simpleResult.getData();
+            diaryVoList.addAll(blosList);
+            diaryVoList.sort((o1, o2) -> {
+                if(BaseUtils.stringToDate(o1.getModifiedDate()+" 00:00:00").before(BaseUtils.stringToDate(o2.getModifiedDate()+" 00:00:00"))){
+                    return 1;
+                }else if (BaseUtils.stringToDate(o1.getModifiedDate()+" 00:00:00").after(BaseUtils.stringToDate(o2.getModifiedDate()+" 00:00:00"))){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            });
+            result.setData(diaryVoList);
         }catch (Exception e){
             result.setSuccess(false);
         }

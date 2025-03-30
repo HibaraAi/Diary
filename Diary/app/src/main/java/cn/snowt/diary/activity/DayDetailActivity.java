@@ -80,6 +80,14 @@ public class DayDetailActivity extends AppCompatActivity implements View.OnClick
                 this.finish();
             }
         }
+        //2025年3月22日，修改界面，不修改代码，直接禁止显示即可
+        endDate.setVisibility(View.GONE);
+        disNow.setVisibility(View.GONE);
+        endDateHelp.setVisibility(View.GONE);
+        View view = findViewById(R.id.day_detail_dis_now_help);
+        if(null!=view){
+            view.setVisibility(View.GONE);
+        }
     }
 
     /**

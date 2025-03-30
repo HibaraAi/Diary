@@ -38,8 +38,16 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import cn.snowt.blog.BlogDetailActivity;
+import cn.snowt.blog.BlogService;
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
+import cn.snowt.diary.service.DiaryService;
+import cn.snowt.diary.service.VideoService;
+import cn.snowt.diary.service.impl.DiaryServiceImpl;
+import cn.snowt.diary.service.impl.DrawIngServiceImpl;
+import cn.snowt.diary.service.impl.VideoServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.GlideEngine;
 import cn.snowt.diary.util.UriUtils;
@@ -157,8 +165,23 @@ public class DiaryVideoAdapter extends RecyclerView.Adapter{
                 });
                 builder.show();
             }else if(recyclerView.getId()==R.id.pic_day_item_ry){
-                //图库区域
-
+                //视频库区域
+                BlogService blogService = new BlogService();
+                Integer blogIdByPicSre = blogService.getBlogIdByPicSre(viewHolder.videoSrc);
+                if(-1!=blogIdByPicSre){
+                    Intent intent = new Intent(context, BlogDetailActivity.class);
+                    intent.putExtra(BlogDetailActivity.INTENT_BLOG_ID,blogIdByPicSre);
+                    context.startActivity(intent);
+                }else{
+                    Integer diaryIdByVideoSrc = new VideoServiceImpl().getDiaryIdByVideoSrc(viewHolder.videoSrc);
+                    if(-1!=diaryIdByVideoSrc){
+                        Intent intent = new Intent(context, DiaryDetailActivity.class);
+                        intent.putExtra("id",diaryIdByVideoSrc);
+                        context.startActivity(intent);
+                    }else{
+                        BaseUtils.shortTipInCoast(context,"处理长按操作失败DiaryVideoAdapter");
+                    }
+                }
             }else{
                 BaseUtils.shortTipInCoast(context,"未定义长按操作");
             }

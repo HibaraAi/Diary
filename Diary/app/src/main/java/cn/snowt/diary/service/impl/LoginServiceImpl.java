@@ -7,10 +7,12 @@ import org.litepal.LitePal;
 import org.litepal.LitePalApplication;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.service.DiaryService;
 import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.util.BaseUtils;
@@ -86,11 +88,11 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void doFirstLoginOfTheDay() {
+    public String doFirstLoginOfTheDay() {
+        String tip = "";
         //1.读取是否有往年今日内容
         //2.纪念日是否逢整百天整年
         if (MyConfiguration.getInstance().isNeedFirstLoginNotice()) {
-            String tip = "";
             //查询往年今日
             List<DiaryVo> voList = new DiaryServiceImpl().getFormerYear(new Date());
             if(!voList.isEmpty()){
@@ -111,7 +113,29 @@ public class LoginServiceImpl implements LoginService {
         //有存储权限且设置了要备份才继续
         if (PermissionUtils.haveExternalStoragePermission(LitePalApplication.getContext())
                 && BaseUtils.getDefaultSharedPreferences().getBoolean("autoBackup",false)) {
-            diaryService.autoBackupDiary();
+            boolean backupSuccess = diaryService.autoBackupDiary();
+            if(backupSuccess){
+                tip = tip+"\n\n自动备份成功。";
+            }
+        }
+        //5.由于将草稿箱的功能移除了，现需要在登录的时候检查草稿箱有没有内容，如果有就将草稿箱的内容存起来
+        saveTempDiary();
+        return tip;
+    }
+
+    /**
+     * 由于将草稿箱的功能移除了，现需要在登录的时候检查草稿箱有没有内容，如果有就将草稿箱的内容存起来
+     */
+    private void saveTempDiary() {
+        //查询有没有
+        List<TempDiary> tempDiaryList = LitePal.findAll(TempDiary.class);
+        if(!tempDiaryList.isEmpty()){
+            tempDiaryList.forEach(tempDiary -> {
+                SimpleResult simpleResult = diaryService.addOneByArgs(tempDiary.getContent(), "#草稿箱自动保存#", "", "", new ArrayList<>(), new Date(), new ArrayList<>(), null);
+                if (simpleResult.getSuccess()) {
+                    tempDiary.delete();
+                }
+            });
         }
     }
 

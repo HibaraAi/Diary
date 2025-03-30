@@ -9,8 +9,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -22,6 +26,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -57,6 +62,8 @@ import java.util.UUID;
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryImageAdapter;
 import cn.snowt.diary.adapter.DiaryVideoAdapter;
+import cn.snowt.diary.async.MyAsyncTask;
+import cn.snowt.diary.async.SaveDiaryTask;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.TempDiary;
 import cn.snowt.diary.entity.Weather;
@@ -154,6 +161,48 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     private boolean autoSave = true;
 
     boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
+
+    private androidx.appcompat.app.AlertDialog ProgressADL;  //加载动画的弹窗
+
+    /**
+     * 有时，选择了很多图片、视频后，保存Diary时会卡住，因为在等文件的磁盘操作。
+     * 因此在2025年3月30日新增一个loading动画，掩盖卡住的现象。仅仅对diaryService.addOneByArgs(...)方法做异步操作
+     */
+    Handler handler = new Handler(new Handler.Callback() {  //处理异步回调
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case MyAsyncTask.FINISH_TASK:{
+                    SimpleResult result = (SimpleResult) msg.obj;
+                    if(!result.getSuccess()){
+                        BaseUtils.shortTipInSnack(diaryInputView,result.getMsg());
+                    }else{
+                        clearTempPinInEdit();
+                        //又判断一次？？？？吃饱了撑？？？
+                        if(-1!=updateDiaryId){
+                            BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"日记的文本内容已更新，请手动刷新!");
+                        }else{
+                            BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"新日记已存储，请手动刷新!");
+                        }
+                        if(-1!=tempDiaryId){
+                            LitePal.delete(TempDiary.class,tempDiaryId);
+                        }
+                        autoSave = false;  //日记保存成功，不需要自动保存
+                        delAutoSaveInSP();
+                        finish();
+                    }
+                    closeProgressAlertDialog();
+                    break;
+                }
+                case MyAsyncTask.START_TASK:{
+                    showProgressAlertDialog();
+                    break;
+                }
+                default:break;
+            }
+            return false;
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -387,7 +436,7 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                     if(!"".equals(dateStr)){
                         date = BaseUtils.stringToDate(dateStr);
                     }
-                    SimpleResult result;
+                    SimpleResult result = new SimpleResult();
                     if(-1!=updateDiaryId){
                         //更新日记文本
                         Diary diary = new Diary();
@@ -396,11 +445,19 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                         result = diaryService.updateDiaryContentById(diary);
                     }else{
                         //正常的保存
-                        result = diaryService.addOneByArgs(diaryInputStr,
+//                        result = diaryService.addOneByArgs(diaryInputStr,
+//                                labelView.getText().toString(),
+//                                locationView.getText().toString(),
+//                                weatherView.getText().toString(),
+//                                imageTempSrcList,date,videoTempSrcList,quoteDiaryId);
+                        SaveDiaryTask saveDiaryTask = new SaveDiaryTask(handler);
+                        saveDiaryTask.asyncSaveDiary(diaryInputStr,
                                 labelView.getText().toString(),
                                 locationView.getText().toString(),
                                 weatherView.getText().toString(),
                                 imageTempSrcList,date,videoTempSrcList,quoteDiaryId);
+                        result.setSuccess(false);
+                        result.setMsg("异步保存");
                     }
                     if(result.getSuccess()){
                         clearTempPinInEdit();
@@ -417,7 +474,9 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                         delAutoSaveInSP();
                         finish();
                     }else{
-                        BaseUtils.shortTipInSnack(diaryInputView,result.getMsg());
+                        if(!"异步保存".equals(result.getMsg())){
+                            BaseUtils.shortTipInSnack(diaryInputView,result.getMsg());
+                        }
                     }
                 }
                 break;
@@ -782,46 +841,60 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
     private void askSave(String content){
         if(updateDiaryId==-1){
             //==-1表示非更新日记，才需要问
-            AlertDialog.Builder builder=new AlertDialog.Builder(KeepDiaryActivity.this);
-            builder.setTitle("提示：");
-            builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？\n如果你是从草稿箱打开这个页面，不保存的话，草稿箱中的记录会被删除!");
-            builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
-                if(content.length()>2000){
-                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存 ORz");
-                }else{
-                    boolean saveSuccess = false;
-                    TempDiary tempDiary = new TempDiary(null, content);
-                    if(tempDiaryId!=-1){
-                        int update = tempDiary.update(tempDiaryId);
-                        if(0!=update){
-                            saveSuccess = true;
-                        }
-                    }else{
-                        saveSuccess = tempDiary.save();
-                    }
-                    if(saveSuccess){
-                        autoSave = false;  //成功保存到草稿箱，不再需要自动保存
+//            AlertDialog.Builder builder=new AlertDialog.Builder(KeepDiaryActivity.this);
+//            builder.setTitle("提示：");
+//            builder.setMessage("你即将退出日记编辑，但还未保存此日记，是否将本条记录保存到草稿箱？\n如果你是从草稿箱打开这个页面，不保存的话，草稿箱中的记录会被删除!");
+//            builder.setNegativeButton("保存到草稿箱", (dialog, which) -> {
+//                if(content.length()>2000){
+//                    BaseUtils.shortTipInSnack(diaryInputView,"你以为写书呢？大于2000字了，禁止保存 ORz");
+//                }else{
+//                    boolean saveSuccess = false;
+//                    TempDiary tempDiary = new TempDiary(null, content);
+//                    if(tempDiaryId!=-1){
+//                        int update = tempDiary.update(tempDiaryId);
+//                        if(0!=update){
+//                            saveSuccess = true;
+//                        }
+//                    }else{
+//                        saveSuccess = tempDiary.save();
+//                    }
+//                    if(saveSuccess){
+//                        autoSave = false;  //成功保存到草稿箱，不再需要自动保存
+//                        delAutoSaveInSP();
+//                        finish();
+//                    }else{
+//                        BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
+//                    }
+//                }
+//            });
+//            builder.setPositiveButton("直接退出",(dialog, which) -> {
+//                if(-1!=tempDiaryId){
+//                    LitePal.delete(TempDiary.class,tempDiaryId);
+//                }
+//                autoSave = false;  //直接退出，也不再需要自动保存
+//                delAutoSaveInSP();
+//                finish();
+//            });
+//            builder.show();
+            new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("没保存的哦，确定保存请使用发送按钮，不保存请继续退出")
+                    .setPositiveButton("继续退出", (dialog, which) -> {
+                        autoSave = false;
                         delAutoSaveInSP();
                         finish();
-                    }else{
-                        BaseUtils.shortTipInCoast(KeepDiaryActivity.this,"保存失败，请重试!");
-                    }
-                }
-            });
-            builder.setPositiveButton("直接退出",(dialog, which) -> {
-                if(-1!=tempDiaryId){
-                    LitePal.delete(TempDiary.class,tempDiaryId);
-                }
-                autoSave = false;  //直接退出，也不再需要自动保存
-                delAutoSaveInSP();
-                finish();
-            });
-            builder.show();
+                    })
+                    .setNegativeButton("继续编辑",null)
+                    .show();
         }else{
             new AlertDialog.Builder(this)
                     .setTitle("提示")
                     .setMessage("你即将退出日记更新，确定更新请使用发送按钮，不更新请继续退出")
-                    .setPositiveButton("继续退出", (dialog, which) -> finish())
+                    .setPositiveButton("继续退出", (dialog, which) -> {
+                        autoSave = false;
+                        delAutoSaveInSP();
+                        finish();
+                    })
                     .setNegativeButton("继续编辑",null)
                     .show();
         }
@@ -883,5 +956,30 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
 //            }
             FileUtils.safeDeleteFolder(tempSrc);
         }
+    }
+
+    private void showProgressAlertDialog(){
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(KeepDiaryActivity.this);
+        builder.setCancelable(false);
+        LinearLayout linearLayout = new LinearLayout(KeepDiaryActivity.this);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        ImageView imageView = new ImageView(KeepDiaryActivity.this);
+        imageView.setImageResource(R.drawable.loading);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(500,500);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Drawable drawable = imageView.getDrawable();
+        if(drawable instanceof AnimatedImageDrawable){
+            AnimatedImageDrawable animatedImageDrawable = (AnimatedImageDrawable) drawable;
+            animatedImageDrawable.start();
+        }
+        linearLayout.addView(imageView);
+        builder.setView(linearLayout);
+        ProgressADL = builder.show();
+    }
+
+    private void closeProgressAlertDialog(){
+        ProgressADL.cancel();
     }
 }

@@ -1137,7 +1137,8 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
-    public void autoBackupDiary() {
+    public boolean autoBackupDiary() {
+        boolean successFlag = false;
         String pin = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_PIN, "");
         String publicKey = MyConfiguration.getInstance().getPublicKey();
         String latestBackupStr = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_LATEST_DAIRY, "1998-01-01 00:00:00");
@@ -1200,6 +1201,7 @@ public class DiaryServiceImpl implements DiaryService {
                     File file = new File(externalDirectory.getAbsolutePath() + "/" + Constant.AUTO_BACKUP_FILE_NAME);
                     writer = new FileWriter(file);
                     writer.write(mapJson);
+                    successFlag = true;
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 } finally {
@@ -1218,12 +1220,24 @@ public class DiaryServiceImpl implements DiaryService {
             BaseUtils.simpleSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
             //BaseUtils.longTextSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
         }
+        return successFlag;
     }
 
     @Override
     public boolean existById(Integer id) {
         Diary diary = LitePal.find(Diary.class, id);
         return null != diary;
+    }
+
+    @Override
+    public boolean isImageSrc(String src) {
+        DrawIngServiceImpl drawIngService = new DrawIngServiceImpl();
+        Integer diaryIdByPicSre = drawIngService.getDiaryIdByPicSre(src);
+        if(-1==diaryIdByPicSre){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     /**

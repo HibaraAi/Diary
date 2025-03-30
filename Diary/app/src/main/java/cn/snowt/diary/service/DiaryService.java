@@ -201,8 +201,9 @@ public interface DiaryService {
 
     /**
      * 自动备份日记
+     * @return 如果备份成功，返回true
      */
-    void autoBackupDiary();
+    boolean autoBackupDiary();
 
     /**
      * 通过id来确认是否存在这个日记
@@ -211,4 +212,10 @@ public interface DiaryService {
      */
     boolean existById(Integer id);
 
+    /**
+     * 给定一个资源地址，看看是不是日记的配图
+     * @param src 资源地址
+     * @return 返回true就是图片资源，返回false只能表示它不是图片，可能是不存在也不能是视频
+     */
+    boolean isImageSrc(String src);
 }

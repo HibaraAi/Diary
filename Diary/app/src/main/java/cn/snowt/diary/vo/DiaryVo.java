@@ -13,12 +13,15 @@ import lombok.NoArgsConstructor;
 /**
  * @Author: HibaraAi
  * @Date: 2021-08-16 13:53
- * @Description:
+ * @Description: 2025年3月15日留：这个原本是Diary的Vo，现在需要将Blog列表预览的功能也加入到这里。
+ * 初步想法是将quoteDiaryUuid设置为-1作为Blog的标记。继续改造屎山代码。。。。。
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiaryVo implements Serializable {
+    public static final String BLOG_FLAG = "-1";
+
     private Integer id;
     private String content;
     private String modifiedDate;

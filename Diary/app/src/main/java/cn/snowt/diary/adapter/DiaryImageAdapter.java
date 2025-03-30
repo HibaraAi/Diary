@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import cn.snowt.blog.BlogDetailActivity;
+import cn.snowt.blog.BlogService;
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.BigImgActivity;
 import cn.snowt.diary.activity.DiaryDetailActivity;
@@ -212,9 +214,28 @@ public class DiaryImageAdapter extends RecyclerView.Adapter{
                 //图库区域
                 DrawingService drawIngService = new DrawIngServiceImpl();
                 Integer diaryId = drawIngService.getDiaryIdByPicSre(viewHolder.imageSrc);
-                Intent intent = new Intent(context, DiaryDetailActivity.class);
-                intent.putExtra("id",diaryId);
-                context.startActivity(intent);
+                if(-1==diaryId){
+                    //如果日记的ID是-1，可能这个图片地址是Blog的图片地址
+                    diaryId = new BlogService().getBlogIdByPicSre(viewHolder.imageSrc);
+                    if(-1!=diaryId){  //再次赋值后，不是-1了，就说明的确是Blog的，跳转Blog
+                        Intent intent = new Intent(context, BlogDetailActivity.class);
+                        intent.putExtra(BlogDetailActivity.INTENT_BLOG_ID,diaryId);
+                        context.startActivity(intent);
+                    }else{
+                        diaryId = new VideoServiceImpl().getDiaryIdByVideoSrc(viewHolder.imageSrc);
+                        if(-1!=diaryId){  //查找日记视频后不是-1，说明是日记的视频
+                            Intent intent = new Intent(context, DiaryDetailActivity.class);
+                            intent.putExtra("id",diaryId);
+                            context.startActivity(intent);
+                        }else{ //还是-1，说明不是Blog的也不是日记的配图或者视频，可能出错了？
+                            BaseUtils.shortTipInSnack(view,"貌似不是日记也不是Blog的配图...");
+                        }
+                    }
+                }else{  //走到这里，是日记的图片
+                    Intent intent = new Intent(context, DiaryDetailActivity.class);
+                    intent.putExtra("id",diaryId);
+                    context.startActivity(intent);
+                }
             }else if (recyclerView.getId()==R.id.video_day_item_ry){
                 //视频库区域
                 VideoService videoService = new VideoServiceImpl();

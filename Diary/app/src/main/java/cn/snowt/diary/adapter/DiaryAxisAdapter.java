@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 import java.util.Random;
 
+import cn.snowt.blog.BlogDetailActivity;
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.DiaryListActivity;
@@ -38,6 +39,7 @@ public class DiaryAxisAdapter extends RecyclerView.Adapter{
         ImageView imageView;
         int diaryId;
         boolean isTempDiary;
+        boolean isBlog;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -73,7 +75,10 @@ public class DiaryAxisAdapter extends RecyclerView.Adapter{
                     intent = new Intent(context, KeepDiaryActivity.class);
                     intent.putExtra(KeepDiaryActivity.OPEN_FROM_TYPE,KeepDiaryActivity.OPEN_FROM_TEMP_DIARY);
                 }
-            }else{
+            }else if(viewHolder.isBlog){  //20250315留：不写注释，看得头很痛
+                intent = new Intent(context, BlogDetailActivity.class);
+                intent.putExtra(BlogDetailActivity.INTENT_BLOG_ID,viewHolder.diaryId);
+            } else{
                 intent = new Intent(context, DiaryDetailActivity.class);
             }
             intent.putExtra("id",viewHolder.diaryId);
@@ -92,6 +97,7 @@ public class DiaryAxisAdapter extends RecyclerView.Adapter{
         }else{
             newHolder.isTempDiary = false;
         }
+        newHolder.isBlog = DiaryVo.BLOG_FLAG.equals(diaryVo.getQuoteDiaryUuid());  //已约定QuoteDiaryUuid作为是否是Blog的标识
         newHolder.diaryId = diaryVo.getId();
         newHolder.dateView.setText((position+1)+"\n"+diaryVo.getModifiedDate());
         newHolder.diaryCutView.setText(diaryVo.getContent());

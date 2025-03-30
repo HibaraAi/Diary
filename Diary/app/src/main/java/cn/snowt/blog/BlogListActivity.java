@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.snowt.diary.R;
@@ -109,6 +111,17 @@ public class BlogListActivity extends AppCompatActivity {
      */
     private void refreshDataForShow() {
         voList = blogService.getAllBlogs();
+        voList.sort((o1, o2) -> {
+            Date o1Date = BaseUtils.stringToDate(o1.getDate());
+            Date o2Date = BaseUtils.stringToDate(o2.getDate());
+            if (o1Date.after(o2Date)) {
+                return -1;
+            } else if (o1Date.before(o2Date)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
         adapter = new BlogAdapter(voList,context);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(layoutManager);
@@ -139,12 +152,15 @@ public class BlogListActivity extends AppCompatActivity {
                 break;
             }
             case R.id.toolbar_day_help:{
-                String tip = "Blog类似于非常简易的博客，可以让你边写文本边插入视频、图片。目前已支持加密存储。" +
+                String tip = "Blog类似于非常简易的博客，是后来加入的功能，所以和日记主程序还是融合的不太好。" +
+                        "Blog可以让你边写文本边插入视频、图片。目前已支持加密存储（你得自己去设置里开启加密功能）。" +
                         "如果你将Blog界面作为首屏，则视为帮你输入密码进行了登录。" +
                         "Blog暂不支持备份和恢复，将在以后的版本支持（累了，先缓一缓）。" +
                         "虽然提供了修改的功能，但还不太完善，因为目前的修改是通过“删掉已有Blog再重新添加一条新的”实现的。" +
-                        "目前Blog是独立于整个APP的，所以不支持搜索Blog，也不支持标签查找、时间轴查找功能，也不会在信息流出现，" +
-                        "以后的版本再支持（先缓缓，但立flag）。";
+                        "主界面的信息流是不显示Blog的，因为Blog和日记的存储结构是不一样的，这会导致一些问题，" +
+                        "例如我并不知道2025年3月15日这条日记的下一个记录是该显示日记还是Blog，" +
+                        "所以主界面的信息流不展示Blog。不过呢，你可以在标签查找、时间轴查找、关键字搜索中同时看到Blog和日记，并由此跳转的“临时信息流”可以同时展示。" +
+                        "目前Blog暂不支持导出PDF、图片，将在以后的版本支持（继续立Flag）";
                 BaseUtils.alertDialogToShow(this,"Blog说明",tip);
                 break;
             }

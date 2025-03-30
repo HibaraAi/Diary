@@ -13,10 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.AnimatedImageDrawable;
@@ -53,13 +51,12 @@ import java.util.List;
 import cn.snowt.blog.BlogListActivity;
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAdapter;
+import cn.snowt.diary.async.FirstLoginOfTheDayTask;
 import cn.snowt.diary.async.MyAsyncTask;
 import cn.snowt.diary.async.SearchTask;
 import cn.snowt.diary.service.DiaryService;
-import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.MyConfigurationService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
-import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.service.impl.MyConfigurationServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
@@ -113,7 +110,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView progressInADL;  //进度条中的进度数字
     private boolean showSearchResult = true;  //如果中途取消，则不展示结果
 
-    Handler handler = new Handler(new Handler.Callback() {  //处理异步回调
+    //处理搜索结果的handler
+    Handler handlerForSearch = new Handler(new Handler.Callback() {  //处理异步回调
         @Override
         public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what){
@@ -150,6 +148,18 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
+    //处理每日首次登录的handler
+    Handler handlerForLogin = new Handler(msg -> {
+        if (msg.what == MyAsyncTask.FINISH_TASK) {
+            SimpleResult result = (SimpleResult) msg.obj;
+            if (result.getSuccess()) {
+                String loginTip = (String) result.getData();
+                BaseUtils.alertDialogToShow(MainActivity.this,"登录通知",loginTip);
+            }
+        }
+        return false;
+    });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,17 +181,18 @@ public class MainActivity extends AppCompatActivity {
         //设置通知栏颜色为透明
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         //读取往年今日等提醒
-        new Thread(() -> {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            LoginService loginService = new LoginServiceImpl();
-            if (loginService.isFirstLoginInTheDay()) {
-                loginService.doFirstLoginOfTheDay();
-            }
-        }).start();
+        new FirstLoginOfTheDayTask(handlerForLogin).doFirstLoginOfTheDay();
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(200);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            LoginService loginService = new LoginServiceImpl();
+//            if (loginService.isFirstLoginInTheDay()) {
+//                loginService.doFirstLoginOfTheDay();
+//            }
+//        }).start();
         bindViewAndSetListener();
         getDiaryForFirstShow();
         diaryAdapter = new DiaryAdapter(voList);
@@ -233,24 +244,24 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     break;
                 }
-                case R.id.nav_update:{
-                    Context context = MainActivity.this;
-                    String versionName = "[读取失败]";
-                    try {
-                        PackageInfo packageInfo = context.getApplicationContext()
-                                .getPackageManager()
-                                .getPackageInfo(context.getPackageName(), 0);
-                        versionName = packageInfo.versionName;
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    BaseUtils.alertDialogToShow(context,
-                            "提示",
-                            "本软件没有接入互联网，请前往Bilibili查看置顶评论的版本，检查是否有更新，当前的版本为"+versionName+"。" +
-                                    "\n已为你复制链接地址https://www.bilibili.com/video/BV1Bb4y1v7qm");
-                    BaseUtils.copyInClipboard(context,"https://www.bilibili.com/video/BV1Bb4y1v7qm");
-                    break;
-                }
+//                case R.id.nav_update:{
+//                    Context context = MainActivity.this;
+//                    String versionName = "[读取失败]";
+//                    try {
+//                        PackageInfo packageInfo = context.getApplicationContext()
+//                                .getPackageManager()
+//                                .getPackageInfo(context.getPackageName(), 0);
+//                        versionName = packageInfo.versionName;
+//                    } catch (PackageManager.NameNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+//                    BaseUtils.alertDialogToShow(context,
+//                            "提示",
+//                            "本软件没有接入互联网，请前往Bilibili查看置顶评论的版本，检查是否有更新，当前的版本为"+versionName+"。" +
+//                                    "\n已为你复制链接地址https://www.bilibili.com/video/BV1Bb4y1v7qm");
+//                    BaseUtils.copyInClipboard(context,"https://www.bilibili.com/video/BV1Bb4y1v7qm");
+//                    break;
+//                }
                 case R.id.nav_note:{
                     Intent intent = new Intent(MainActivity.this, NoteActivity.class);
                     intent.putExtra(NoteActivity.OPEN_FROM,NoteActivity.OPEN_FROM_MAIN_ACTIVITY);
@@ -345,12 +356,12 @@ public class MainActivity extends AppCompatActivity {
                     builder.show();
                     break;
                 }
-                case R.id.nav_temp:{
-                    Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
-                    intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_TEMP_DIARY);
-                    startActivity(intent);
-                    break;
-                }
+//                case R.id.nav_temp:{
+//                    Intent intent = new Intent(MainActivity.this,DiaryListActivity.class);
+//                    intent.putExtra(DiaryListActivity.OPEN_FROM_TYPE,DiaryListActivity.OPEN_FROM_TEMP_DIARY);
+//                    startActivity(intent);
+//                    break;
+//                }
                 case R.id.nav_asc:{
                     Intent intent = new Intent(this, PicturesActivity.class);
                     intent.putExtra(PicturesActivity.OPEN_FROM_TYPE,PicturesActivity.OPEN_FROM_VIDEO);
@@ -374,7 +385,10 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case R.id.nav_pic:{
-                    BaseUtils.gotoActivity(this, PicturesActivity.class);
+                    Intent intent = new Intent(this, PicturesActivity.class);
+                    intent.putExtra(PicturesActivity.OPEN_FROM_TYPE,PicturesActivity.OPEN_FROM_PICTURE);
+                    startActivity(intent);
+                    //BaseUtils.gotoActivity(this, PicturesActivity.class);
                     break;
                 }
                 default:{
@@ -627,7 +641,7 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setCancelable(false);
                 builder.setTitle("搜索日记");
-                builder.setMessage("仅搜索日记及评论文本");
+                builder.setMessage("搜索范围：日记正文及评论、Blog标题及正文");
                 EditText editText = new EditText(MainActivity.this);
                 editText.setBackgroundResource(R.drawable.edge);
                 editText.setPadding(10,10,10,10);
@@ -637,7 +651,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setView(editText);
                 builder.setPositiveButton("搜索", (dialog, which) -> {
                     String searchValue = editText.getText().toString();
-                    SearchTask searchTask = new SearchTask(handler);
+                    SearchTask searchTask = new SearchTask(handlerForSearch);
                     searchTask.fullSearch(searchValue);
                 });
                 builder.setNegativeButton("取消", null);

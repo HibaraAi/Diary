@@ -84,7 +84,7 @@ public class PDFUtils {
         PdfDocument.Page page = null;
         for(int i =0;i<diaryVos.size();i++){
             DiaryVo diaryVo = diaryVos.get(i);
-            if (!diaryService.existById(diaryVo.getId())){  //如果不存在则跳过
+            if (!diaryService.existById(diaryVo.getId()) || DiaryVo.BLOG_FLAG.equals(diaryVo.getQuoteDiaryUuid())){  //如果不存在或者是Blog的Vo则跳过
                 continue;
             }
             View view = voToView(diaryVo, context, parent);

@@ -98,7 +98,7 @@ public class TimeAscActivity extends AppCompatActivity {
                         BaseUtils.shortTipInSnack(recyclerView,"【BUG】程序异常222...");
                     }else{
                         switch (intExtra) {
-                            case OPEN_FROM_SIMPLE_DIARY_LIST:{
+                            case OPEN_FROM_SIMPLE_DIARY_LIST:{  //临时信息流
                                 voList = (List<DiaryVo>) result.getData();
                                 afterShowByIds2(getIntent().getIntExtra("sortType",1));
                                 diaryAdapter = new DiaryAdapter(voList);
@@ -158,8 +158,7 @@ public class TimeAscActivity extends AppCompatActivity {
             case OPEN_FROM_SIMPLE_DIARY_LIST:{
                 actionBar.setTitle("临时信息流");
                 stopRefreshLayout();
-                //showByIds(intent.getIntegerArrayListExtra("ids"),intent.getIntExtra("sortType",1));
-                showByIds2(intent.getIntegerArrayListExtra("ids"),intent.getIntExtra("sortType",1));
+                showByIds3(intent.getIntegerArrayListExtra("ids"),intent.getIntegerArrayListExtra("blogIds"));
                 break;
             }
             case OPEN_FROM_DELETE_LIST:{
@@ -213,6 +212,17 @@ public class TimeAscActivity extends AppCompatActivity {
         task.getDiaryVoByIds(ids);
     }
 
+    /**
+     * 根据diary和blog的id，展示给定数据
+     * 异步加载，提供加载动画
+     * @param diaryIds diaryIds
+     * @param blogIds blogIds
+     */
+    private void showByIds3(ArrayList<Integer> diaryIds,ArrayList<Integer> blogIds) {
+        GetDiaryByIdsTask task = new GetDiaryByIdsTask(handler);
+        task.getDiaryVoByIds(diaryIds,blogIds);
+    }
+
     private void afterShowByIds2(int sortType){
         if(sortType==2){
             voList.sort((o1, o2) -> {
@@ -222,6 +232,18 @@ public class TimeAscActivity extends AppCompatActivity {
                     return 1;
                 } else if (o1Date.before(o2Date)) {
                     return -1;
+                } else {
+                    return 0;
+                }
+            });
+        }else{
+            voList.sort((o1, o2) -> {
+                Date o1Date = BaseUtils.stringToDate(o1.getModifiedDate());
+                Date o2Date = BaseUtils.stringToDate(o2.getModifiedDate());
+                if (o1Date.after(o2Date)) {
+                    return -1;
+                } else if (o1Date.before(o2Date)) {
+                    return 1;
                 } else {
                     return 0;
                 }
@@ -376,7 +398,7 @@ public class TimeAscActivity extends AppCompatActivity {
                 }
                 android.app.AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("验证你的身份");
-                builder.setMessage("\n将临时信息流的日记导出到一个PDF文件中，如果你在信息流删除了某个日记，请重新进入信息流，否则会导出失败。");
+                builder.setMessage("\n将临时信息流的日记（不包含Blog）导出到一个PDF文件中，如果你在信息流删除了某个日记，请重新进入信息流，否则会导出失败。");
                 EditText pinView = new EditText(context);
                 pinView.setBackgroundResource(R.drawable.edge);
                 pinView.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);

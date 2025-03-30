@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.snowt.blog.BlogService;
 import cn.snowt.diary.R;
 import cn.snowt.diary.adapter.DiaryAxisAdapter;
 import cn.snowt.diary.async.MyAsyncTask;
@@ -76,6 +77,7 @@ public class DiaryListActivity extends AppCompatActivity {
     public static final int OPEN_FROM_ASYNC_SEARCH = 8;
 
     private final DiaryService diaryService = new DiaryServiceImpl();
+    private final BlogService blogService = new BlogService();
 
     private RecyclerView recyclerView;
     private TextView tipView;
@@ -92,12 +94,15 @@ public class DiaryListActivity extends AppCompatActivity {
     static List<Integer> beSelectedToDelID = new ArrayList<>();
 
     private androidx.appcompat.app.AlertDialog ProgressADL;  //进度条的弹窗
+
+    /**
+     * 这个东西和加载动画有关
+     */
     Handler handler = new Handler(new Handler.Callback() {  //处理异步回调
         @Override
         public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what){
                 case MyAsyncTask.FINISH_TASK:{
-                    ProgressADL.cancel();
                     SimpleResult result = (SimpleResult) msg.obj;
                     if(!result.getSuccess()){
                         tipView.setText("【BUG】由于神秘力量，查询异常...");
@@ -105,6 +110,13 @@ public class DiaryListActivity extends AppCompatActivity {
                         switch (openType) {
                             case OPEN_FROM_DELETE_LIST:{
                                 diaryList = (List<DiaryVo>) result.getData();
+                                List<DiaryVo> list = new ArrayList<>();
+                                diaryList.forEach(diaryVo -> {
+                                    if(!"-1".equals(diaryVo.getQuoteDiaryUuid())){
+                                        list.add(diaryVo);
+                                    }
+                                });
+                                diaryList = list;
                                 afterShowDeleteList2();
                                 break;
                             }
@@ -121,6 +133,7 @@ public class DiaryListActivity extends AppCompatActivity {
                         }
 
                     }
+                    ProgressADL.cancel();
                     break;
                 }
                 case MyAsyncTask.START_TASK:{
@@ -145,40 +158,38 @@ public class DiaryListActivity extends AppCompatActivity {
         Intent intent = getIntent();
         openType = intent.getIntExtra(OPEN_FROM_TYPE, -1);
         switch (openType) {
-            case OPEN_FROM_TIME_AXIS:{
-//                showSimpleDiary(intent.getStringExtra(DATE_ONE),intent.getStringExtra(DATE_TWO));
+            case OPEN_FROM_TIME_AXIS:{  //时间轴
                 showSimpleDiary2(intent.getStringExtra(DATE_ONE),intent.getStringExtra(DATE_TWO));
                 break;
             }
-            case OPEN_FROM_TEMP_DIARY:{
+            case OPEN_FROM_TEMP_DIARY:{  //草稿箱
                 showSimpleDiary();
                 break;
             }
-            case OPEN_FROM_SEARCH_DIARY:{
+            case OPEN_FROM_SEARCH_DIARY:{  //旧版搜索，应该已弃用
                 showSimpleDiary(intent.getIntegerArrayListExtra("ids"),intent.getStringExtra("searchValue"));
                 break;
             }
-            case OPEN_FROM_SEARCH_LABEL:{
+            case OPEN_FROM_SEARCH_LABEL:{  //同标签下的数据
                 showSimpleDiary(intent.getStringExtra("label"));
                 break;
             }
-            case OPEN_FROM_LABEL_LIST:{
+            case OPEN_FROM_LABEL_LIST:{  //展示所有标签
                 searchView.setVisibility(View.VISIBLE);
                 showAllLabel();
                 break;
             }
-            case OPEN_FROM_FULL_SEARCH:{
+            case OPEN_FROM_FULL_SEARCH:{  //旧版的搜索，应该已弃用
                 List<DiaryVo> diaryVos = (List<DiaryVo>) intent.getSerializableExtra("diaryVos");
                 diaryList = diaryVos;
                 showFullSearchResult();
                 break;
             }
-            case OPEN_FROM_DELETE_LIST:{
-//                showDeleteList();
+            case OPEN_FROM_DELETE_LIST:{  //批量删除
                 showDeleteList2();
                 break;
             }
-            case OPEN_FROM_ASYNC_SEARCH:{
+            case OPEN_FROM_ASYNC_SEARCH:{  //最新版搜索
                 List<DiaryVo> diaryVos = (List<DiaryVo>) intent.getSerializableExtra("diaryVos");
                 diaryList = diaryVos;
                 showAsyncSearchResult();
@@ -454,6 +465,17 @@ public class DiaryListActivity extends AppCompatActivity {
         assert supportActionBar != null;
         supportActionBar.setTitle(labelStr);
         diaryList = diaryService.getSimpleDiaryByLabel(labelStr);
+        List<DiaryVo> simpleBlogAsDiaryVo = blogService.getSimpleBlogAsDiaryVo(labelStr);
+        diaryList.addAll(simpleBlogAsDiaryVo);
+        diaryList.sort((o1, o2) -> {
+            if(BaseUtils.stringToDate(o1.getModifiedDate()+" 00:00:00").before(BaseUtils.stringToDate(o2.getModifiedDate()+" 00:00:00"))){
+                return 1;
+            }else if (BaseUtils.stringToDate(o1.getModifiedDate()+" 00:00:00").after(BaseUtils.stringToDate(o2.getModifiedDate()+" 00:00:00"))){
+                return -1;
+            }else{
+                return 0;
+            }
+        });
         tipView.setText("含有标签["+labelStr+"]的日记共有"+diaryList.size()+"条");
         adapter = new DiaryAxisAdapter(diaryList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -540,11 +562,19 @@ public class DiaryListActivity extends AppCompatActivity {
                     select.set(items[i]);
                 });
                 builder.setPositiveButton("确定", (dialog, which) -> {
-                    ArrayList<Integer> ids = new ArrayList<>();
-                    diaryList.forEach(diaryVo -> ids.add(diaryVo.getId()));
+                    ArrayList<Integer> ids = new ArrayList<>();  //这个是原来的ids，是用于存储日记的ids
+                    ArrayList<Integer> blogIds = new ArrayList<>();  //这个是新增的ids，用于存储Blog的ids
+                    diaryList.forEach(diaryVo -> {
+                        if(DiaryVo.BLOG_FLAG.equals(diaryVo.getQuoteDiaryUuid())){
+                            blogIds.add(diaryVo.getId());
+                        }else{
+                            ids.add(diaryVo.getId());
+                        }
+                    });
                     Intent intent = new Intent(this, TimeAscActivity.class);
                     intent.putExtra(TimeAscActivity.OPEN_FROM_TYPE,TimeAscActivity.OPEN_FROM_SIMPLE_DIARY_LIST);
                     intent.putIntegerArrayListExtra("ids",ids);
+                    intent.putIntegerArrayListExtra("blogIds",blogIds);
                     switch (select.get()) {
                         case "倒序":{
                             intent.putExtra("sortType",1);

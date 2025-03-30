@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -143,6 +144,23 @@ public class SettingsActivity extends AppCompatActivity {
         public boolean onPreferenceTreeClick(Preference preference) {
             Context context = preference.getContext();
             switch (preference.getKey()) {
+                case "updateCheck":{
+                    String versionName = "[读取失败]";
+                    try {
+                        PackageInfo packageInfo = context.getApplicationContext()
+                                .getPackageManager()
+                                .getPackageInfo(context.getPackageName(), 0);
+                        versionName = packageInfo.versionName;
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    BaseUtils.alertDialogToShow(context,
+                            "提示",
+                            "本软件没有接入互联网，请前往Bilibili查看置顶评论的版本，检查是否有更新，当前的版本为"+versionName+"。" +
+                                    "\n已为你复制链接地址https://www.bilibili.com/video/BV1Bb4y1v7qm");
+                    BaseUtils.copyInClipboard(context,"https://www.bilibili.com/video/BV1Bb4y1v7qm");
+                    break;
+                }
                 case "setPassword":{
                     BaseUtils.gotoActivity((Activity) context,SetPasswordActivity.class);
                     break;
@@ -496,7 +514,8 @@ public class SettingsActivity extends AppCompatActivity {
                             "默认就是登录界面；\n" +
                             "自动登录，这个只是帮你输入密码登录了而已，登录密码仍然是非常重要的数据！请不要忘记；\n" +
                             "便签界面，允许不登录就访问，能方便快捷记录东西，你新增一个内容为“123”的便签就能跳转登录；\n" +
-                            "画板界面，允许不登录就访问，能方便快捷记录东西，你新增一个内容为“123”的文本框画笔就能跳转登录。");
+                            "画板界面，允许不登录就访问，能方便快捷记录东西，你新增一个内容为“123”的文本框画笔就能跳转登录；\n" +
+                            "Blog界面，这个相当于自动登录并且马上进入到Blog列表。");
                     builder.setCancelable(false);
                     builder.setNegativeButton("没懂，我不使用此功能",null);
                     builder.setPositiveButton("懂了，去选择首屏模式", new DialogInterface.OnClickListener() {

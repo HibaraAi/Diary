@@ -13,7 +13,11 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -23,6 +27,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -43,10 +49,14 @@ import java.util.List;
 import cn.snowt.blog.view.RichTextEditor;
 import cn.snowt.blog.view.StringUtils;
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.PicturesActivity;
+import cn.snowt.diary.async.MyAsyncTask;
+import cn.snowt.diary.async.SaveBlogTask;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.GlideEngine;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
+import cn.snowt.drawboard.DrawBoardActivity;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -80,6 +90,32 @@ public class EditBlogActivity extends AppCompatActivity {
     private String richText;  //暂存富文本数据，辅助渲染
 
     boolean removeTip = BaseUtils.getDefaultSharedPreferences().getBoolean("removeTip", false);
+
+    private androidx.appcompat.app.AlertDialog ProgressADL;  //进度条的弹窗
+    Handler handler = new Handler(new Handler.Callback() {  //处理异步回调
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case MyAsyncTask.FINISH_TASK:{
+                    SimpleResult result = (SimpleResult) msg.obj;
+                    closeProgressAlertDialog();
+                    if(result.getSuccess()){
+                        BaseUtils.shortTipInCoast(context,"保存成功。");
+                        finish();
+                    }else{
+                        BaseUtils.alertDialogToShow(context,"保存失败",result.getMsg());
+                    }
+                    break;
+                }
+                case MyAsyncTask.START_TASK:{
+                    showProgressAlertDialog();
+                    break;
+                }
+                default:break;
+            }
+            return false;
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -457,7 +493,7 @@ public class EditBlogActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home :{
-                finish();
+                askSave();
                 break;
             }
             case R.id.toolbar_select_picture:{
@@ -533,22 +569,25 @@ public class EditBlogActivity extends AppCompatActivity {
             case R.id.toolbar_save_blog:{
                 BlogDto dto = inputToDto();
                 if(null!=dto){
+                    SaveBlogTask saveBlogTask = new SaveBlogTask(handler);
                     if(null!=needEditId && -1!=needEditId){
-                        //更新Blog
-                        SimpleResult result = blogService.updateById(needEditId,dto);
-                        if(result.getSuccess()){
-                            finish();
-                        }else{
-                            showSnackbar(result.getMsg());
-                        }
+//                        //更新Blog
+//                        SimpleResult result = blogService.updateById(needEditId,dto);
+//                        if(result.getSuccess()){
+//                            finish();
+//                        }else{
+//                            showSnackbar(result.getMsg());
+//                        }
+                        saveBlogTask.asyncSaveBlog(false,dto,needEditId);
                     }else{
                         //保存新的Blog
-                        SimpleResult result = blogService.addOne(dto);
-                        if(result.getSuccess()){
-                            finish();
-                        }else{
-                            BaseUtils.alertDialogToShow(context,"保存失败",result.getMsg());
-                        }
+//                        SimpleResult result = blogService.addOne(dto);
+//                        if(result.getSuccess()){
+//                            finish();
+//                        }else{
+//                            BaseUtils.alertDialogToShow(context,"保存失败",result.getMsg());
+//                        }
+                        saveBlogTask.asyncSaveBlog(true,dto,needEditId);
                     }
                 }
                 break;
@@ -559,6 +598,54 @@ public class EditBlogActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        askSave();
+    }
+
+    /**
+     * 保存提示
+     */
+    private void askSave() {
+        if(getEditData().isEmpty()){
+            finish();
+        }else{
+            androidx.appcompat.app.AlertDialog.Builder builder=new androidx.appcompat.app.AlertDialog.Builder(context);
+            builder.setTitle("提示：");
+            builder.setMessage("还没有保存的哦！继续退出吗？");
+            builder.setNegativeButton("留下编辑", null);
+            builder.setPositiveButton("不要保存并退出",(dialog, which) -> {
+                finish();
+            });
+            builder.show();
+        }
+    }
+
+    private void showProgressAlertDialog(){
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        builder.setCancelable(false);
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        ImageView imageView = new ImageView(context);
+        imageView.setImageResource(R.drawable.loading);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(500,500);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Drawable drawable = imageView.getDrawable();
+        if(drawable instanceof AnimatedImageDrawable){
+            AnimatedImageDrawable animatedImageDrawable = (AnimatedImageDrawable) drawable;
+            animatedImageDrawable.start();
+        }
+        linearLayout.addView(imageView);
+        builder.setView(linearLayout);
+        ProgressADL = builder.show();
+    }
+
+    private void closeProgressAlertDialog(){
+        ProgressADL.cancel();
     }
 
 }

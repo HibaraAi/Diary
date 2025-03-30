@@ -13,10 +13,10 @@
             android:id="@+id/nav_blog"
             android:icon="@drawable/icon_blog"
             android:title="Blog"/>
-        <item
-            android:id="@+id/nav_temp"
-            android:icon="@drawable/nav_temp"
-            android:title="草稿箱" />
+<!--        <item-->
+<!--            android:id="@+id/nav_temp"-->
+<!--            android:icon="@drawable/nav_temp"-->
+<!--            android:title="草稿箱" />-->
         <item
             android:id="@+id/nav_label"
             android:icon="@drawable/ic_label"
@@ -50,10 +50,10 @@
             android:id="@+id/nav_settings"
             android:icon="@drawable/nav_settings"
             android:title="设置" />
-    <item
-        android:id="@+id/nav_update"
-        android:icon="@drawable/nav_update"
-        android:title="检查更新" />
+<!--    <item-->
+<!--        android:id="@+id/nav_update"-->
+<!--        android:icon="@drawable/nav_update"-->
+<!--        android:title="检查更新" />-->
         <item
             android:id="@+id/nav_help"
             android:icon="@drawable/nav_help"

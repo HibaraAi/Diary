@@ -39,6 +39,7 @@ import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.GlideEngine;
 import cn.snowt.diary.util.PermissionUtils;
 import cn.snowt.diary.util.SimpleResult;
+import cn.snowt.drawboard.DrawBoardActivity;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -236,12 +237,19 @@ public class BlogDetailActivity extends AppCompatActivity {
                 break;
             }
             case R.id.toolbar_del:{
-                SimpleResult result = blogService.deleteById(blogId);
-                if(result.getSuccess()){
-                    finish();
-                }else{
-                    BaseUtils.alertDialogToShow(context,"提示失败原因",result.getMsg());
-                }
+                androidx.appcompat.app.AlertDialog.Builder builder=new androidx.appcompat.app.AlertDialog.Builder(context);
+                builder.setTitle("提示：");
+                builder.setMessage("真的删除吗？");
+                builder.setNegativeButton("不删除，刚刚点错了", null);
+                builder.setPositiveButton("是的，我要删除",(dialog, which) -> {
+                    SimpleResult result = blogService.deleteById(blogId);
+                    if(result.getSuccess()){
+                        finish();
+                    }else{
+                        BaseUtils.alertDialogToShow(context,"提示失败原因",result.getMsg());
+                    }
+                });
+                builder.show();
                 break;
             }
             //编辑

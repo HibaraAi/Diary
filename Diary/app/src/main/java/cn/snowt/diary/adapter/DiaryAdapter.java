@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -38,6 +39,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.snowt.blog.BlogDetailActivity;
 import cn.snowt.diary.R;
 import cn.snowt.diary.activity.DiaryDetailActivity;
 import cn.snowt.diary.activity.DiaryListActivity;
@@ -90,6 +92,8 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         Integer diaryId;
         String quoteDiaryUuid;
         String myUuid;
+
+        boolean isBlog;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -364,9 +368,15 @@ public class DiaryAdapter extends RecyclerView.Adapter{
         });
         //长按引用日记
         viewHolder.quoteDiaryArea.setOnLongClickListener(v -> {
-            Intent intent = new Intent(context,DiaryDetailActivity.class);
-            intent.putExtra("uuid",viewHolder.quoteDiaryUuid);
-            context.startActivity(intent);
+            if(viewHolder.isBlog){
+                Intent intent = new Intent(context, BlogDetailActivity.class);
+                intent.putExtra(BlogDetailActivity.INTENT_BLOG_ID,viewHolder.diaryId);
+                context.startActivity(intent);
+            }else{
+                Intent intent = new Intent(context,DiaryDetailActivity.class);
+                intent.putExtra("uuid",viewHolder.quoteDiaryUuid);
+                context.startActivity(intent);
+            }
             return true;
         });
         //短按引用日记的提示
@@ -431,15 +441,10 @@ public class DiaryAdapter extends RecyclerView.Adapter{
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ViewHolder newHolder = (ViewHolder)holder;
         DiaryVo diaryVo = diaryVoList.get(position);
+        newHolder.isBlog = DiaryVo.BLOG_FLAG.equals(diaryVo.getQuoteDiaryUuid());  //已约定QuoteDiaryUuid作为是否是Blog的标识
         newHolder.diaryId = diaryVo.getId();
         newHolder.quoteDiaryUuid = diaryVo.getQuoteDiaryUuid();
         newHolder.myUuid = diaryVo.getMyUuid();
-//        if(null== MyConfiguration.getInstance().getHeadImg()){
-//            newHolder.headImg.setImageResource(R.drawable.nav_icon);
-//        }else{
-//            Glide.with(newHolder.diaryView).load(MyConfiguration.getInstance().getHeadImg()).into(newHolder.headImg);
-//        }
-//        newHolder.username.setText(MyConfiguration.getInstance().getUsername());
         newHolder.modifyDate.setText(diaryVo.getModifiedDate());
         newHolder.weather.setText(diaryVo.getWeatherStr());
         newHolder.location.setText(diaryVo.getLocationStr());
@@ -450,45 +455,65 @@ public class DiaryAdapter extends RecyclerView.Adapter{
             newHolder.label.setVisibility(View.VISIBLE);
         }
         newHolder.content.setText(diaryVo.getContent());
-        //处理图片展示
-        RecyclerView imgRecyclerView = newHolder.imageView;
-        DiaryImageAdapter imgAdapter = new DiaryImageAdapter((ArrayList<String>) diaryVo.getPicSrcList());
-        GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
-        imgRecyclerView.setAdapter(imgAdapter);
-        imgRecyclerView.setLayoutManager(layoutManager);
-        //处理视频展示
-        RecyclerView videoRV = newHolder.videoView;
-        DiaryVideoAdapter videoAdapter = new DiaryVideoAdapter(diaryVo.getVideoSrcList());
-        GridLayoutManager videoLayoutManager = new GridLayoutManager(context, 2);
-        videoRV.setAdapter(videoAdapter);
-        videoRV.setLayoutManager(videoLayoutManager);
-        //处理评论区
-        RecyclerView commentRecyclerView = newHolder.commentView;
-        DiaryCommentAdapter commentAdapter = new DiaryCommentAdapter(diaryVo.getCommentList());
-        GridLayoutManager layoutManager2 = new GridLayoutManager(context, 1);
-        commentRecyclerView.setAdapter(commentAdapter);
-        commentRecyclerView.setLayoutManager(layoutManager2);
-        androidx.cardview.widget.CardView commentAreaParent=newHolder.diaryView.findViewById(R.id.item_comment_area_parent);
-        if (context.getResources().getConfiguration().uiMode == 0x11) {
-            commentAreaParent.setCardBackgroundColor(Color.parseColor("#EFEAEB"));
-        }else{
-            commentAreaParent.setCardBackgroundColor(Color.parseColor("#525050"));
-        }
-        if(!diaryVo.getCommentList().isEmpty()){
-            newHolder.comment.setText("评论("+diaryVo.getCommentList().size()+")");
-            //改为可见
-            if(MyConfiguration.getInstance().isAutoOpenComment()){
-                commentAreaParent.setVisibility(View.VISIBLE);
-                newHolder.visible = true;
+        if(!newHolder.isBlog){  //非Blog（也就是日记）才需要处理图片、视频、评论区的展示
+            //处理图片展示
+            RecyclerView imgRecyclerView = newHolder.imageView;
+            DiaryImageAdapter imgAdapter = new DiaryImageAdapter((ArrayList<String>) diaryVo.getPicSrcList());
+            GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
+            imgRecyclerView.setAdapter(imgAdapter);
+            imgRecyclerView.setLayoutManager(layoutManager);
+            //处理视频展示
+            RecyclerView videoRV = newHolder.videoView;
+            DiaryVideoAdapter videoAdapter = new DiaryVideoAdapter(diaryVo.getVideoSrcList());
+            GridLayoutManager videoLayoutManager = new GridLayoutManager(context, 2);
+            videoRV.setAdapter(videoAdapter);
+            videoRV.setLayoutManager(videoLayoutManager);
+            //处理评论区
+            RecyclerView commentRecyclerView = newHolder.commentView;
+            DiaryCommentAdapter commentAdapter = new DiaryCommentAdapter(diaryVo.getCommentList());
+            GridLayoutManager layoutManager2 = new GridLayoutManager(context, 1);
+            commentRecyclerView.setAdapter(commentAdapter);
+            commentRecyclerView.setLayoutManager(layoutManager2);
+            androidx.cardview.widget.CardView commentAreaParent=newHolder.diaryView.findViewById(R.id.item_comment_area_parent);
+            if (context.getResources().getConfiguration().uiMode == 0x11) {
+                commentAreaParent.setCardBackgroundColor(Color.parseColor("#EFEAEB"));
+            }else{
+                commentAreaParent.setCardBackgroundColor(Color.parseColor("#525050"));
             }
-        }else{
-            newHolder.comment.setText("评论");
-            //改为不可见
-            commentAreaParent.setVisibility(View.GONE);
-            newHolder.visible = false;
+            if(!diaryVo.getCommentList().isEmpty()){
+                newHolder.comment.setText("评论("+diaryVo.getCommentList().size()+")");
+                //改为可见
+                if(MyConfiguration.getInstance().isAutoOpenComment()){
+                    commentAreaParent.setVisibility(View.VISIBLE);
+                    newHolder.visible = true;
+                }
+            }else{
+                newHolder.comment.setText("评论");
+                //改为不可见
+                commentAreaParent.setVisibility(View.GONE);
+                newHolder.visible = false;
+            }
         }
-        //处理引用日记
-        if(null!=newHolder.quoteDiaryUuid && !"".equals(newHolder.quoteDiaryUuid)){
+        //处理是Blog的情况
+        if(null!=newHolder.quoteDiaryUuid && DiaryVo.BLOG_FLAG.equals(newHolder.quoteDiaryUuid)){
+            //禁用部分View
+            newHolder.comment.setVisibility(View.GONE);
+            newHolder.commentView.setVisibility(View.GONE);
+            newHolder.imageView.setVisibility(View.GONE);
+            newHolder.content.setVisibility(View.GONE);
+            //更换某些View作为提示
+            newHolder.username.setText("Blog");
+            newHolder.headImg.setImageResource(R.drawable.icon_blog);
+            newHolder.location.setText("提示：长按“引用”即可跳转Blog详情");
+            newHolder.quoteDiaryStr.setText(diaryVo.getContent());
+            if (context.getResources().getConfiguration().uiMode == 0x11) {
+                newHolder.quoteDiaryArea.setCardBackgroundColor(Color.parseColor("#EFEAEB"));
+            }else{
+                newHolder.quoteDiaryArea.setCardBackgroundColor(Color.parseColor("#525050"));
+            }
+            newHolder.quoteDiaryArea.setVisibility(View.VISIBLE);
+        }else if(null!=newHolder.quoteDiaryUuid && !"".equals(newHolder.quoteDiaryUuid)){
+            //处理引用日记
             if("del".equals(newHolder.quoteDiaryUuid)){
                 newHolder.quoteDiaryStr.setText("[提示:引用的日记已被删除]");
             }else{

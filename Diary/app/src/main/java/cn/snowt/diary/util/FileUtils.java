@@ -100,7 +100,7 @@ public class FileUtils {
      *  根据路径删除指定的目录或文件，无论存在与否
      *@param sPath  要删除的目录或文件
      *@return 删除成功返回 true，否则返回 false。
-     * @deprecated 这个方法不安全，有可能会删除用户的未见，建议使用safeDeleteFolder
+     * @deprecated 这个方法不安全，有可能会删除用户的文件，建议使用safeDeleteFolder
      */
     @Deprecated
     public static boolean deleteFolder(String sPath) {

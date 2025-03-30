@@ -12,10 +12,17 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.snowt.diary.entity.Diary;
+import cn.snowt.diary.entity.Drawing;
+import cn.snowt.diary.service.LabelService;
+import cn.snowt.diary.service.impl.LabelServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
@@ -23,6 +30,7 @@ import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.RSAUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.diary.util.UriUtils;
+import cn.snowt.diary.vo.DiaryVo;
 
 /**
  * @Author : HibaraAi github.com/HibaraAi
@@ -32,6 +40,15 @@ import cn.snowt.diary.util.UriUtils;
 public class BlogService {
     public static final String TAG = "BlogService";
 
+    private final LabelService labelService = new LabelServiceImpl();
+
+    /**
+     * 更新操作
+     * 目前是将原来的删掉，再重新添加一个新的Blog（包括了磁盘文件的重新读写）
+     * @param needEditId needEditId
+     * @param dto dto
+     * @return
+     */
     public SimpleResult updateById(Integer needEditId, BlogDto dto) {
         //根据id读取Blog
         Blog blog = LitePal.find(Blog.class, needEditId);
@@ -206,7 +223,7 @@ public class BlogService {
      * @param id BlogID
      * @return 没有就返回null
      */
-    private String getCover(Integer id){
+    public String getCover(Integer id){
         //尝试读取一张图片
         List<BlogMedia> blogMedia = LitePal.select().where("blogId = " + id + " AND mediaType = "+BlogMedia.TYPE_IMAGE).limit(1).find(BlogMedia.class);
         if(!blogMedia.isEmpty()){
@@ -322,6 +339,234 @@ public class BlogService {
                 srcList.add(video.getMediaSrc());
             });
             return SimpleResult.ok().data(srcList);
+        }
+    }
+
+    /**
+     * 根据标签值获取简易的BlogList
+     * @param labelStr 标签值
+     * @return SimpleResult
+     */
+    public List<DiaryVo> getSimpleBlogAsDiaryVo(String labelStr){
+        //查询同名标签
+        List<String> sameLabels = labelService.getSameLabelsByOne(labelStr);
+        List<Blog> blogList = new ArrayList<>();
+        sameLabels.forEach(label->{
+            blogList.addAll(
+                    LitePal.where("label LIKE ?", "%"+label+"%")
+                            .order("modifiedDate desc")
+                            .find(Blog.class)
+            );
+        });
+        //多个同名标签，结果集按时间排序
+        if(sameLabels.size()>1){
+            blogList.sort((o1, o2) -> {
+                if(o1.getModifiedDate().before(o2.getModifiedDate())){
+                    return 1;
+                }else if (o1.getModifiedDate().after(o2.getModifiedDate())){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            });
+        }
+        List<DiaryVo> voList = new ArrayList<>();
+        blogList.forEach(blog -> {
+            DiaryVo vo = new DiaryVo();
+            vo.setQuoteDiaryUuid(DiaryVo.BLOG_FLAG);
+            vo.setId(blog.getId());
+            String subDateStr = BaseUtils.dateToString(blog.getModifiedDate()).substring(0, 10);
+            vo.setModifiedDate(subDateStr);
+            if(blog.getEncryption()){
+                //需要解密
+                blog.setContent(RSAUtils.decodePartial(blog.getContent(),MyConfiguration.getInstance().getPrivateKey(),1));
+            }
+            String subDiary = (blog.getContent().length()>30)
+                    ? (blog.getContent().substring(0,30)+"...")
+                    : blog.getContent();
+            subDiary = subDiary.replaceAll("\n","");
+            vo.setContent("[这是一条Blog]  "+blog.getTitle()+"\n"+subDiary);
+            String cover = getCover(blog.getId());
+            List<String> picSrcList = new ArrayList<>();
+            picSrcList.add(cover);
+            vo.setPicSrcList(picSrcList);
+            voList.add(vo);
+        });
+        return voList;
+    }
+
+    /**
+     * 根据时间范围获取简易的BlogList
+     * @param date1 date1
+     * @param date2 date2
+     * @return
+     */
+    public List<DiaryVo> getSimpleBlogAsDiaryVo(Date date1, Date date2) {
+        String date1ToString = BaseUtils.dateToString(date1);
+        String date2ToString = BaseUtils.dateToString(date2);
+        String s = date1ToString.replaceAll("00:00:00", "00:00:01");
+        String s1 = date2ToString.replaceAll("00:00:00", "23:59:59");
+        date1 = BaseUtils.stringToDate(s);
+        date2 = BaseUtils.stringToDate(s1);
+        List<Blog> blogList = LitePal.where("modifiedDate >= ? AND modifiedDate <= ?", date1.getTime()+"", date2.getTime()+"")
+                .order("modifiedDate desc")
+                .find(Blog.class);
+        List<DiaryVo> voList = new ArrayList<>();
+        blogList.forEach(blog -> {
+            DiaryVo vo = new DiaryVo();
+            vo.setQuoteDiaryUuid(DiaryVo.BLOG_FLAG);
+            vo.setId(blog.getId());
+            String subDateStr = BaseUtils.dateToString(blog.getModifiedDate()).substring(0, 10);
+            vo.setModifiedDate(subDateStr);
+            if(blog.getEncryption()){
+                //需要解密
+                blog.setContent(RSAUtils.decodePartial(blog.getContent(),MyConfiguration.getInstance().getPrivateKey(),1));
+            }
+            String subDiary = (blog.getContent().length()>30)
+                    ? (blog.getContent().substring(0,30)+"...")
+                    : blog.getContent();
+            subDiary = subDiary.replaceAll("\n","");
+            vo.setContent("[这是一条Blog]  "+blog.getTitle()+"\n"+subDiary);
+            String cover = getCover(blog.getId());
+            List<String> picSrcList = new ArrayList<>();
+            picSrcList.add(cover);
+            vo.setPicSrcList(picSrcList);
+            voList.add(vo);
+        });
+        return voList;
+    }
+
+    /**
+     * 根据ID获取简易的Blog，但其实比其他两个会完整一些
+     * @param blogId blogId
+     * @return 查找成功就返回DiaryVo，如果失败就返回null
+     */
+    public DiaryVo getSimpleBlogAsDiaryVo(Integer blogId) {
+        Blog blog = LitePal.find(Blog.class, blogId);
+        if(null!=blog){
+            DiaryVo vo = new DiaryVo();
+            vo.setQuoteDiaryUuid(DiaryVo.BLOG_FLAG);
+            vo.setId(blog.getId());
+            vo.setModifiedDate(BaseUtils.dateToString(blog.getModifiedDate()));
+            if(blog.getEncryption()){
+                //需要解密
+                blog.setContent(RSAUtils.decodePartial(blog.getContent(),MyConfiguration.getInstance().getPrivateKey(),1));
+            }
+            String subDiary = (blog.getContent().length()>30)
+                    ? (blog.getContent().substring(0,30)+"...")
+                    : blog.getContent();
+            subDiary = subDiary.replaceAll("\n","");
+            vo.setContent("[这是一条Blog]  "+blog.getTitle()+"\n"+subDiary);
+            String cover = getCover(blog.getId());
+            List<String> picSrcList = new ArrayList<>();
+            picSrcList.add(cover);
+            vo.setPicSrcList(picSrcList);
+            vo.setVideoSrcList(new ArrayList<>());
+            vo.setCommentList(new ArrayList<>());
+            vo.setLabelStr(blog.getLabel());
+            return vo;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * 获取Blog中所有的图片资源
+     * @return
+     */
+    public Map<Integer,List<String>> getAllBlogPic(){
+        Map<Integer ,List<String>> resultMap = new HashMap();
+        List<BlogMedia> allPic = LitePal.where( "mediaType = " + BlogMedia.TYPE_IMAGE).find(BlogMedia.class);
+        allPic.forEach(blogMedia -> {
+            String imgSrc =blogMedia.getMediaSrc();
+            File file = new File(imgSrc);
+            if(file.exists()){
+                List<String> tempDrawingList = new ArrayList<>();
+                Integer blogId = blogMedia.getBlogId();
+                Set<Integer> keySet = resultMap.keySet();
+                if(keySet.contains(blogId)){
+                    List<String> drawings = resultMap.get((Integer) blogId);
+                    assert drawings != null;
+                    drawings.add(imgSrc);
+                }else{
+                    List<String> list = new ArrayList<>();
+                    list.add(imgSrc);
+                    resultMap.put(blogId,list);
+                }
+            }
+        });
+        return resultMap;
+    }
+
+    /**
+     * 获取Blog中所有的视频资源
+     * @return
+     */
+    public Map<Integer,List<String>> getAllBlogVideo(){
+        Map<Integer ,List<String>> resultMap = new HashMap();
+        List<BlogMedia> allPic = LitePal.where( "mediaType = " + BlogMedia.TYPE_VIDEO).find(BlogMedia.class);
+        allPic.forEach(blogMedia -> {
+            String imgSrc =blogMedia.getMediaSrc();
+            File file = new File(imgSrc);
+            if(file.exists()){
+                List<String> tempDrawingList = new ArrayList<>();
+                Integer blogId = blogMedia.getBlogId();
+                Set<Integer> keySet = resultMap.keySet();
+                if(keySet.contains(blogId)){
+                    List<String> drawings = resultMap.get((Integer) blogId);
+                    assert drawings != null;
+                    drawings.add(imgSrc);
+                }else{
+                    List<String> list = new ArrayList<>();
+                    list.add(imgSrc);
+                    resultMap.put(blogId,list);
+                }
+            }
+        });
+        return resultMap;
+    }
+
+    /**
+     * 根据Blog的ID获取该Blog的日期
+     * @param integer id
+     * @return 如果没有则返回null
+     */
+    public Date getDateById(Integer integer) {
+        Blog blog = LitePal.select("modifiedDate").where("id = " + integer).findFirst(Blog.class);
+        if(blog==null){
+            return null;
+        }else{
+            return blog.getModifiedDate();
+        }
+    }
+
+    /**
+     * 根据Blog图片（包含视频）地址获取BlogID
+     * @param imageSrc imageSrc
+     * @return 返回BlogId，如果没有则返回-1
+     */
+    public Integer getBlogIdByPicSre(String imageSrc) {
+        BlogMedia first = LitePal.where("mediaSrc like '" + imageSrc+"'").findFirst(BlogMedia.class);
+        if(null==first){
+            return -1;
+        }else{
+            return first.getBlogId();
+        }
+    }
+
+    /**
+     * 给定一个资源地址，看看是不是Blog的配图
+     * @param src 资源地址
+     * @return 返回true就是图片资源，返回false只能表示它不是图片，可能是不存在也不能是视频
+     */
+    public boolean isImageSrc(String src) {
+        BlogMedia first = LitePal.where("mediaSrc like '" + src+"'").findFirst(BlogMedia.class);
+        if(null==first){
+            return false;
+        }else if (first.getMediaType().equals(BlogMedia.TYPE_IMAGE)){
+            return true;
+        }else{
+            return false;
         }
     }
 }

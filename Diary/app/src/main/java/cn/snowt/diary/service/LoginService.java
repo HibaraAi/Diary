@@ -28,8 +28,10 @@ public interface LoginService {
 
     /**
      * 当天第一次登录，执行一些操作
+     *
+     * @return
      */
-    void doFirstLoginOfTheDay();
+    String doFirstLoginOfTheDay();
 
     /**
      * 判断当天是不是第一次登录

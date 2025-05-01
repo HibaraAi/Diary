@@ -569,4 +569,93 @@ public class BlogService {
             return false;
         }
     }
+
+    /**
+     * 获取所有Blog并封装成BlogVoForBackup
+     * @return List<BlogVoForBackup>
+     */
+    public List<BlogVoForBackup> getAllBlogVoForBackup(){
+        List<BlogVoForBackup> backupList = new ArrayList<>();
+        //读库
+        List<Blog> blogs = LitePal.findAll(Blog.class);
+        if(!blogs.isEmpty()){
+            blogs.forEach(blog -> {
+                BlogVoForBackup blogVoForBackup = new BlogVoForBackup();
+                blogVoForBackup.setId(blog.getId());
+                blogVoForBackup.setContent(blog.getContent());
+                blogVoForBackup.setModifiedDate(blog.getModifiedDate());
+                blogVoForBackup.setLabel(blog.getLabel());
+                blogVoForBackup.setTitle(blog.getTitle());
+                blogVoForBackup.setEncryption(blog.getEncryption());
+                blogVoForBackup.setMyUuid(blog.getMyUuid());
+                blogVoForBackup.setBlogMediaList(getAllBlogMediaByBlogId(blog.getId()));
+                backupList.add(blogVoForBackup);
+            });
+        }
+        return backupList;
+    }
+
+    /**
+     * 根据BlogId获取该Blog关联的所有媒体资源
+     * @param blogId blogId
+     * @return 如果没有就返回一个空的List
+     */
+    public List<BlogMedia> getAllBlogMediaByBlogId(Integer blogId){
+        return LitePal.where("blogId = " + blogId).find(BlogMedia.class);
+    }
+
+
+    /**
+     * 从blogVoForBackup新增一个Blog（级联新增对应的媒体资源BlogMedia）
+     * @param blogVoForBackup blogVoForBackup
+     * @return 新增成功返回true
+     */
+    public boolean addOne(BlogVoForBackup blogVoForBackup) {
+        //1.先存储Blog
+        if(uuidAlreadyExists(blogVoForBackup.getMyUuid())){
+            return false;
+        }else{
+            Blog blog = new Blog();
+            blog.setContent(blogVoForBackup.getContent());
+            blog.setMyUuid(blogVoForBackup.getMyUuid());
+            blog.setTitle(blogVoForBackup.getTitle());
+            blog.setLabel(blogVoForBackup.getLabel());
+            blog.setEncryption(blogVoForBackup.getEncryption());
+            blog.setModifiedDate(blogVoForBackup.getModifiedDate());
+            boolean save = blog.save();
+            if (save){
+                //2.后存储BlogMedia
+                List<BlogMedia> blogMediaList = blogVoForBackup.getBlogMediaList();
+                if(null!=blogMediaList && !blogMediaList.isEmpty()){
+                    blogMediaList.forEach(blogMedia -> {
+                        BlogMedia media = new BlogMedia();
+                        media.setMediaSrc(blogMedia.getMediaSrc());
+                        media.setBlogId(blog.getId());
+                        media.setMediaType(blogMedia.getMediaType());
+                        media.save();
+                    });
+                }
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
+    /**
+     * 检查Blog的uuid是否已存在
+     * 如果uuid为null或""，视为不存在
+     * @param uuid uuid
+     * @return true已存在
+     */
+    public boolean uuidAlreadyExists(String uuid){
+        //如果uuid为null或""，视为不存在
+        if(null==uuid || uuid.isEmpty()){
+            return false;
+        }
+        Blog myUuid = LitePal.select("myUuid")
+                .where("myUuid = ?", uuid)
+                .findFirst(Blog.class);
+        return null != myUuid;
+    }
 }

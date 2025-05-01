@@ -38,6 +38,7 @@ import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.MyConfiguration;
 import cn.snowt.diary.util.PermissionUtils;
+import cn.snowt.diary.util.RSAUtils;
 import cn.snowt.diary.util.SimpleResult;
 import cn.snowt.drawboard.DrawBoardActivity;
 import cn.snowt.mine.MineGameActivity;
@@ -65,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        autoNight();
+        //autoNight();
         loadLoginType();
         //横屏、竖屏的布局处理
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -251,27 +252,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         boolean firstUse = sharedPreferences.getBoolean("firstUse", true);
         if(firstUse){
             //第一次使用本程序
-            //创建数据库
-            LitePal.getDatabase();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //写入帮助日记
-                    try {
-                        new DiaryServiceImpl().addHelpDiary();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
             //免责声明
             AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
             builder.setTitle("免责声明")
                     .setMessage("本软件不会盗取你任何数据，有开源代码可查，开源网址https://github.com/HibaraAi/Diary或https://gitee.com/HibaraAi/Diary。" +
                             "\n此外，如果你在使用本软件的过程中，产生无论何种形式的损失，都与本作者无关，你不准追究本作者的责任。")
                     .setPositiveButton("了解并接受", (dialog, which) -> {
-                        //申请存储权限
-                        applyPermission();
+                        //1.创建数据库
+                        LitePal.getDatabase();
+                        //2.初始化加密密钥
+                        RSAUtils.mandatoryUseRSA();
+                        new Thread(() -> {
+                            //3.写入帮助日记
+                            try {
+                                new DiaryServiceImpl().addHelpDiary();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
+                        //4.初次使用软件，跳转设置密码
+                        BaseUtils.gotoActivity(this, SetPasswordActivity.class);
+
                     })
                     .setCancelable(false)
                     .setNegativeButton("不接受并退出",((dialog, which) -> finish()))

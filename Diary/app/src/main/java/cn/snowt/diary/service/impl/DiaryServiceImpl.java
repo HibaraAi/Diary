@@ -2,7 +2,6 @@ package cn.snowt.diary.service.impl;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Environment;
 import android.util.Log;
 
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +32,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.snowt.blog.BlogService;
+import cn.snowt.blog.BlogVoForBackup;
 import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.Drawing;
@@ -515,13 +515,16 @@ public class DiaryServiceImpl implements DiaryService {
                 vo.setMyUuid(diary.getMyUuid());
                 vos.add(vo);
             });
-            //读取纪念日
+            //1.2读取纪念日
             SpecialDayService specialDayService = new SpecialDayServiceImpl();
             List<SpecialDay> specialDays = specialDayService.getAll();
-            //读取同名标签设置
+            //1.3读取同名标签设置
             String sameLabel = BaseUtils.getSharedPreference().getString("sameLabel", "");
-            //读取便签数据
+            //1.4读取便签数据
             String TipJson = new ItemDao().getAllDataToJSON();
+            //1.5读取Blog
+            BlogService blogService = new BlogService();
+            List<BlogVoForBackup> blogVoForBackups = blogService.getAllBlogVoForBackup();
             //2.封装数据
             Map<String,Object> map = new HashMap<>();
             String uuid = UUID.randomUUID().toString();
@@ -534,6 +537,7 @@ public class DiaryServiceImpl implements DiaryService {
             map.put("SpecialDay",specialDays);
             map.put("sameLabel",sameLabel);
             map.put("TipJson",TipJson);
+            map.put("Blog",blogVoForBackups);
             String mapJson = JSON.toJSONString(map);
             //3.输出文件
             String fileName = "Backup_"+BaseUtils.dateToString(new Date()).substring(0,10)+"_"+UUID.randomUUID().toString().substring(0,4)+".dll";
@@ -595,7 +599,7 @@ public class DiaryServiceImpl implements DiaryService {
                     specialDay.forEach(jsonObject -> {
                         SpecialDay day = JSON.toJavaObject(jsonObject, SpecialDay.class);
                         day.setId(null);
-                        day.save();
+                        boolean save = day.save();
                         successNum2.getAndIncrement();
                     });
                 }
@@ -608,9 +612,22 @@ public class DiaryServiceImpl implements DiaryService {
                 //4.处理便签
                 String tipJson = (String) map.get("TipJson");
                 new ItemDao().addFromJson(tipJson);
+                //5.处理Blog
+                AtomicReference<Integer> addBlogNum = new AtomicReference<>(0);
+                List<JSONObject>  blogVoForBackups = (List<JSONObject>) map.get("Blog");
+                if(null!=blogVoForBackups && !blogVoForBackups.isEmpty()){
+                    BlogService blogService = new BlogService();
+                    blogVoForBackups.forEach(jsonObject -> {
+                        BlogVoForBackup blogVoForBackup = JSON.toJavaObject(jsonObject, BlogVoForBackup.class);
+                        boolean b = blogService.addOne(blogVoForBackup);
+                        if(b){
+                            addBlogNum.getAndSet(addBlogNum.get() + 1);
+                        }
+                    });
+                }
                 if(flag.get()){
                     result.setSuccess(true);
-                    result.setMsg("从备份文件恢复成功(图片/视频资源你得自己复制，详见帮助)，共写入\n"+successNum+"条日记和\n"+successNum2+"个纪念日");
+                    result.setMsg("从备份文件恢复成功(图片/视频资源你得自己复制，详见帮助)，共写入\n"+successNum+"条日记、"+addBlogNum.get()+"条Blog和\n"+successNum2+"个纪念日");
                     Log.i(TAG,"从备份文件恢复成功，共写入"+successNum+"条日记");
                 }else{
                     result.setSuccess(false);
@@ -1174,11 +1191,16 @@ public class DiaryServiceImpl implements DiaryService {
                     vo.setMyUuid(diary.getMyUuid());
                     vos.add(vo);
                 });
-                //读取纪念日
+                //1.2读取纪念日
                 SpecialDayService specialDayService = new SpecialDayServiceImpl();
                 List<SpecialDay> specialDays = specialDayService.getAll();
-                //读取同名标签设置
+                //1.3读取同名标签设置
                 String sameLabel = BaseUtils.getSharedPreference().getString("sameLabel", "");
+                //1.4读取便签数据
+                String TipJson = new ItemDao().getAllDataToJSON();
+                //1.5读取Blog
+                BlogService blogService = new BlogService();
+                List<BlogVoForBackup> blogVoForBackups = blogService.getAllBlogVoForBackup();
                 //2.封装数据
                 Map<String,Object> map = new HashMap<>();
                 String uuid = UUID.randomUUID().toString();
@@ -1190,6 +1212,8 @@ public class DiaryServiceImpl implements DiaryService {
                 map.put(Constant.BACKUP_ARGS_NAME_ENCODE_UUID,MD5Utils.encrypt(Constant.PASSWORD_PREFIX+uuid));
                 map.put("SpecialDay",specialDays);
                 map.put("sameLabel",sameLabel);
+                map.put("TipJson",TipJson);
+                map.put("Blog",blogVoForBackups);
                 String mapJson = JSON.toJSONString(map);
                 //3.输出文件
                 FileWriter writer = null;
@@ -1217,7 +1241,7 @@ public class DiaryServiceImpl implements DiaryService {
             SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
             edit.putString(Constant.SHARE_PREFERENCES_AUTO_BACKUP_LATEST_DAIRY,dateToString);
             edit.apply();
-            BaseUtils.simpleSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
+            //BaseUtils.simpleSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
             //BaseUtils.longTextSysNotice(LitePalApplication.getContext(),"消消乐: 完成自动备份");
         }
         return successFlag;

@@ -31,7 +31,16 @@ public class MyConfiguration {
         bgImg = sharedPreference.getString(Constant.SHARE_PREFERENCES_MAIN_IMG_BG,null);
         privateKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PRIVATE_KEY, "");
         publicKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PUBLIC_KEY,"");
-        boolean useEncode = BaseUtils.getDefaultSharedPreferences().getBoolean("useEncode", false);
+        //因为2025年4月19日，软件设置改为强制使用RSA加密，但设置加密密钥只会在软件初次使用时才设置，如果是更新安装，则可能加密密钥可能为空，所以需要判断一下加密密钥是否为空
+        if("".equals(privateKey) || "".equals(publicKey)){
+            //如果为空，则是以前从来没有使用过加密，现在需要为其初始化一个加密密钥
+            RSAUtils.mandatoryUseRSA();
+            //然后重新为两个密钥进行赋值
+            privateKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PRIVATE_KEY, "");
+            publicKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PUBLIC_KEY,"");
+        }
+        //boolean useEncode = BaseUtils.getDefaultSharedPreferences().getBoolean("useEncode", true);
+        boolean useEncode = true;
         boolean haveSetEncodeKey = false;
         String publicKey = BaseUtils.getSharedPreference().getString(Constant.SHARE_PREFERENCES_PUBLIC_KEY, "");
         if(!"".equals(publicKey)){

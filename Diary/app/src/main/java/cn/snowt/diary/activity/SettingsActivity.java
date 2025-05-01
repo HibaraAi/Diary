@@ -38,7 +38,9 @@ import java.util.Date;
 import cn.snowt.diary.R;
 import cn.snowt.diary.entity.Weather;
 import cn.snowt.diary.service.DiaryService;
+import cn.snowt.diary.service.LoginService;
 import cn.snowt.diary.service.impl.DiaryServiceImpl;
+import cn.snowt.diary.service.impl.LoginServiceImpl;
 import cn.snowt.diary.util.BaseUtils;
 import cn.snowt.diary.util.Constant;
 import cn.snowt.diary.util.FileUtils;
@@ -211,7 +213,41 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 }
                 case "changeEncodeKey":{
-                    BaseUtils.gotoActivity((Activity) context,SetRSAActivity.class);
+//                    BaseUtils.gotoActivity((Activity) context,SetRSAActivity.class);
+                    if (PermissionUtils.haveExternalStoragePermission(context)) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle("验证你的登陆密码");
+                        EditText pinView = new EditText(context);
+                        pinView.setHint("输入登陆密码，点击窗外取消。");
+                        pinView.setBackgroundResource(R.drawable.edge);
+                        pinView.setMinLines(2);
+                        pinView.setMaxLines(2);
+                        pinView.setPadding(10,10,10,10);
+                        builder.setView(pinView);
+                        builder.setCancelable(true);
+                        builder.setPositiveButton("验证密码", (dialog, which) -> {
+                            String pinStr = pinView.getText().toString().trim();
+                            SharedPreferences sharedPreferences = BaseUtils.getSharedPreference();
+                            String passwordInSp = sharedPreferences.getString("loginPassword", "");
+                            String encrypt = MD5Utils.encrypt(Constant.PASSWORD_PREFIX + pinStr);
+                            boolean truePassword = passwordInSp.equals(encrypt);
+                            if(truePassword){
+                                String privateKey = MyConfiguration.getInstance().getPrivateKey();
+                                boolean saveSuccess = FileUtils.saveAsFileWriter(privateKey, "长密钥.txt");
+                                if(saveSuccess){
+                                    BaseUtils.alertDialogToShow(context,"提示","保存成功，密钥保存在【"+Constant.EXTERNAL_STORAGE_LOCATION+"output】目录下。文件名为【长密钥.txt】");
+                                }else{
+                                    BaseUtils.alertDialogToShow(context,"提示","保存失败，密钥写入磁盘失败。");
+                                    Log.e("SettingActivity","密钥保存失败，密钥写入磁盘失败。");
+                                }
+                            }else{
+                                BaseUtils.alertDialogToShow(context,"提示","登录密码校验失败。");
+                            }
+                        });
+                        builder.show();
+                    }else{
+                        BaseUtils.alertDialogToShow(context,"提示","你没有授予外部读写权限，无法保存密钥。\n你可以到主界面，长按背景图进行授权，再回来保存。");
+                    }
                     break;
                 }
                 case "useEncode":{
@@ -408,7 +444,7 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 }
                 case "firstLoginNotice":{
-                    BaseUtils.alertDialogToShow(context,"提示","开启后，每日首次登录后会检查今天是否有往年今日的消息，是否有逢百天/整年的纪念日，如果有则会通知栏通知，没有则不打扰。\n\n如果你的设备收不到通知，请手动去系统设置开启消消乐的通知权限，根据自己的需要开启声音、震动或横幅通知。");
+                    BaseUtils.alertDialogToShow(context,"提示","开启后，每日首次登录后会检查今天是否有往年今日的消息，是否有逢百天/整年的纪念日，如果有则会在登录到主界面时弹窗通知，没有则不打扰。");
                     break;
                 }
                 case "fullSearch":{

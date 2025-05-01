@@ -1,5 +1,6 @@
 package cn.snowt.diary.util;
 
+import android.content.SharedPreferences;
 import android.util.Base64;
 
 import java.security.InvalidKeyException;
@@ -80,6 +81,19 @@ public class RSAUtils {
 //        }
 //        return null;
 //    }
+
+    /**
+     * 强制使用RSA加密
+     */
+    public static void mandatoryUseRSA(){
+        List<String> randomKey = RSAUtils.getRandomKey();
+        String publicKey = randomKey.get(0);
+        String privateKey = randomKey.get(1);
+        SharedPreferences.Editor edit = BaseUtils.getSharedPreference().edit();
+        edit.putString(Constant.SHARE_PREFERENCES_PRIVATE_KEY,privateKey);
+        edit.putString(Constant.SHARE_PREFERENCES_PUBLIC_KEY,publicKey);
+        edit.apply();
+    }
 
     /**
      * 解密密文的前面部分的一些数据，需要你提供分片数needSliceNum，一个分片的长度为(KEY_SIZE / 8)-1，

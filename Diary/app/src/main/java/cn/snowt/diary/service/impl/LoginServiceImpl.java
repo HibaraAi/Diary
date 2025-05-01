@@ -102,9 +102,9 @@ public class LoginServiceImpl implements LoginService {
             String haveSpecialCount = new SpecialDayServiceImpl().haveSpecialCount();
             tip += haveSpecialCount;
             tip = tip.trim();
-            if(!"".equals(tip)){
-                BaseUtils.longTextSysNotice(LitePalApplication.getContext(),tip);
-            }
+//            if(!"".equals(tip)){
+//                BaseUtils.longTextSysNotice(LitePalApplication.getContext(),tip);
+//            }
         }
         //3.清除沙盒中的cache
         File externalCacheDir = LitePalApplication.getContext().getExternalCacheDir();

@@ -52,17 +52,16 @@
             app:title="修改登录密码"
             app:summary="我也要有灰字提示QaQ😤"/>
 
-        <SwitchPreferenceCompat
-            app:key="useEncode"
-            app:defaultValue="false"
-            app:title="启用加密"
-            app:summaryOn="当前: 已启用。更安全但运行速度更慢(仅对今后新增日记生效)"
-            app:summaryOff="当前: 未开启。响应更快速(仅对今后新增日记生效)"/>
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="useEncode"-->
+<!--            app:defaultValue="false"-->
+<!--            app:title="启用加密"-->
+<!--            app:summaryOn="当前: 已启用。更安全但运行速度更慢(仅对今后新增日记生效)"-->
+<!--            app:summaryOff="当前: 未开启。响应更快速(仅对今后新增日记生效)"/>-->
         <Preference
             app:key="changeEncodeKey"
-            app:dependency="useEncode"
-            app:title="修改加密密钥"
-            app:summary="日记加密/解密用到的密钥。仅可修改一次"/>
+            app:title="保存加密密钥"
+            app:summary="就是保存啦，不需要提示了。"/>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="还没想到名字">

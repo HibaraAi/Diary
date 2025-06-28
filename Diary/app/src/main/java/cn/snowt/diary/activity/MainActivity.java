@@ -182,17 +182,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         //读取往年今日等提醒
         new FirstLoginOfTheDayTask(handlerForLogin).doFirstLoginOfTheDay();
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(200);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            LoginService loginService = new LoginServiceImpl();
-//            if (loginService.isFirstLoginInTheDay()) {
-//                loginService.doFirstLoginOfTheDay();
-//            }
-//        }).start();
+        new Thread(diaryService::encodeDataInDB).start();
         bindViewAndSetListener();
         getDiaryForFirstShow();
         diaryAdapter = new DiaryAdapter(voList);
@@ -206,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
     private void bindViewAndSetListener(){
         toolbar = findViewById(R.id.main_toolbar);
         SharedPreferences sharedPreferences = BaseUtils.getDefaultSharedPreferences();
-        boolean showUsernameInBar = sharedPreferences.getBoolean("showUsernameInBar", false);
+        boolean showUsernameInBar = sharedPreferences.getBoolean("showUsernameInBar", true);
         if(showUsernameInBar){
             CollapsingToolbarLayout toolbarLayout = findViewById(R.id.main_title);
             toolbarLayout.setTitle(MyConfiguration.getInstance().getUsername());

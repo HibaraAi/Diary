@@ -1,5 +1,9 @@
 package cn.snowt.blog;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,6 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
@@ -49,7 +54,9 @@ import java.util.List;
 import cn.snowt.blog.view.RichTextEditor;
 import cn.snowt.blog.view.StringUtils;
 import cn.snowt.diary.R;
+import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.activity.PicturesActivity;
+import cn.snowt.diary.activity.SelectLabelActivity;
 import cn.snowt.diary.async.MyAsyncTask;
 import cn.snowt.diary.async.SaveBlogTask;
 import cn.snowt.diary.util.BaseUtils;
@@ -117,6 +124,8 @@ public class EditBlogActivity extends AppCompatActivity {
         }
     });
 
+    public ActivityResultLauncher<Intent> launcher;  //标签选择的Activity
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +136,18 @@ public class EditBlogActivity extends AppCompatActivity {
         }
         context = EditBlogActivity.this;
         setContentView(R.layout.activity_edit_blog);
+        this.launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                if (result.getData() != null) {
+                    String beSelectLabelStr = result.getData().getStringExtra("beSelectLabelStr");
+                    if(null==beSelectLabelStr || beSelectLabelStr.isEmpty()){
+                        BaseUtils.shortTipInSnack(labelView,"要么标签为空，要么读取失败");
+                    }else{
+                        labelView.setText(beSelectLabelStr.trim());
+                    }
+                }
+            }
+        });
         bindViewAndSetListener();
         imgSrcList = new ArrayList<>();
         videoSrcList = new ArrayList<>();
@@ -199,7 +220,8 @@ public class EditBlogActivity extends AppCompatActivity {
             android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(context);
             dialog.setTitle("输入1个或多个标签");
             if(!removeTip){
-                dialog.setMessage("标签总长度不能超过30个字符，点击弹窗外取消修改，标签支持以下两种输入方式：\n#美食##周末#\n美食。周末");
+                dialog.setMessage("标签总长度不能超过30个字符。\n点击弹窗外取消修改；长按输入框选择已有标签。\n" +
+                        "标签支持以下两种输入方式：\n#美食##周末#\n美食。周末");
             }
             EditText editText = new EditText(context);
             editText.setBackgroundResource(R.drawable.edge);
@@ -242,12 +264,19 @@ public class EditBlogActivity extends AppCompatActivity {
             dialog.setNegativeButton("删除标签",(dialog1, which) -> {
                 labelView.setText("");
             });
-            dialog.show();
+            AlertDialog alertDialog = dialog.show();
+            editText.setOnLongClickListener(v1 -> {
+                Intent intent = new Intent(context,SelectLabelActivity.class);
+                launcher.launch(intent);
+                alertDialog.cancel();
+                return true;
+            });
         });
         labelView.setOnLongClickListener(v -> {
-            //长按删除已选择标签
-            labelView.setText("");
-            return true;
+            //长按选择已有标签
+            Intent intent = new Intent(context, SelectLabelActivity.class);
+            launcher.launch(intent);
+            return false;
         });
     }
 

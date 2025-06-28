@@ -111,7 +111,7 @@ public class NoteActivity extends AppCompatActivity {
                 editText.setLines(10);
                 editText.setGravity(Gravity.TOP);
                 editText.setBackgroundResource(R.drawable.edge);
-                editText.setHint("输入......");
+                editText.setHint("在输入......\n\n请注意：便签内容不会加密存储，且备份恢复时不会去重处理。");
                 editText.setMinLines(10);
                 editText.setMaxLines(10);
                 editText.setPadding(10,10,10,10);

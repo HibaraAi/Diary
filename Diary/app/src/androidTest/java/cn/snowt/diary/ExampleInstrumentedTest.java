@@ -12,7 +12,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import cn.snowt.blog.Blog;
+import cn.snowt.blog.BlogDto;
+import cn.snowt.blog.BlogService;
+import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.Drawing;
 import cn.snowt.diary.service.DiaryService;
@@ -33,6 +38,16 @@ import cn.snowt.diary.vo.DiaryVo;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
     List<String> contentList = new ArrayList<>();
+
+    @Test
+    public void test02(){
+        Blog blog = new Blog(null, "测试", "", "未加密测试啊啊啊啊啊啊412515235623", new Date(), false, UUID.randomUUID().toString());
+        blog.save();
+        Diary diary = new Diary(null, "", "未加密日记啊啊啊32424524525", new Date(), null, null, false, null, UUID.randomUUID().toString());
+        diary.save();
+        Comment comment = new Comment(null, "评论未加密和东方红东方红", 3, new Date(), false);
+        comment.save();
+    }
 
     @Test
     public void test01(){

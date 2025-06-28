@@ -117,29 +117,29 @@ public class SettingsActivity extends AppCompatActivity {
             }else{
                 findPreference("setDiarySize").setSummary("当前为默认字体大小");
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
-            SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
-            String autoNightTime = "";
-            try {
-                int nightStart = MyConfiguration.getInstance().getNightStart();
-                int nightEnd = MyConfiguration.getInstance().getNightEnd();
-                Date parse;
-                if(nightStart<1000){
-                    parse = sdf.parse("0" + nightStart);
-                }else{
-                    parse = sdf.parse(String.valueOf(nightStart));
-                }
-                Date parse1;
-                if(nightEnd<1000){
-                    parse1 = sdf.parse("0"+nightEnd);
-                }else{
-                    parse1 = sdf.parse(String.valueOf(nightEnd));
-                }
-                autoNightTime = sdf2.format(parse)+"——"+sdf2.format(parse1);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            findPreference("autoNightTime").setSummary(autoNightTime);
+//            SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+//            SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
+//            String autoNightTime = "";
+//            try {
+//                int nightStart = MyConfiguration.getInstance().getNightStart();
+//                int nightEnd = MyConfiguration.getInstance().getNightEnd();
+//                Date parse;
+//                if(nightStart<1000){
+//                    parse = sdf.parse("0" + nightStart);
+//                }else{
+//                    parse = sdf.parse(String.valueOf(nightStart));
+//                }
+//                Date parse1;
+//                if(nightEnd<1000){
+//                    parse1 = sdf.parse("0"+nightEnd);
+//                }else{
+//                    parse1 = sdf.parse(String.valueOf(nightEnd));
+//                }
+//                autoNightTime = sdf2.format(parse)+"——"+sdf2.format(parse1);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//            findPreference("autoNightTime").setSummary(autoNightTime);
         }
 
         @Override
@@ -197,6 +197,7 @@ public class SettingsActivity extends AppCompatActivity {
                         boolean truePassword = BaseUtils.getSharedPreference().getString("loginPassword","").equals(MD5Utils.encrypt(Constant.PASSWORD_PREFIX+s));
                         if(truePassword){
                             String path = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION).getAbsolutePath();
+                            path = path+"/";
                             FileUtils.safeDeleteFolder(path);
                             //重新展示缓存大小
                             Preference clearROMPreference = findPreference("clearROM");
@@ -631,7 +632,7 @@ public class SettingsActivity extends AppCompatActivity {
                             "说这么多只是想告诉你，真正的导出PDF在“临时信息流”（时间轴、标签集、搜索结果-->右上角跳转信息流），" +
                             "临时信息流预览的什么样导出就是什么样，且需要你先选好时间顺序还是倒叙。" +
                             "PDF中默认打开评论区（如果评论不为空的话），视频采用一个低画质缩略图展示，图片也是压缩过的，防止PDF文件过大。\n\n" +
-                            "没有授权外部存储权限的话，不能导出PDF，但你可以导出TXT。";
+                            "没有授权外部存储权限的话，不能导出PDF。";
                     BaseUtils.alertDialogToShow(context,"这里只是提示",tip);
                     break;
                 }

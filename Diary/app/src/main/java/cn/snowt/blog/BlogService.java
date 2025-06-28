@@ -610,13 +610,18 @@ public class BlogService {
      * @param blogVoForBackup blogVoForBackup
      * @return 新增成功返回true
      */
-    public boolean addOne(BlogVoForBackup blogVoForBackup) {
+    public boolean addOne(BlogVoForBackup blogVoForBackup,String privateKeyInput) {
         //1.先存储Blog
         if(uuidAlreadyExists(blogVoForBackup.getMyUuid())){
             return false;
         }else{
             Blog blog = new Blog();
-            blog.setContent(blogVoForBackup.getContent());
+            String decode = RSAUtils.decode(blogVoForBackup.getContent(), privateKeyInput);
+            if(null==decode){
+                blog.setContent("");
+            }else{
+                blog.setContent(RSAUtils.encode(decode,MyConfiguration.getInstance().getPublicKey()));
+            }
             blog.setMyUuid(blogVoForBackup.getMyUuid());
             blog.setTitle(blogVoForBackup.getTitle());
             blog.setLabel(blogVoForBackup.getLabel());

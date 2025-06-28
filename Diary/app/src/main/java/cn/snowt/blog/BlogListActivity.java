@@ -15,11 +15,18 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -30,8 +37,12 @@ import cn.snowt.diary.R;
 import cn.snowt.diary.activity.AddSpecialDayActivity;
 import cn.snowt.diary.activity.KeepDiaryActivity;
 import cn.snowt.diary.activity.MainActivity;
+import cn.snowt.diary.activity.PicturesActivity;
+import cn.snowt.diary.async.LoadingBlogListTask;
+import cn.snowt.diary.async.MyAsyncTask;
 import cn.snowt.diary.async.SearchTask;
 import cn.snowt.diary.util.BaseUtils;
+import cn.snowt.diary.util.SimpleResult;
 
 /**
  * @Author : HibaraAi github.com/HibaraAi
@@ -53,6 +64,34 @@ public class BlogListActivity extends AppCompatActivity {
     private BlogAdapter adapter;
     private RecyclerView recyclerView;
 
+    private androidx.appcompat.app.AlertDialog ProgressADL;  //进度条的弹窗
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case MyAsyncTask.FINISH_TASK:{
+                    SimpleResult result = (SimpleResult) msg.obj;
+                    if(result.getSuccess()){
+                        voList = (List<BlogSimpleVo>) result.getData();
+                        adapter = new BlogAdapter(voList,context);
+                        GridLayoutManager layoutManager = new GridLayoutManager(context, 1);
+                        recyclerView.setLayoutManager(layoutManager);
+                        recyclerView.setAdapter(adapter);
+                    }
+                    closeProgressAlertDialog();
+                    BaseUtils.shortTipInSnack(recyclerView,result.getMsg());
+                    break;
+                }
+                case MyAsyncTask.START_TASK:{
+                    showProgressAlertDialog();
+                    break;
+                }
+                default:break;
+            }
+            return false;
+        }
+    });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,13 +104,13 @@ public class BlogListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_blog_list);
         bindViewAndSetListener();
         blogService = new BlogService();
-        refreshDataForShow();
+        asyncRefreshDataForShow();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        refreshDataForShow();
+        asyncRefreshDataForShow();
     }
 
     private void bindViewAndSetListener() {
@@ -129,6 +168,14 @@ public class BlogListActivity extends AppCompatActivity {
         System.out.println(voList);
     }
 
+    /**
+     * 异步刷新数据
+     */
+    private void asyncRefreshDataForShow() {
+        LoadingBlogListTask loadingBlogListTask = new LoadingBlogListTask(handler);
+        loadingBlogListTask.getAllBlogsDesc();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_special_day,menu);
@@ -152,15 +199,14 @@ public class BlogListActivity extends AppCompatActivity {
                 break;
             }
             case R.id.toolbar_day_help:{
-                String tip = "Blog类似于非常简易的博客，是后来加入的功能，所以和日记主程序还是融合的不太好。" +
-                        "Blog可以让你边写文本边插入视频、图片。目前已支持加密存储（你得自己去设置里开启加密功能）。" +
-                        "如果你将Blog界面作为首屏，则视为帮你输入密码进行了登录。" +
-                        "Blog暂不支持备份和恢复，将在以后的版本支持（累了，先缓一缓）。" +
-                        "虽然提供了修改的功能，但还不太完善，因为目前的修改是通过“删掉已有Blog再重新添加一条新的”实现的。" +
-                        "主界面的信息流是不显示Blog的，因为Blog和日记的存储结构是不一样的，这会导致一些问题，" +
+                String tip = "Blog类似于非常简易的博客，" +
+                        "可以让你边写文本边插入视频、图片，正文文本支持加密存储，标签、标题、媒体资源不会加密。" +
+                        "虽然提供了修改的功能，但还不太完善，因为目前的修改是通过“删掉已有Blog再重新添加一条新的”实现的。\n" +
+                        "如果你将Blog界面作为首屏，则视为帮你输入密码进行了登录。\n" +
+                        "Blog是后来加入的功能，所以和日记主程序还是融合的不太好，主界面的信息流是不显示Blog的，因为Blog和日记的存储结构是不一样的，这会导致一些问题，" +
                         "例如我并不知道2025年3月15日这条日记的下一个记录是该显示日记还是Blog，" +
-                        "所以主界面的信息流不展示Blog。不过呢，你可以在标签查找、时间轴查找、关键字搜索中同时看到Blog和日记，并由此跳转的“临时信息流”可以同时展示。" +
-                        "目前Blog暂不支持导出PDF、图片，将在以后的版本支持（继续立Flag）";
+                        "所以主界面的信息流不展示Blog。不过，你可以在标签查找、时间轴查找、关键字搜索中同时看到Blog和日记，并由此跳转的“临时信息流”可以同时展示。\n" +
+                        "目前Blog暂不支持导出为PDF、另存为图片和批量删除，将在以后的版本支持（继续立Flag）";
                 BaseUtils.alertDialogToShow(this,"Blog说明",tip);
                 break;
             }
@@ -174,5 +220,30 @@ public class BlogListActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    private void showProgressAlertDialog(){
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        builder.setCancelable(false);
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        ImageView imageView = new ImageView(context);
+        imageView.setImageResource(R.drawable.loading);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(500,500);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Drawable drawable = imageView.getDrawable();
+        if(drawable instanceof AnimatedImageDrawable){
+            AnimatedImageDrawable animatedImageDrawable = (AnimatedImageDrawable) drawable;
+            animatedImageDrawable.start();
+        }
+        linearLayout.addView(imageView);
+        builder.setView(linearLayout);
+        ProgressADL = builder.show();
+    }
+
+    private void closeProgressAlertDialog(){
+        ProgressADL.cancel();
     }
 }

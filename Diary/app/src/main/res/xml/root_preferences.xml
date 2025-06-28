@@ -1,11 +1,12 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory app:title="软件UI">
-        <SwitchPreferenceCompat
-            app:key="showUsernameInBar"
-            app:title="主界面工具栏显示用户名"
-            app:summaryOff="当前: 显示“Diary”\n软件重启后生效"
-            app:summaryOn="当前: 显示你的用户名\n软件重启后生效"/>
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="showUsernameInBar"-->
+<!--            app:title="主界面工具栏显示用户名"-->
+<!--            app:summaryOff="当前: 显示“Diary”\n软件重启后生效"-->
+<!--            app:summaryOn="当前: 显示你的用户名\n软件重启后生效"/>-->
 
         <Preference
             app:key="setDiarySize"
@@ -16,16 +17,16 @@
             app:title="自动展开评论区"
             app:defaultValue="false"
             app:summary="如果该日记有评论，自动展开评论区" />
-        <SwitchPreferenceCompat
-            app:key="autoNight"
-            app:title="自动暗色模式"
-            app:defaultValue="false"
-            app:summary="启用后,暗色模式不再跟随系统" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="autoNight"-->
+<!--            app:title="自动暗色模式"-->
+<!--            app:defaultValue="false"-->
+<!--            app:summary="启用后,暗色模式不再跟随系统" />-->
 
-        <Preference
-            app:key="autoNightTime"
-            app:title="暗色模式时间段"
-            app:dependency="autoNight"/>
+<!--        <Preference-->
+<!--            app:key="autoNightTime"-->
+<!--            app:title="暗色模式时间段"-->
+<!--            app:dependency="autoNight"/>-->
 
         <Preference
             app:key="themes"
@@ -58,17 +59,17 @@
 <!--            app:title="启用加密"-->
 <!--            app:summaryOn="当前: 已启用。更安全但运行速度更慢(仅对今后新增日记生效)"-->
 <!--            app:summaryOff="当前: 未开启。响应更快速(仅对今后新增日记生效)"/>-->
-        <Preference
-            app:key="changeEncodeKey"
-            app:title="保存加密密钥"
-            app:summary="就是保存啦，不需要提示了。"/>
+<!--        <Preference-->
+<!--            app:key="changeEncodeKey"-->
+<!--            app:title="保存加密密钥"-->
+<!--            app:summary="每次重装（更新不算）会换一个加密密钥，请自己保存。"/>-->
     </PreferenceCategory>
 
     <PreferenceCategory app:title="还没想到名字">
         <SwitchPreferenceCompat
             app:key="firstLoginNotice"
             app:title="每日首次登录的通知"
-            app:defaultValue="false"
+            app:defaultValue="true"
             app:summaryOff="已关闭。"
             app:summaryOn="已开启"/>
 
@@ -121,7 +122,8 @@
         <Preference
             app:key="txtOutput"
             app:title="导出TXT"
-            app:summary="明文导出日记正文、评论等内容到一个txt文件" />
+            app:summary="功能停用"
+            android:enabled="false"/>
         <Preference
             app:key="pdfOutput"
             app:title="导出PDF"
@@ -129,7 +131,7 @@
         <Preference
             app:key="backupDiary"
             app:title="备份日记"
-            app:summary="导出一个仅能由本软件读取的备份文件"/>
+            app:summary="导出一个仅能由本软件读取的备份文件和对应的解密密钥文件"/>
         <SwitchPreferenceCompat
             app:key="autoBackup"
             app:defaultValue="false"

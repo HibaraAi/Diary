@@ -31,7 +31,7 @@ public class PayActivity extends AppCompatActivity {
     private boolean showThanks = true;
 
     private final String thanksTip = "觉得好用就为我点个赞吧，主要是想知道有多少人在用这个app，但软件本身没有联网，就用这个收款码作为点赞吧。长按下面的图片保存收款码。\n仅需一分钱就能点赞，确定不鼓励一下我吗？";
-    private final String payTip = "请喝奶茶";
+    private final String payTip = "打赏金额随意，但一定要备注上是因为“消消乐APP”付款的，这样你才有机会上感谢名单。（长按图片保存二维码）";
 
     private Button btn;
     private TextView tipView;
@@ -59,7 +59,7 @@ public class PayActivity extends AppCompatActivity {
                         "xiaoxiaolePay",
                         "消消乐的收款码");
             }else{
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.nav_home);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.reward);
                 MediaStore.Images.Media.insertImage(
                         getContentResolver(),
                         bitmap,
@@ -80,8 +80,8 @@ public class PayActivity extends AppCompatActivity {
                     supportActionBar.setTitle("打赏\uD83D\uDCB0");
                 }
                 tipView.setText(payTip);
-                imageView.setImageResource(R.drawable.nav_home);
-                btn.setText("不想请我喝奶茶");
+                imageView.setImageResource(R.drawable.reward);
+                btn.setText("算了，还是1分钱点个赞吧");
             }else{
                 //当前展示的是奶茶，需要转换为点赞
                 if(null!=supportActionBar){
@@ -90,7 +90,7 @@ public class PayActivity extends AppCompatActivity {
                 }
                 tipView.setText(thanksTip);
                 imageView.setImageResource(R.drawable.pay);
-                btn.setText("请我喝奶茶");
+                btn.setText("有赏，请作者喝奶茶");
             }
             showThanks = !showThanks;
         });

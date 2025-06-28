@@ -147,6 +147,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="cn.snowt.diary.activity.SelectLabelActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/TopTransparent" />
     </application>
 
 </manifest>

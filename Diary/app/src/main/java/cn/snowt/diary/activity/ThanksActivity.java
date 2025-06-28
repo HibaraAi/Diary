@@ -36,6 +36,8 @@ public class ThanksActivity extends AppCompatActivity {
         thanksVoList.add(new ThanksVo(R.drawable.thanks_02,"看哔哩世界","BUG反馈--“备份与恢复”功能会闪退"));
         thanksVoList.add(new ThanksVo(R.drawable.thanks_03,"鱼缸要睡个好觉","功能建议--日记编辑界面在意外关闭的情况下支持恢复日记文本"));
         thanksVoList.add(new ThanksVo(R.drawable.thanks_04,"蓝白_-_--_-_","功能建议--画板（画布）"));
+        thanksVoList.add(new ThanksVo(R.drawable.thanks_05,"公主殿下","功能建议--1.输入标签时，允许选择已有标签；2.日记输入框支持文本滑动。"));
+        thanksVoList.add(new ThanksVo(R.drawable.thanks_06,"我吃不吃饭都饿","打赏--请我喝了一杯188元的奶茶。"));
     }
 
     @Override

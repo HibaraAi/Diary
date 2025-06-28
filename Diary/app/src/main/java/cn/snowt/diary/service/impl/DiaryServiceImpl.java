@@ -32,8 +32,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.snowt.blog.Blog;
 import cn.snowt.blog.BlogService;
 import cn.snowt.blog.BlogVoForBackup;
+import cn.snowt.diary.entity.BackupString;
 import cn.snowt.diary.entity.Comment;
 import cn.snowt.diary.entity.Diary;
 import cn.snowt.diary.entity.Drawing;
@@ -540,11 +542,18 @@ public class DiaryServiceImpl implements DiaryService {
             map.put("Blog",blogVoForBackups);
             String mapJson = JSON.toJSONString(map);
             //3.输出文件
-            String fileName = "Backup_"+BaseUtils.dateToString(new Date()).substring(0,10)+"_"+UUID.randomUUID().toString().substring(0,4)+".dll";
+            String dateSub = BaseUtils.dateToString(new Date()).substring(0, 10);
+            String uuidSub = UUID.randomUUID().toString().substring(0, 4);
+
+            String fileName = "Backup_"+dateSub+"_"+uuidSub+".dll";
             boolean saveFlag = FileUtils.saveAsFileWriter(mapJson, fileName);
             if(saveFlag){
-                String absolutePath = Environment.getExternalStoragePublicDirectory(Constant.EXTERNAL_STORAGE_LOCATION + "output/").getAbsolutePath();
-                result.setMsg("备份文件保存至["+absolutePath+"/"+fileName+"],建议马上移动文件到其他文件夹,用完之后应及时删除.");
+
+                String privateKey = MyConfiguration.getInstance().getPrivateKey();
+                FileUtils.saveAsFileWriter(privateKey, "长密钥_"+dateSub+"_"+uuidSub+".txt");
+
+                String absolutePath =Constant.EXTERNAL_STORAGE_LOCATION + "output/";
+                result.setMsg("备份文件保存至["+absolutePath+"/"+fileName+"],建议马上移动文件到其他文件夹,用完之后应及时删除。同时为你存了一份解密密钥（长密钥）。");
                 result.setSuccess(true);
             }else{
                 result.setSuccess(false);
@@ -597,10 +606,18 @@ public class DiaryServiceImpl implements DiaryService {
                 AtomicInteger successNum2 = new AtomicInteger();
                 if(specialDay!=null && !specialDay.isEmpty()){
                     specialDay.forEach(jsonObject -> {
-                        SpecialDay day = JSON.toJavaObject(jsonObject, SpecialDay.class);
-                        day.setId(null);
-                        boolean save = day.save();
-                        successNum2.getAndIncrement();
+                        SpecialDay dayFromJson = JSON.toJavaObject(jsonObject, SpecialDay.class);
+                        SpecialDay needSave = new SpecialDay();
+                        needSave.setTitle(dayFromJson.getTitle());
+                        needSave.setImageSrc(dayFromJson.getImageSrc());
+                        needSave.setRemark(dayFromJson.getRemark());
+                        needSave.setStartDate(dayFromJson.getStartDate());
+                        needSave.setStopDate(dayFromJson.getStopDate());
+                        needSave.setNeedNotice(dayFromJson.getNeedNotice());
+                        boolean save = needSave.save();
+                        if(save){
+                            successNum2.getAndIncrement();
+                        }
                     });
                 }
                 //3. 处理同名标签设置(以新增的方式恢复)
@@ -619,7 +636,7 @@ public class DiaryServiceImpl implements DiaryService {
                     BlogService blogService = new BlogService();
                     blogVoForBackups.forEach(jsonObject -> {
                         BlogVoForBackup blogVoForBackup = JSON.toJavaObject(jsonObject, BlogVoForBackup.class);
-                        boolean b = blogService.addOne(blogVoForBackup);
+                        boolean b = blogService.addOne(blogVoForBackup,privateKeyInput);
                         if(b){
                             addBlogNum.getAndSet(addBlogNum.get() + 1);
                         }
@@ -695,15 +712,15 @@ public class DiaryServiceImpl implements DiaryService {
         weather1.save();
         Location location1 = new Location(null,null,null,"广东省河源市");
         location1.save();
-        String tip = "初次使用软件，建议先看看右侧菜单栏的“帮助”部分的内容，" +
+        String tip = "初次使用软件，建议先看看左侧菜单栏的“帮助”部分的内容，" +
                 "特别是关于本软件的登录、加密、备份和本软件需要的权限的相关说明";
         Diary diary1 = new Diary(null,
                 "#初次使用软件#",
-                tip,
+                RSAUtils.encode(tip, MyConfiguration.getInstance().getPublicKey()),
                 new Date(),
                 weather1.getId(),
                 location1.getId(),
-                false,
+                true,
                 null,
                 UUID.randomUUID().toString());
         diary1.save();
@@ -941,6 +958,17 @@ public class DiaryServiceImpl implements DiaryService {
                 }
             }
             labelSet.addAll(Arrays.asList(items));
+        });
+        return labelSet;
+    }
+
+    public Set<String> getAllLabelsUnsplit() {
+        Set<String> labelSet = new HashSet<>();
+        List<Diary> labels = LitePal.select("label").order("modifiedDate desc").find(Diary.class);
+        labels.forEach(l->{
+            if(null!=l.getLabel() && !"".equals(l.getLabel())){
+                labelSet.add(l.getLabel());
+            }
         });
         return labelSet;
     }
@@ -1217,6 +1245,7 @@ public class DiaryServiceImpl implements DiaryService {
                 String mapJson = JSON.toJSONString(map);
                 //3.输出文件
                 FileWriter writer = null;
+                FileWriter writer2 = null;
                 try {
                     File externalDirectory = Environment.getExternalStoragePublicDirectory("/Hibara/");
                     if (!externalDirectory.exists()){
@@ -1225,6 +1254,11 @@ public class DiaryServiceImpl implements DiaryService {
                     File file = new File(externalDirectory.getAbsolutePath() + "/" + Constant.AUTO_BACKUP_FILE_NAME);
                     writer = new FileWriter(file);
                     writer.write(mapJson);
+
+                    File file2 = new File(externalDirectory.getAbsolutePath() + "/" + "长密钥_AutoBackup.txt");
+                    writer2 = new FileWriter(file2);
+                    String privateKey = MyConfiguration.getInstance().getPrivateKey();
+                    writer2.write(privateKey);
                     successFlag = true;
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -1232,6 +1266,8 @@ public class DiaryServiceImpl implements DiaryService {
                     try {
                         writer.flush();
                         writer.close();
+                        writer2.flush();
+                        writer2.close();
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -1262,6 +1298,72 @@ public class DiaryServiceImpl implements DiaryService {
         }else{
             return true;
         }
+    }
+
+    @Override
+    public void encodeDataInDB() {
+        //1.处理未加密日记
+        List<Diary> diaryList = LitePal.where("encryption = 0").find(Diary.class);
+        diaryList.forEach(diary -> {
+            if(!diary.getEncryption()){  //再次确认是未加密的
+                String content = diary.getContent();
+                BackupString backupString = new BackupString(content, BackupString.TYPE_DIARY, diary.getModifiedDate(),"");
+                backupString.save();
+                diary.setContent(RSAUtils.encode(content,MyConfiguration.getInstance().getPublicKey()));
+                if(content.equals(RSAUtils.decode(diary.getContent(),MyConfiguration.getInstance().getPrivateKey()))){
+                    //确认加密后的数据解密后与原文一致
+                    diary.setEncryption(true);
+                    int update = diary.update(diary.getId());
+                    if(1==update){
+                        //1.1查询此日记的评论
+                        List<Comment> commentList = LitePal.where("encryption = 0 AND diaryId = " + diary.getId()).find(Comment.class);
+                        commentList.forEach(comment -> {
+                            if(!comment.getEncryption()){
+                                String content1 = comment.getContent();
+                                BackupString backupString1 = new BackupString(content1, BackupString.TYPE_DIARY_COMMENT, comment.getModifiedDate(), diary.getMyUuid());
+                                backupString1.save();
+                                comment.setContent(RSAUtils.encode(content1,MyConfiguration.getInstance().getPublicKey()));
+                                if(content1.equals(RSAUtils.decode(comment.getContent(),MyConfiguration.getInstance().getPrivateKey()))){
+                                    comment.setEncryption(true);
+                                    comment.update(comment.getId());
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        //2.处理已加密日记的未加密评论
+        List<Diary> diaryList2 = LitePal.select("id,myUuid").where("encryption = 1").find(Diary.class);
+        diaryList2.forEach(diary -> {
+            List<Comment> commentList = LitePal.where("encryption = 0 AND diaryId = " + diary.getId()).find(Comment.class);
+            commentList.forEach(comment -> {
+                if(!comment.getEncryption()){
+                    String content1 = comment.getContent();
+                    BackupString backupString1 = new BackupString(content1, BackupString.TYPE_DIARY_COMMENT, comment.getModifiedDate(), diary.getMyUuid());
+                    backupString1.save();
+                    comment.setContent(RSAUtils.encode(content1,MyConfiguration.getInstance().getPublicKey()));
+                    if(content1.equals(RSAUtils.decode(comment.getContent(),MyConfiguration.getInstance().getPrivateKey()))){
+                        comment.setEncryption(true);
+                        comment.update(comment.getId());
+                    }
+                }
+            });
+        });
+        //3.处理Blog
+        List<Blog> blogList = LitePal.where("encryption = 0").find(Blog.class);
+        blogList.forEach(blog -> {
+            if(!blog.getEncryption()){
+                String content = blog.getContent();
+                blog.setContent(RSAUtils.encode(content,MyConfiguration.getInstance().getPublicKey()));
+                if(content.equals(RSAUtils.decode(blog.getContent(),MyConfiguration.getInstance().getPrivateKey()))){
+                    BackupString backupString = new BackupString(content, BackupString.TYPE_BLOG, blog.getModifiedDate(), "");
+                    backupString.save();
+                    blog.setEncryption(true);
+                    blog.update(blog.getId());
+                }
+            }
+        });
     }
 
     /**

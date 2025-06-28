@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/y8675678567"
-        android:text="请我喝奶茶"
+        android:text="有赏，请作者喝奶茶"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"/>
     <TextView

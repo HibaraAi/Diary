@@ -130,11 +130,18 @@ public interface DiaryService {
     List<DiaryVo> getDiaryVoListAsc(int startIndex, int needNum);
 
     /**
-     * 展示系统中已有的所有标签
+     * 展示系统中已有的所有标签，已分割成单个标签
      * 应该使用一张表将所有标签存起来，而不是现在这样直接存字符串，现在找所有标签还得一条一条解析。。。
      * @return
      */
     Set<String> getAllLabels();
+
+    /**
+     * 展示系统中已有的所有标签，没有分割的标签
+     * 应该使用一张表将所有标签存起来，而不是现在这样直接存字符串，现在找所有标签还得一条一条解析。。。
+     * @return
+     */
+    Set<String> getAllLabelsUnsplit();
 
     /**
      * 更新日记文本
@@ -218,4 +225,10 @@ public interface DiaryService {
      * @return 返回true就是图片资源，返回false只能表示它不是图片，可能是不存在也不能是视频
      */
     boolean isImageSrc(String src);
+
+    /**
+     * 由于1.7.1强制使用加密，需要查询数据库中未加密的数据，将他们进行加密加密
+     */
+    void encodeDataInDB();
+
 }

@@ -22,6 +22,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -30,6 +31,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -164,6 +169,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
 
     private androidx.appcompat.app.AlertDialog ProgressADL;  //加载动画的弹窗
 
+    public ActivityResultLauncher<Intent> launcher;  //标签选择的Activity
+
     /**
      * 有时，选择了很多图片、视频后，保存Diary时会卡住，因为在等文件的磁盘操作。
      * 因此在2025年3月30日新增一个loading动画，掩盖卡住的现象。仅仅对diaryService.addOneByArgs(...)方法做异步操作
@@ -214,6 +221,19 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         }
         setContentView(R.layout.activity_keep_diary);
         bindViewAndSetListener();
+        this.launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                if (result.getData() != null) {
+                    String beSelectLabelStr = result.getData().getStringExtra("beSelectLabelStr");
+                    if(null==beSelectLabelStr || beSelectLabelStr.isEmpty()){
+                        BaseUtils.shortTipInSnack(labelView,"要么标签为空，要么读取失败");
+                    }else{
+                        labelView.setText(beSelectLabelStr.trim());
+                    }
+                }
+            }
+        });
+
         openTip();
         Intent intent = getIntent();
         if(null!=intent){
@@ -365,6 +385,16 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
         weatherView.setOnClickListener(this);
         labelView.setOnClickListener(this);
         dateView.setOnClickListener(this);
+        addLabelBtn.setOnLongClickListener(v -> {
+            Intent intent = new Intent(KeepDiaryActivity.this,SelectLabelActivity.class);
+            launcher.launch(intent);
+            return false;
+        });
+        labelView.setOnLongClickListener(v -> {
+            Intent intent = new Intent(KeepDiaryActivity.this,SelectLabelActivity.class);
+            launcher.launch(intent);
+            return false;
+        });
         //输入字数监听
         diaryInputView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -385,6 +415,28 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 }
             }
         });
+        // 复写EditText的onTouch方法
+        diaryInputView.setOnTouchListener((v, event) -> {
+            // 当触摸的是EditText & 当前EditText可滚动时，则将事件交给EditText处理；
+            if ((v.getId() == R.id.keep_diary_input && canVerticalScroll(diaryInputView))) {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                // 否则将事件交由其父类处理
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                }
+            }
+            return false;
+        });
+
+    }
+
+    // 判断当前EditText是否可滚动
+    private boolean canVerticalScroll(EditText editText) {
+
+        if (editText.getLineCount() > editText.getMaxLines()) {
+            return true;
+        }
+        return false;
     }
 
     private void initToolbar(){
@@ -627,7 +679,8 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(KeepDiaryActivity.this);
                 dialog.setTitle("输入1个或多个标签");
                 if(!removeTip){
-                    dialog.setMessage("标签总长度不能超过30个字符，点击弹窗外取消修改，标签支持以下两种输入方式：\n#美食##周末#\n美食。周末");
+                    dialog.setMessage("标签总长度不能超过30个字符。\n点击弹窗外取消修改；长按输入框选择已有标签；日记编辑界面长按标签也可以选择已有标签。\n" +
+                            "\n标签支持以下两种输入方式：\n#美食##周末#\n美食。周末");
                 }
                 EditText editText = new EditText(KeepDiaryActivity.this);
                 editText.setBackgroundResource(R.drawable.edge);
@@ -670,7 +723,13 @@ public class KeepDiaryActivity extends AppCompatActivity implements View.OnClick
                 dialog.setNegativeButton("删除标签",(dialog1, which) -> {
                     labelView.setText("");
                 });
-                dialog.show();
+                android.app.AlertDialog alertDialog = dialog.show();
+                editText.setOnLongClickListener(v1 -> {
+                    Intent intent = new Intent(KeepDiaryActivity.this,SelectLabelActivity.class);
+                    launcher.launch(intent);
+                    alertDialog.cancel();
+                    return true;
+                });
                 break;
             }
             case R.id.keep_diary_date:

@@ -255,14 +255,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //免责声明
             AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
             builder.setTitle("免责声明")
-                    .setMessage("本软件不会盗取你任何数据，有开源代码可查，开源网址https://github.com/HibaraAi/Diary或https://gitee.com/HibaraAi/Diary。" +
-                            "\n此外，如果你在使用本软件的过程中，产生无论何种形式的损失，都与本作者无关，你不准追究本作者的责任。")
+                    .setMessage("本软件不会盗取你任何数据，有开源代码可查，开源网址https://github.com/HibaraAi/Diary" +
+                            "\n此外，你在使用本软件时，产生无论何种形式的损失，都与本作者无关，你不准追究本作者的责任。")
                     .setPositiveButton("了解并接受", (dialog, which) -> {
                         //1.创建数据库
                         LitePal.getDatabase();
-                        //2.初始化加密密钥
-                        RSAUtils.mandatoryUseRSA();
                         new Thread(() -> {
+                            //2.初始化加密密钥
+                            RSAUtils.mandatoryUseRSA();
                             //3.写入帮助日记
                             try {
                                 new DiaryServiceImpl().addHelpDiary();
